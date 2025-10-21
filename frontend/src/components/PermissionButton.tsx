@@ -6,7 +6,7 @@ export default function PermissionButton({ onRequestPermission }: PermissionButt
   return (
     <button
       onClick={onRequestPermission}
-      className="mb-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+      className="permission-button"
     >
       Request Microphone Permission
     </button>

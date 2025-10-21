@@ -1368,6 +1368,240 @@ button, .card {
 	white-space: pre-wrap;
 }
 
+/* Discovery Card styles */
+.discovery-card {
+	padding: 20px;
+	background-color: var(--bg-light);
+	border-radius: var(--radius);
+	margin-top: 20px;
+	border: 1px solid var(--border-color);
+}
+
+.discovery-track-info p {
+	margin: 8px 0;
+	font-size: 14px;
+	color: var(--text-color);
+}
+
+.discovery-track-info strong {
+	color: var(--text-muted);
+	font-weight: 600;
+}
+
+.discovery-album-cover {
+	width: 192px;
+	height: 192px;
+	object-fit: cover;
+	margin-top: 10px;
+	border-radius: var(--radius);
+	border: 1px solid var(--border-color);
+}
+
+.discovery-spotify-link {
+	margin-top: 10px;
+	display: inline-block;
+}
+
+.discovery-spotify-link a {
+	color: #22c55e;
+	text-decoration: none;
+	font-weight: 600;
+	transition: color 0.2s;
+}
+
+.discovery-spotify-link a:hover {
+	color: #16a34a;
+}
+
+.discovery-artist-section {
+	margin-top: 16px;
+	padding-top: 16px;
+	border-top: 1px solid var(--border-color);
+}
+
+.discovery-artist-title {
+	font-weight: 600;
+	margin-bottom: 12px;
+	font-size: 14px;
+	color: var(--text-color);
+}
+
+.discovery-artist-details {
+	margin-bottom: 12px;
+	font-size: 13px;
+	color: var(--text-muted);
+}
+
+.discovery-social-title {
+	font-weight: 500;
+	margin-bottom: 8px;
+	font-size: 13px;
+	color: var(--text-color);
+}
+
+.discovery-social-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.discovery-social-links a {
+	font-weight: 500;
+	text-decoration: none;
+	transition: opacity 0.2s;
+}
+
+.discovery-social-links a:hover {
+	opacity: 0.8;
+}
+
+.link-twitter {
+	color: #3b82f6;
+}
+
+.link-instagram {
+	color: #ec4899;
+}
+
+.link-facebook {
+	color: #2563eb;
+}
+
+.link-youtube {
+	color: #dc2626;
+}
+
+.link-tiktok {
+	color: var(--text-color);
+}
+
+.link-soundcloud {
+	color: #f97316;
+}
+
+.link-bandcamp {
+	color: #0891b2;
+}
+
+.link-website {
+	color: var(--text-muted);
+}
+
+/* Shazam component styles */
+.shazam-container {
+	display: flex;
+	min-height: 100vh;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 16px;
+}
+
+.shazam-content {
+	width: 100%;
+	max-width: 448px;
+}
+
+.shazam-error {
+	margin-top: 8px;
+	color: #ef4444;
+	font-size: 14px;
+}
+
+/* AudioPlayer component styles */
+.audio-player-container {
+	width: 100%;
+	max-width: 448px;
+}
+
+.audio-player-recording-area {
+	display: flex;
+	height: 192px;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--radius);
+	background-color: var(--bg-light);
+}
+
+.audio-player-button {
+	position: relative;
+	height: 96px;
+	width: 96px;
+	cursor: pointer;
+	border: none;
+	background-color: transparent;
+	padding: 0;
+}
+
+.audio-player-button-inner {
+	position: relative;
+	display: flex;
+	height: 96px;
+	width: 96px;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+}
+
+.audio-player-recording-pulse {
+	position: absolute;
+	inset: 0;
+	animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+	border-radius: 50%;
+	background-color: #ef4444;
+	opacity: 0.75;
+}
+
+@keyframes ping {
+	75%, 100% {
+		transform: scale(2);
+		opacity: 0;
+	}
+}
+
+.audio-player-recording-bg {
+	background-color: #ef4444;
+}
+
+.audio-player-start-bg {
+	background-color: var(--primary-color);
+	transition: background-color 0.2s;
+}
+
+.audio-player-start-bg:hover {
+	background-color: var(--primary-hover);
+}
+
+.audio-player-icon {
+	height: 48px;
+	width: 48px;
+	color: white;
+}
+
+.audio-player-analyzing {
+	font-size: 24px;
+	font-weight: 600;
+	color: var(--primary-color);
+}
+
+/* PermissionButton component styles */
+.permission-button {
+	margin-bottom: 16px;
+	border-radius: var(--radius);
+	background-color: var(--primary-color);
+	padding: 8px 16px;
+	color: white;
+	font-weight: 500;
+	border: none;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.permission-button:hover {
+	background-color: var(--primary-hover);
+}
+
 /* Mobile responsive balance display */
 @media (max-width: 480px) {
 	.balance-grid {

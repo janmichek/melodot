@@ -16,7 +16,6 @@ export default function Shazam() {
     resetRecording,
   } = useAudioRecorder();
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const [result, setResult] = useState((null));
   const [isCompleted, setIsCompleted] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -31,7 +30,6 @@ export default function Shazam() {
 
       if (!response.ok) {throw new Error(`HTTP error! status: ${response.status}`);}
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       setResult((await response.json()));
       reset();
     } catch (error) {
@@ -44,7 +42,6 @@ export default function Shazam() {
     if (isCompleted && audioBlob) {
       void submitAudioForAnalysis();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCompleted, audioBlob]);
 
   // Timer effect that tracks recording duration
@@ -88,7 +85,7 @@ export default function Shazam() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+    <div className="shazam-container">
       {!permission && (
         <PermissionButton onRequestPermission={requestPermission} />
       )}
@@ -100,8 +97,8 @@ export default function Shazam() {
         onStartStop={startStop}
         onReset={reset}
       />
-      <div className="w-full max-w-md space-y-8">
-        {errorMessage && <p className="mt-2 text-red-500">{errorMessage}</p>}
+      <div className="shazam-content">
+        {errorMessage && <p className="shazam-error">{errorMessage}</p>}
 {/*todo explore result and print more if available*/}
         {result &&
           <DiscoveryCard result={result} />

@@ -18,33 +18,33 @@ export default function AudioPlayer({
   onReset: _onReset
 }: AudioPlayerProps) {
   return (
-    <div className="w-full max-w-md space-y-8">
-      <div className="flex h-48 flex-col items-center justify-center rounded-lg bg-muted">
+    <div className="audio-player-container">
+      <div className="audio-player-recording-area">
         {isRecording && (
           <button
             onClick={onStartStop}
-            className="relative h-24 w-24 cursor-pointer border-0 bg-transparent p-0"
+            className="audio-player-button"
             aria-label="Stop recording"
           >
-            <div className="absolute inset-0 animate-ping rounded-full bg-red-500 opacity-75"></div>
-            <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-red-500">
-              <Square className="h-12 w-12 text-white" />
+            <div className="audio-player-recording-pulse"></div>
+            <div className="audio-player-button-inner audio-player-recording-bg">
+              <Square className="audio-player-icon" />
             </div>
           </button>
         )}
         {!isRecording && !isCompleted && (
           <button
             onClick={onStartStop}
-            className="relative h-24 w-24 cursor-pointer border-0 bg-transparent p-0"
+            className="audio-player-button"
             aria-label="Start recording"
           >
-            <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-primary hover:bg-primary/90 transition-colors">
-              <Mic className="h-12 w-12 text-white" />
+            <div className="audio-player-button-inner audio-player-start-bg">
+              <Mic className="audio-player-icon" />
             </div>
           </button>
         )}
         {isCompleted && (
-          <div className="text-2xl font-bold text-primary">
+          <div className="audio-player-analyzing">
             Analyzing ...
           </div>
         )}

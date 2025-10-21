@@ -8,7 +8,7 @@ export function Balance() {
   const chainId = useChainId();
 
   const { data, isLoading, error } = useBalance({ address });
-  // console.log("user data: ", data);
+
 
   // Get decimals from wagmi config for proper Asset Hub decimals
   const getNetworkInfo = (chainId: number) => {
