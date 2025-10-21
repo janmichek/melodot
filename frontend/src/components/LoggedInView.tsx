@@ -1,11 +1,11 @@
 import { Balance } from "./Balance";
 import { ContractShaz } from "./ContractShaz";
 import Shazam from "./Shazam";
-import { WALLET_CONNECTOR_TYPE } from "@web3auth/modal/react";
 import { useChainId, useReadContract } from "wagmi";
 import { passetHub, kusamaAssetHub, westend } from "../wagmi-config";
 import { donateConfig } from "../generated";
 import type { Abi } from "viem";
+import type { WALLET_CONNECTOR_TYPE } from "@web3auth/no-modal";
 
 interface LoggedInViewProps {
   connectorName: WALLET_CONNECTOR_TYPE | null;

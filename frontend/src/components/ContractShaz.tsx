@@ -46,7 +46,7 @@ export function ContractShaz(params: {
   return (
     <div data-testid="contract-data" className="max-w-600">
       {count && Number(count) > 0 && (
-        <ArtistsList count={count} contractAddress={params.contractAddress} />
+        <ArtistsList count={count as bigint} contractAddress={params.contractAddress} />
       )}
 
       <DonationForm
