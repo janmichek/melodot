@@ -7,7 +7,9 @@
     "prepare": "cd contracts && bun install && cd ../frontend && bun install",
     "deploy-contract": "cd contracts && bun run deploy-contract && cd ../frontend && bun run generate",
     "test-contract": "cd contracts && bun run test",
-    "start": "cd frontend && bun start"
+    "start": "cd frontend && bun start",
+    "vercel-build": "cd frontend && bun run build",
+    "build": "cd frontend && bun run build"
   },
   "keywords": [],
   "author": "",
