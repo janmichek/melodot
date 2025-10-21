@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "prepare": "cd contracts && bun install && cd ../frontend && bun install",
-    "deploy-contract": "cd contracts && bun run clean && bun run deploy-contract && cd ../frontend && bun run generate",
+    "deploy-contract": "cd contracts && bun run deploy-contract",
     "test-contract": "cd contracts && bun run test",
     "start": "cd frontend && bun start"
   },
