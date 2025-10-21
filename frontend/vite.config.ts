@@ -17,6 +17,14 @@ export default defineConfig({
   // stream: "stream-browserify",
   // },
   // },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5174',
+        changeOrigin: true,
+      },
+    },
+  },
   define: {
     global: "globalThis",
   },

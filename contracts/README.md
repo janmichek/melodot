@@ -42,7 +42,7 @@ Contracts are written in `contracts/contracts`. Each smart contract has a Hardha
 1. Edit smart contracts in `contracts/contracts`
 2. Edit ignition module in `contracts/igniton/modules`
 3. Run `npx hardhat compile` to compile smart contracts
-4. Run `npx hardhat ignition deploy ./ignition/modules/<ModuleName>.ts --network passetHubTestnet` to deploy them
+4. Run `npx hardhat ignition deploy ./ignition/modules/<ModuleName>.ts --network passetHub` to deploy them
 
 ### Note on committing `ignition/deployments`
 

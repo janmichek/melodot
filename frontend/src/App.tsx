@@ -6,14 +6,12 @@ import {
   useWeb3Auth,
 } from "@web3auth/modal/react";
 import { useAccount, useChainId } from "wagmi";
-import { SendTransaction } from "./components/sendTransaction";
 import { Balance } from "./components/getBalance";
-import { SwitchChain } from "./components/switchNetwork";
-import { ExportPrivateKey } from "./components/exportPrivateKey";
-import { ContractData } from "./components/ContractData";
-import { myTokenModuleMyTokenAddress } from "./generated";
+import {donateModuleDonateConfig } from "./generated";
 import { passetHub, kusamaAssetHub, westend } from "./wagmi-config";
 import { useState, useEffect } from "react";
+import {ContractShaz} from "./components/ContractShaz";
+import Shazam from "./components/Shazam";
 
 function App() {
   const {
@@ -100,8 +98,8 @@ function App() {
 
 
   const contractAddress =
-    myTokenModuleMyTokenAddress[
-      passetHub.id as keyof typeof myTokenModuleMyTokenAddress
+    donateModuleDonateConfig.address[
+      passetHub.id
     ];
 
   // Faucet URLs for different networks
@@ -147,8 +145,15 @@ function App() {
         </p>
       </div>
 
+
+      <Shazam />
+
+
       <h2>Connected to {connectorName}</h2>
-      <div>{address}</div>
+      <div>Connected address: {address}</div>
+      <Balance />
+
+
       <div className="flex-container">
         <div>
           <button onClick={() => uiConsole(userInfo)} className="card">
@@ -171,60 +176,16 @@ function App() {
         </div>
       </div>
 
-      <div className="showcase-message">
-        <h3>💰 Check Your Balance</h3>
-        <p>View your current token balances on the connected network.</p>
-      </div>
-      <Balance />
-
-      {/* <div className="showcase-message">
-        <h3>🔄 Send Transactions</h3>
-        <p>Transfer tokens directly through Asset Hub without additional wallet prompts.</p>
-      </div>
-      <SendTransaction /> */}
-
       {contractAddress && (
         <>
-          <div className="showcase-message">
-            <h3>📋 Smart Contract Interactions</h3>
-            <p>
-              Interact with deployed contracts on Asset Hub - read balances,
-              approve tokens, and execute transactions.
-            </p>
-          </div>
           <div className="contract-section">
-            <h3>FakeUSDT Contract Interactions</h3>
-            <ContractData
+            <h3>Message Contract Interactions</h3>
+            <ContractShaz
               contractAddress={contractAddress}
               userAddresses={address ? [address] : undefined}
             />
           </div>
         </>
-      )}
-
-      <div className="showcase-message">
-        <h3>🌐 Network Switching</h3>
-        <p>Switch between different Polkadot networks seamlessly.</p>
-      </div>
-      <SwitchChain />
-
-      <div className="showcase-message">
-        <h3>🔑 Private Key Access</h3>
-        <p>
-          Export your private key for advanced use cases while maintaining
-          security.
-        </p>
-      </div>
-      <ExportPrivateKey />
-
-      {!contractAddress && (
-        <div className="contract-section">
-          <h3>Contract Not Available</h3>
-          <p>
-            Please deploy the FakeUSDT contract and update the address in
-            generated.ts
-          </p>
-        </div>
       )}
     </div>
   );
@@ -295,23 +256,9 @@ function App() {
         >
           Web3Auth{" "}
         </a>
-        & React Modal Quick Start by WEB3DEV
       </h1>
 
       {isConnected ? loggedInView : unloggedInView}
-      <div id="console" style={{ whiteSpace: "pre-line" }}>
-        <p style={{ whiteSpace: "pre-line" }}></p>
-      </div>
-
-      <footer className="footer">
-        <a
-          href="https://github.com/w3b3d3v/web3auth-examples/tree/web3dev-version/quick-starts/react-quick-start"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Source code
-        </a>
-      </footer>
     </div>
   );
 }

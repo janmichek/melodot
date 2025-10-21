@@ -5,21 +5,22 @@
   "main": "index.js",
   "scripts": {
     "test": "npx hardhat test",
-    "deploy-contract": "npx hardhat ignition deploy ignition/modules/MyContract.js --network sepolia"
+    "deploy-contract": "npx hardhat ignition deploy ignition/modules/Donate.js --network passetHub",
+    "clean": "npx hardhat clean && rm -rf artifacts-pvm && rm -rf cache && rm -rf cache-pvm && rm -rf ignition/deployments && npx hardhat ignition wipe"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "@nomicfoundation/hardhat-viem": "^2.0.6",
     "@nomicfoundation/hardhat-ignition": "^0.15.12",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-viem": "^2.0.6",
     "@parity/hardhat-polkadot": "^0.1.8",
     "@types/chai-as-promised": "^7.1.8",
-    "hardhat": "2.24.1",
     "chai": "^4.5.0",
-    "solc": "0.8.28",
+    "hardhat": "2.24.1",
+    "solc": "0.8.19",
     "typescript": "~5.0.4",
     "viem": "^2.31.7"
   },

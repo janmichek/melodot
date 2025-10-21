@@ -50,16 +50,17 @@ export function Balance() {
   const networkDecimals = data?.decimals ?? networkInfo.decimals;
 
   return (
-    <div data-testid="balance">
-      <h2>Balance</h2>
-      <p style={{ fontSize: "14px", color: "#666", marginBottom: "10px" }}>
-        Network: {networkInfo.name} | Currency: {networkInfo.symbol} | Decimals: {networkDecimals}
-      </p>
+    <div data-testid="balance" className="balance-component-box">
+
       <div>
+        Balance:
         {data?.value !== undefined &&
           `${formatUnits(data.value, networkDecimals)} ${data.symbol || networkInfo.symbol}`}{" "}
         {isLoading && "Loading..."} {error && "Error: " + error.message}
       </div>
+      <p className="network-info-text">
+        Network: {networkInfo.name} | Currency: {networkInfo.symbol} | Decimals: {networkDecimals}
+      </p>
     </div>
   );
 }
