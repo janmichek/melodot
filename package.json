@@ -1,0 +1,15 @@
+{
+  "name": "my-polkadot-cistej",
+  "version": "1.0.0",
+  "description": "Polkadot project with contracts and frontend",
+  "private": true,
+  "scripts": {
+    "prepare": "cd contracts && bun install && cd ../frontend && bun install",
+    "deploy-contract": "cd contracts && bun run clean && bun run deploy-contract && cd ../frontend && bun run generate",
+    "test-contract": "cd contracts && bun run test",
+    "start": "cd frontend && bun start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
