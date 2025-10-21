@@ -27,7 +27,7 @@ export default function Shazam() {
       formData.append("file", audioBlob, "recording.webm");
 
       const response = await fetch('/api/analyze-audio', { method: 'POST', body: formData, });
-
+      console.log('response', response)
       if (!response.ok) {throw new Error(`HTTP error! status: ${response.status}`);}
 
       setResult((await response.json()));

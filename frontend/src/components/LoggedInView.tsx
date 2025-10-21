@@ -1,4 +1,4 @@
-import { Balance } from "./getBalance";
+import { Balance } from "./Balance";
 import { ContractShaz } from "./ContractShaz";
 import Shazam from "./Shazam";
 import { WALLET_CONNECTOR_TYPE } from "@web3auth/modal/react";
@@ -35,7 +35,6 @@ export function LoggedInView({
 
   const handleFaucetClick = () => {
     if (!address) return;
-
     const faucetUrl = getFaucetUrl(chainId, address);
     window.open(faucetUrl, "_blank", "noopener,noreferrer");
   };
