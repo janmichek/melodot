@@ -1,16 +1,37 @@
 import { defineConfig } from '@wagmi/cli'
 import { Abi } from 'viem'
-import { readdirSync, readFileSync } from 'fs'
+import { readdirSync, readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 
 // Path to your contract artifacts
 const ARTIFACTS_PATH = '../contracts/artifacts-pvm/contracts'
+const CHAIN_ID = 420420422
+
+/**
+ * Load deployed contract addresses from Hardhat Ignition
+ */
+function loadDeployedAddresses(): Record<string, string> {
+  const addressesFile = `../contracts/ignition/deployments/chain-${CHAIN_ID}/deployed_addresses.json`
+
+  if (existsSync(addressesFile)) {
+    try {
+      return JSON.parse(readFileSync(addressesFile, 'utf-8'))
+    } catch (err) {
+      console.error('Error loading deployed addresses:', err)
+    }
+  }
+
+  return {}
+}
 
 /**
  * Recursively reads all contract ABIs from Hardhat artifacts
  */
-function loadContractABIs(): Array<{ name: string; abi: Abi; address?: `0x${string}` }> {
-  const contracts: Array<{ name: string; abi: Abi; address?: `0x${string}` }> = []
+// todo remove address from params and function
+function loadContractABIs(): Array<{ name: string; abi: Abi; address?: Record<number, `0x${string}`> }> {
+  const contracts: Array<{ name: string; abi: Abi; address?: Record<number, `0x${string}`> }> = []
+  const deployedAddresses = loadDeployedAddresses()
+
 
   try {
     // Read all .sol directories
@@ -29,13 +50,32 @@ function loadContractABIs(): Array<{ name: string; abi: Abi; address?: `0x${stri
 
           if (artifact.abi && Array.isArray(artifact.abi)) {
             const contractName = file.replace('.json', '')
+
+            // Try to find deployed address - Hardhat Ignition uses "ModuleName#ContractName" format
+            const possibleKeys = [
+              `${contractName}Module#${contractName}`,
+              contractName
+            ]
+
+            let deployedAddress: string | undefined
+            for (const key of possibleKeys) {
+              if (deployedAddresses[key]) {
+                deployedAddress = deployedAddresses[key]
+                break
+              }
+            }
+
             contracts.push({
               name: contractName,
               abi: artifact.abi as Abi,
-              // todo add address
-              // Add your deployed addresses here (optional)
-              // address: '0x...' as `0x${string}`
+              ...(deployedAddress && {
+                address: {
+                  [CHAIN_ID]: deployedAddress as `0x${string}`
+                }
+              })
             })
+
+            console.log(`✓ Loaded ${contractName}${deployedAddress ? ` at ${deployedAddress}` : ' (no address)'}`)
           }
         }
       } catch (err) {
