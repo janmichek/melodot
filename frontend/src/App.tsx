@@ -7,7 +7,7 @@ import {
 } from "@web3auth/modal/react";
 import { useAccount, useChainId } from "wagmi";
 import { Balance } from "./components/getBalance";
-import {donateModuleDonateConfig } from "./generated";
+import {donateConfig } from "./generated";
 import { passetHub, kusamaAssetHub, westend } from "./wagmi-config";
 import { useState, useEffect } from "react";
 import {ContractShaz} from "./components/ContractShaz";
@@ -98,7 +98,7 @@ function App() {
 
 
   const contractAddress =
-    donateModuleDonateConfig.address[
+    donateConfig.address[
       passetHub.id
     ];
 
