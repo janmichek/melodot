@@ -114,7 +114,7 @@ function App() {
       {isConnected ? (
         <div>
           {/*todo move user info inside LoggedInView*/}
-        aaa  {userInfo?.name}
+
         <LoggedInView
           connectorName={connectorName}
           address={address}
@@ -122,6 +122,7 @@ function App() {
           onDisconnect={() => disconnect()}
           disconnectLoading={disconnectLoading}
           disconnectError={disconnectError}
+          userInfo={userInfo}
         />
         </div>
       ) : (

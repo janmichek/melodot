@@ -2,8 +2,10 @@ import { Balance } from "./Balance";
 import { ContractShaz } from "./ContractShaz";
 import Shazam from "./Shazam";
 import { WALLET_CONNECTOR_TYPE } from "@web3auth/modal/react";
-import { useChainId } from "wagmi";
+import { useChainId, useReadContract } from "wagmi";
 import { passetHub, kusamaAssetHub, westend } from "../wagmi-config";
+import { donateConfig } from "../generated";
+import type { Abi } from "viem";
 
 interface LoggedInViewProps {
   connectorName: WALLET_CONNECTOR_TYPE | null;
@@ -12,6 +14,7 @@ interface LoggedInViewProps {
   onDisconnect: () => void;
   disconnectLoading: boolean;
   disconnectError: Error | null;
+  userInfo:   any;
 }
 
 export function LoggedInView({
@@ -21,8 +24,16 @@ export function LoggedInView({
   onDisconnect,
   disconnectLoading,
   disconnectError,
+                               userInfo,
 }: LoggedInViewProps) {
   const chainId = useChainId();
+
+  // Read contract balance
+  const { data: contractBalance } = useReadContract({
+    address: contractAddress,
+    abi: donateConfig.abi as Abi,
+    functionName: "balance",
+  });
 
   const getFaucetUrl = (chainId: number, address: string) => {
     const faucetUrls = {
@@ -55,7 +66,25 @@ export function LoggedInView({
 
       <h2>Connected to {connectorName}</h2>
       <div>Connected address: {address}</div>
+      <div>   Name: {userInfo?.name}</div>
       <Balance />
+
+      {contractAddress && (
+        <div className="contract-info-box">
+          <p className="contract-info-label">Smart contract address:</p>
+          <a
+            href={`https://blockscout-passet-hub.parity-testnet.parity.io/address/${contractAddress}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {contractAddress} 🔗
+          </a>
+          <p className="contract-info-label">Contract Balance:</p>
+          <p className="contract-balance-text">
+            {contractBalance ? `${Number(contractBalance) / 1e18} PAS` : "0 PAS"}
+          </p>
+        </div>
+      )}
 
       <div className="flex-container">
         <div>
