@@ -1,7 +1,7 @@
 import { useAccount, useBalance } from "wagmi";
 import { formatUnits } from "viem";
 import { useChainId } from "wagmi";
-import { passetHub, kusamaAssetHub, westend } from "../wagmi-config";
+import { passetHub } from "../wagmi-config";
 
 export function Balance() {
   const { address } = useAccount();
@@ -18,19 +18,6 @@ export function Balance() {
           decimals: passetHub.nativeCurrency.decimals, // 10
           symbol: passetHub.nativeCurrency.symbol, // PAS
           name: passetHub.name
-        };
-        // todo ditch kusama and westend from the app completely
-      case kusamaAssetHub.id:
-        return {
-          decimals: kusamaAssetHub.nativeCurrency.decimals, // 12
-          symbol: kusamaAssetHub.nativeCurrency.symbol, // KSM
-          name: kusamaAssetHub.name
-        };
-      case westend.id:
-        return {
-          decimals: westend.nativeCurrency.decimals, // 12
-          symbol: westend.nativeCurrency.symbol, // WND
-          name: westend.name
         };
       case 1: // Ethereum mainnet
         return {

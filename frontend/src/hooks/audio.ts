@@ -77,11 +77,9 @@ export const useAudioRecorder = () => {
       console.error("Error accessing microphone:", error);
     }
   }, []);
-// todo remove eslint comments from this component
   const startRecording = useCallback(() => {
     if (state.mediaRecorder && !state.isRecording) {
       audioChunksRef.current = []; // Clear audio chunks on start
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       state.mediaRecorder.start();
       setState((prev) => ({ ...prev, isRecording: true, isPaused: false }));
     }
@@ -89,7 +87,6 @@ export const useAudioRecorder = () => {
 
   const stopRecording = useCallback(() => {
     if (state.mediaRecorder && state.isRecording) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       state.mediaRecorder.stop();
       setState((prev) => ({ ...prev, isRecording: false, isPaused: false }));
     }
@@ -97,7 +94,6 @@ export const useAudioRecorder = () => {
 
   const resumeRecording = useCallback(() => {
     if (state.mediaRecorder && state.isPaused) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       state.mediaRecorder.resume();
       setState((prev) => ({ ...prev, isPaused: false }));
     }
@@ -105,7 +101,6 @@ export const useAudioRecorder = () => {
 
   const pauseRecording = useCallback(() => {
     if (state.mediaRecorder && state.isRecording && !state.isPaused) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       state.mediaRecorder.pause();
       setState((prev) => ({ ...prev, isPaused: true }));
     }
@@ -114,7 +109,6 @@ export const useAudioRecorder = () => {
   const resetRecording = useCallback(() => {
     if (state.mediaRecorder) {
       audioChunksRef.current = []; // Clear audio chunks
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       state.mediaRecorder.stop();
       setState((prev) => ({
         ...prev,

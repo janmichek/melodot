@@ -1,3 +1,4 @@
+import { ButtonProps } from "../types";
 interface PermissionButtonProps {
   onRequestPermission: () => void;
 }
@@ -6,9 +7,8 @@ export default function PermissionButton({ onRequestPermission }: PermissionButt
   return (
     <button
       onClick={onRequestPermission}
-      className="permission-button"
-    >
-      Request Microphone Permission
+      className="permission-button">
+      Enable Microphone
     </button>
   );
 }

@@ -2,87 +2,74 @@ import "./App.css";
 import {
   useWeb3AuthConnect,
   useWeb3AuthDisconnect,
-  useWeb3AuthUser,
   useWeb3Auth,
 } from "@web3auth/modal/react";
-import { useAccount, useChainId } from "wagmi";
+import { useAccount } from "wagmi";
 import { donateConfig } from "./generated";
-import { passetHub, kusamaAssetHub, westend } from "./wagmi-config";
+import { passetHub } from "./wagmi-config";
 import { useState, useEffect } from "react";
-import { LoggedInView } from "./components/LoggedInView";
-import { LoginForm } from "./components/LoginForm";
-// todo remove unused variables and code from this component
+import { Header } from "./components/Header";
+import AudioRecorder from "./components/AudioRecorder";
+import DiscoveryCard from "./components/DiscoveryCard";
+import { DonationForm } from "./components/DonationForm";
+import { DiscoveryResult } from "./types";
+
 function App() {
   const {
     connect,
     isConnected,
-    connectorName,
     loading: connectLoading,
-    error: connectError,
   } = useWeb3AuthConnect();
   const {
     disconnect,
     loading: disconnectLoading,
-    error: disconnectError,
   } = useWeb3AuthDisconnect();
-  const { userInfo } = useWeb3AuthUser();
   const { web3Auth } = useWeb3Auth();
   const { address } = useAccount();
-  const chainId = useChainId();
 
-  // Provider readiness states
+  // Provider readiness state
   const [providerReady, setProviderReady] = useState(false);
-  const [providerLoading, setProviderLoading] = useState(true);
-  const [providerError, setProviderError] = useState(false);
+
+  // Discovery state - lifted from AudioRecorder
+  const [discoveryData, setDiscoveryData] = useState<DiscoveryResult | null>(null);
 
   // Track Web3Auth provider initialization
   useEffect(() => {
     const checkProviderStatus = () => {
       if (web3Auth) {
         try {
-          // Check if Web3Auth is properly initialized and ready for login
           const isInitialized = web3Auth.status === "ready";
           const isNotConnecting = !connectLoading;
           const canLogin = isInitialized && isNotConnecting;
 
           setProviderReady(canLogin);
-          setProviderLoading(web3Auth.status !== "ready");
 
-          // If ready, clear the interval
           if (canLogin) {
-            return true; // Signal to stop interval
+            return true;
           }
         } catch (error) {
           console.error("Error checking Web3Auth status:", error);
           setProviderReady(false);
-          setProviderLoading(true);
         }
       } else {
-        // Still loading if web3Auth instance not available
         setProviderReady(false);
-        setProviderLoading(true);
       }
-      return false; // Continue interval
+      return false;
     };
 
-    // Check immediately
     if (checkProviderStatus()) {
-      return; // Already ready, no need for interval
+      return;
     }
 
-    // Set up interval to continuously check until ready
     const interval = setInterval(() => {
       if (checkProviderStatus()) {
         clearInterval(interval);
       }
-    }, 200); // Check more frequently
+    }, 200);
 
-    // Cleanup interval after 30 seconds max
     const timeout = setTimeout(() => {
       clearInterval(interval);
       console.warn("Web3Auth initialization timeout");
-      setProviderLoading(false);
-      setProviderError(true);
       setProviderReady(false);
     }, 30000);
 
@@ -92,46 +79,52 @@ function App() {
     };
   }, [web3Auth, connectLoading]);
 
-
   const contractAddress = donateConfig.address[passetHub.id];
+
+  const handleDonateClick = () => {
+    if (!isConnected) {
+      void connect();
+    }
+  };
 
   return (
     <div className="container">
-      <h1 className="title">
-        <a
-          target="_blank"
-          href="https://web3auth.io/docs/sdk/pnp/web/modal"
-          rel="noreferrer">
-          Web3Auth{" "}
-        </a>
-      </h1>
+      <Header
+        isConnected={isConnected}
+        address={address}
+        onConnect={() => connect()}
+        onDisconnect={() => disconnect()}
+        connectLoading={connectLoading}
+        disconnectLoading={disconnectLoading}
+        providerReady={providerReady}
+      />
 
-      {isConnected ? (
-        <div>
-          {/*todo move user info to LoggedInView*/}
+      <main className="main-content">
+        {!discoveryData ? (
+          <AudioRecorder onAnalysisComplete={setDiscoveryData} />
+        ) : (
+          <div className="discovery-section">
+            <button
+              onClick={() => setDiscoveryData(null)}
+              className="btn-secondary"
+              style={{ marginBottom: '1rem' }}
+            >
+              ← Search Again
+            </button>
 
-        <LoggedInView
-          connectorName={connectorName}
-          address={address}
-          contractAddress={contractAddress}
-          onDisconnect={() => disconnect()}
-          disconnectLoading={disconnectLoading}
-          disconnectError={disconnectError}
-          userInfo={userInfo}
-        />
-        </div>
-      ) : (
-        <LoginForm
-          providerLoading={providerLoading}
-          providerReady={providerReady}
-          providerError={providerError}
-          connectLoading={connectLoading}
-          connectError={connectError}
-          isConnected={isConnected}
-          web3AuthStatus={web3Auth?.status}
-          onConnect={() => connect()}
-        />
-      )}
+            <DiscoveryCard discovery={discoveryData} />
+
+            {contractAddress && (
+              <DonationForm
+                contractAddress={contractAddress}
+                onSuccess={() => console.log("Donation successful")}
+                onRequireAuth={handleDonateClick}
+              />
+            )}
+          </div>
+        )}
+
+      </main>
     </div>
   );
 }

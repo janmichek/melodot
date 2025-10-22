@@ -1,6 +1,4 @@
-import { useReadContract } from "wagmi";
-import { donateConfig } from "../generated";
-import type { Abi } from "viem";
+import { ArtistCard } from "./ArtistCard";
 
 interface ArtistsListProps {
   count: bigint;
@@ -15,55 +13,12 @@ export function ArtistsList({ count, contractAddress }: ArtistsListProps) {
       </h3>
       <div className="artists-list-container">
         {Array.from({ length: Number(count) }, (_, i) => (
-          <AllArtistsCard
+          <ArtistCard
             key={i}
             artistIndex={i}
             contractAddress={contractAddress}
           />
         ))}
-      </div>
-    </div>
-  );
-}
-interface allArtistsCartProps  {
-  artistIndex: number;
-  contractAddress: `0x${string}`;
-}
-// todo move all artistcard to separate component and renamae to ArtistCard
-function AllArtistsCard({artistIndex, contractAddress,}: allArtistsCartProps) {
-  const { data: artistData, isLoading } = useReadContract({
-    address: contractAddress,
-    abi: donateConfig.abi as Abi,
-    functionName: "artists",
-    args: [artistIndex],
-  });
-
-  if (isLoading) {
-    return (
-        <p className="p-text">Loading artist #{artistIndex}...</p>
-    );
-  }
-
-  if (!artistData || !(artistData as any)[0]) {
-    return (
-        <p className="p-text">No data found for artist #{artistIndex}</p>
-    );
-  }
-
-  const [musicId, balance, isClaimed] = artistData as [string, bigint, boolean];
-
-  return (
-    <div className="artist-card">
-      <div className="artist-card-header">
-        <div className="artist-card-content">
-          <p className="artist-card-label">Artist #{artistIndex} - Music ID</p>
-          <p className="artist-card-value">{musicId}</p>
-        </div>
-        {isClaimed && <span className="badge-claimed">CLAIMED</span>}
-      </div>
-      <div>
-        <p className="artist-card-label">Balance</p>
-        <p className="artist-card-balance">{Number(balance) / 1e18} PAS</p>
       </div>
     </div>
   );

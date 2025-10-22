@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { useAudioRecorder } from "../hooks/audio";
-import PermissionButton from "./PermissionButton";
 import AudioControls from "./AudioControls";
-import DiscoveryCard from "./DiscoveryCard";
+import { DiscoveryResult } from "../types";
 
-export default function AudioRecorder() {
+export default function AudioRecorder({ onAnalysisComplete }: { onAnalysisComplete: (data: DiscoveryResult) => void }) {
   const {
     permission,
     audioBlob,
@@ -16,8 +15,7 @@ export default function AudioRecorder() {
     resetRecording,
   } = useAudioRecorder();
 
-  const [result, setResult] = useState((null));
-  const [isCompleted, setIsCompleted] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [duration, setDuration] = useState(0);
 
   const submitAudioForAnalysis = async () => {
@@ -28,10 +26,12 @@ export default function AudioRecorder() {
       formData.append("file", audioBlob, "recording.webm");
 
       const response = await fetch('/api/analyze-audio', { method: 'POST', body: formData, });
-      console.log('response', response)
       if (!response.ok) {throw new Error(`HTTP error! status: ${response.status}`);}
 
-      setResult((await response.json()));
+      const data = await response.json();
+      console.log('Analysis complete - Full response:', data);
+      console.log('Track structure:', JSON.stringify(data.track, null, 2));
+      onAnalysisComplete(data);
       reset();
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -40,10 +40,10 @@ export default function AudioRecorder() {
 
   // Autosubmit after stop
   useEffect(() => {
-    if (isCompleted && audioBlob) {
+    if (isAnalyzing && audioBlob) {
       void submitAudioForAnalysis();
     }
-  }, [isCompleted, audioBlob]);
+  }, [isAnalyzing, audioBlob]);
 
   // Timer effect that tracks recording duration
   useEffect(() => {
@@ -61,13 +61,13 @@ export default function AudioRecorder() {
     if (!isRecording) {
       startRecording();
     } else {
-      setIsCompleted(true);
+      setIsAnalyzing(true);
       stopRecording();
     }
   };
 
   const reset = () => {
-    setIsCompleted(false);
+    setIsAnalyzing(false);
     setDuration(0);
     resetRecording();
   };
@@ -94,25 +94,15 @@ export default function AudioRecorder() {
 
   return (
     <div className="shazam-container">
-      {!permission && (
-        <PermissionButton onRequestPermission={requestPermission} />
-      )}
-      {duration}
+      <div className="duration-display">{duration}s</div>
       <AudioControls
+        permission={permission}
         isRecording={isRecording}
-        isCompleted={isCompleted}
-        duration={duration}
-        audioBlob={audioBlob}
+        isAnalyzing={isAnalyzing}
         onStartStop={startStop}
-        onReset={reset}
+        onRequestPermission={requestPermission}
       />
-      <div className="shazam-content">
-        {errorMessage && <p className="shazam-error">{errorMessage}</p>}
-        {/*todo refactor naming result to artistData*/}
-
-        {result && <DiscoveryCard result={result} />}
-        {/*todo print full artistData result aside*/}
-      </div>
+      {errorMessage && <p className="shazam-error">{errorMessage}</p>}
     </div>
   );
 }

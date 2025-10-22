@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useState, useEffect } from "react";
+import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { donateConfig } from "../generated";
 import type { Abi } from "viem";
 import { parseEther } from "viem";
@@ -7,12 +7,15 @@ import { parseEther } from "viem";
 interface DonationFormProps {
   contractAddress: `0x${string}`;
   onSuccess?: () => void;
+  onRequireAuth?: () => void;
 }
 
-export function DonationForm({ contractAddress, onSuccess }: DonationFormProps) {
-  const [artistId, setArtistId] = useState("");
-  const [donationAmount, setDonationAmount] = useState("");
+// Mock artist ID for testing - replace with actual artist ID from discovery
+const MOCK_ARTIST_ID = "artist-123-mock";
+
+export function DonationForm({ contractAddress, onSuccess, onRequireAuth }: DonationFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { isConnected } = useAccount();
 
   // Write contract hook
   const {
@@ -20,6 +23,7 @@ export function DonationForm({ contractAddress, onSuccess }: DonationFormProps) 
     writeContract,
     isPending: isWritePending,
     error: writeError,
+    reset: resetWrite,
   } = useWriteContract();
 
   // Wait for transaction confirmation
@@ -27,19 +31,25 @@ export function DonationForm({ contractAddress, onSuccess }: DonationFormProps) 
     hash,
   });
 
-  // Handle form submission
-  const handleDonation = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!artistId.trim() || !donationAmount.trim()) return;
+  // Handle direct donation with preset amount
+  const handleDirectDonation = async (amount: number) => {
+    // Check if user is connected, if not trigger auth modal
+    if (!isConnected) {
+      onRequireAuth?.();
+      return;
+    }
 
+    if (isSubmitting || isWritePending || isConfirming) return;
+
+    // instead og mock artist id use id from discovery
     try {
       setIsSubmitting(true);
       writeContract({
         address: contractAddress,
         abi: donateConfig.abi as Abi,
         functionName: "donateToArtist",
-        args: [artistId],
-        value: parseEther(donationAmount),
+        args: [MOCK_ARTIST_ID],
+        value: parseEther(amount.toString()),
       });
     } catch (err) {
       console.error("Error donating:", err);
@@ -48,63 +58,48 @@ export function DonationForm({ contractAddress, onSuccess }: DonationFormProps) 
     }
   };
 
-  // Handle successful transaction
-  if (isConfirmed) {
-    setArtistId("");
-    setDonationAmount("");
-    onSuccess?.();
-  }
+  /**
+   * Handle successful transaction completion
+   *
+   * This useEffect is necessary for two important reasons:
+   * 1. Trigger the onSuccess callback when the transaction is confirmed on-chain
+   * 2. Reset the form state after displaying the success message for 3 seconds
+   *
+   * We use useEffect instead of handling this in the write function because
+   * transaction confirmation happens asynchronously after the write is submitted.
+   * The isConfirmed state comes from useWaitForTransactionReceipt hook which
+   * monitors the blockchain for transaction confirmation.
+   */
+  useEffect(() => {
+    if (isConfirmed) {
+      onSuccess?.();
+      // Reset after a brief delay to allow user to see the success message
+      setTimeout(() => {
+        resetWrite();
+      }, 3000);
+    }
+  }, [isConfirmed, onSuccess, resetWrite]);
 
   return (
     <div className="contract-form-section">
       <h3 className="contract-form-title">🎵 Donate to Artist</h3>
-      {/*todo change UX of this component to directly submit after clicking on preset. No need to select and submit */}
-      <form onSubmit={handleDonation}>
-        <div className="form-group">
-          <label className="form-label">Artist Music ID</label>
-          <input
-            type="text"
-            value={artistId}
-            onChange={(e) => setArtistId(e.target.value)}
-            placeholder="Enter artist music ID..."
-            disabled={isSubmitting || isWritePending || isConfirming}
-            className="form-input"
-          />
+      <div className="form-group">
+        <p className="form-label">Artist ID: {MOCK_ARTIST_ID}</p>
+        <p className="form-label">Select amount to donate instantly:</p>
+        <div className="amount-selector-group">
+          {[1, 2, 10].map((amount) => (
+            <button
+              key={amount}
+              type="button"
+              onClick={() => handleDirectDonation(amount)}
+              disabled={isSubmitting || isWritePending || isConfirming}
+              className="btn-amount-selector"
+            >
+              {isWritePending || isConfirming ? "Donating..." : `${amount} PAS`}
+            </button>
+          ))}
         </div>
-
-        <div className="form-group">
-          <label className="form-label">Donation Amount</label>
-          <div className="amount-selector-group">
-            {[1, 2, 10].map((amount) => (
-              <button
-                key={amount}
-                type="button"
-                onClick={() => setDonationAmount(amount.toString())}
-                disabled={isSubmitting || isWritePending || isConfirming}
-                className={`btn-amount-selector ${
-                  donationAmount === amount.toString() ? "active" : ""
-                }`}
-              >
-                {amount} PAS
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={
-            !artistId.trim() ||
-            !donationAmount.trim() ||
-            isSubmitting ||
-            isWritePending ||
-            isConfirming
-          }
-          className="btn-success"
-        >
-          {isWritePending || isConfirming ? "Donating..." : "Donate"}
-        </button>
-      </form>
+      </div>
 
       {hash && (
         <div

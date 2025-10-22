@@ -1,85 +1,160 @@
-# react-solidity-hardhat template
+# Shaz
 
-[//]: # (todo merge 2 of READM.MDs to just on in the root of the app. Then delete 2 old ones)
+Decentralized music discovery and tipping platform on Polkadot. Identify songs through audio recognition and tip artists directly with crypto.
 
-This template sets up a combination of Solidity smart contracts and a React front-end app that interacts with these
-smart contracts.  
-This template includes:
+## Features
 
-- [OpenZeppelin](https://docs.openzeppelin.com/contracts/5.x/) smart contract library.
-- [hardhat](https://hardhat.org/) smart contract development tooling.
-- [wagmi](https://wagmi.sh/) for smart contract interaction.
-- [Tailwind CSS](https://tailwindcss.com) + [Tailwind UI](https://tailwindui.com/).
-- [Vite](https://vite.dev/) for dev tooling.
+- Audio recording and music recognition
+- Direct artist tipping via smart contracts
+- Web3Auth integration for easy onboarding
+- Transparent on-chain donations
 
-The project is configured to deploy on "[Passet Hub](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fpasset-hub-paseo.ibp.network#/accounts)" network
+## Tech Stack
 
-## Setting up environment
+- **Contracts**: Solidity, Hardhat, Polkadot Paseo Asset Hub
+- **Frontend**: React, TypeScript, Vite, Wagmi, Web3Auth
+- **Audio**: Web Audio API
 
-First, set up Metamask wallet for Passet Hub network, and get some PAS there. ([docs](https://docs.polkadot.com/develop/smart-contracts/wallets/))  
-In `contracts` directory, set up private key for hardhat:
+## Quick Start
 
-```
-npx hardhat vars set PRIVATE_KEY "INSERT_PRIVATE_KEY"
-```
+### Prerequisites
 
-[How to export private key from Metamask wallet](https://support.metamask.io/configure/accounts/how-to-export-an-accounts-private-key/)
+- Node.js 20+
+- Bun or npm
+- MetaMask wallet
+- [PAS testnet tokens](https://faucet.polkadot.io/?parachain=1111)
 
-## 1. Writing smart contracts
+### Setup
 
-Contracts are written in `contracts/contracts`. Each smart contract has a Hardhat Ignition module counterpart in `contracts/igniton/modules`. More on that in [Hardhat Ignition docs](https://hardhat.org/ignition/docs/getting-started#overview).
+```bash
+# Install dependencies
+git clone <repository-url>
+cd shaz
+bun install
 
-1. Edit smart contracts in `contracts/contracts`
-2. Edit ignition module in `contracts/igniton/modules`
-3. Run `npx hardhat compile` to compile smart contracts
-4. Run `npx hardhat ignition deploy ./ignition/modules/<ModuleName>.ts --network polkadotHubTestnet` to deploy them
+# Configure contracts
+cd contracts
+cp .env.example .env
+# Add your PRIVATE_KEY to .env
 
-### Note on committing `ignition/deployments`
+# Configure frontend
+cd ../frontend
+# Add VITE_WEB3AUTH_CLIENT_ID to .env
 
-This is a directory that contains build and deployment artifacts from `hardhat`.
-They aren't ignored, becuase they are used for types generation for frontend: if there's a smart contract already deployed, you may want to keep it in git, so a fresh clone would give you a working frontend.
-
-However, several issues with hardhat are resolved by removing `ignition/deployments` directory, to start fresh deployment. These issues include:
-
-```
-An unexpected error occurred:
-
-Error: Could not parse row {...
-```
-
-```
-[ MyTokenModule ] reconciliation failed ⛔
-
-The module contains changes to executed futures:
-...
+# Run the app
+cd ..
+bun start
 ```
 
-In such cases, do `rm -rf ignition/deployments`, deploy the new contract, and commit the artifacts anew :)
+Visit `http://localhost:5173`
 
-## 2. Interacting with smart contracts from frontend app
+### Get Testnet Tokens
 
-1. Generate types from deployed smart contracts by running `npm run generate` in `frontend` directory
-2. Run `npm run dev` to start `vite` environment
-3. You can import contract ABI and deployed addresses from `src/generated.ts`:
+1. Add [Paseo Asset Hub via Chainlist](https://chainlist.org/?search=passet)
+2. Get tokens: [Polkadot Faucet](https://faucet.polkadot.io/?parachain=1111)
+3. Track transactions: [Block Explorer](http://blockscout-passet-hub.parity-testnet.parity.io/)
 
-```ts
-import {
-  myTokenModuleMyTokenAddress,
-  myTokenModuleMyTokenAbi,
-} from "./generated";
+## Development
 
-const contractAddress = myTokenModuleMyTokenAddress[420420422];
-// ...
+### Project Structure
+
+```
+shaz/
+├── contracts/           # Solidity contracts
+│   ├── contracts/      # Donate.sol
+│   └── @README.md      # Contract docs
+├── frontend/           # React app
+│   ├── src/
+│   └── @README.md      # Frontend docs
+└── package.json
+```
+
+### Scripts
+
+```bash
+# Root
+bun start                  # Start dev server
+bun run deploy-contract    # Deploy contract + generate types
+bun run build              # Build for production
+
+# Contracts
+cd contracts
+bun run compile            # Compile contracts
+bun run deploy-contract    # Deploy to Paseo
+bun run test               # Run tests
+
+# Frontend
+cd frontend
+bun run dev                # Dev server
+bun run generate           # Generate contract types
+```
+
+### Contract Functions
+
+```solidity
+// Donate to an artist
+donateToArtist(string memory id) external payable
+
+// Get artist count
+getArtistsCount() public view returns (uint)
+
+// Owner withdrawal
+withdraw() external
+```
+
+### Frontend Integration
+
+```typescript
+import { donateConfig } from "./generated";
+import { useWriteContract } from "wagmi";
+
+const { writeContract } = useWriteContract();
+
 writeContract({
-  address: contractAddress,
-  abi: myTokenModuleMyTokenAbi,
-  functionName: "mint",
-  args: [address, BigInt(amount) * 10n ** BigInt(params.decimals)],
+  ...donateConfig,
+  functionName: "donateToArtist",
+  args: [artistId],
+  value: parseEther(amount),
 });
 ```
 
-More info at:
+## Network
 
-- [docs on smart contracts on Polkadot](https://docs.polkadot.com/develop/smart-contracts/)
-- [hardhat docs](https://hardhat.org/docs)
-- [wagmi docs](https://wagmi.sh/react/getting-started)
+**Paseo Asset Hub Testnet**
+- Chain ID: `420420422`
+- RPC: `https://testnet-passet-hub-eth-rpc.polkadot.io`
+- Explorer: [Blockscout](http://blockscout-passet-hub.parity-testnet.parity.io/)
+- Currency: PAS
+
+## Deployment
+
+Deploy to Vercel:
+```bash
+vercel deploy
+```
+
+Reset contract deployment if needed:
+```bash
+cd contracts
+rm -rf ignition/deployments
+bun run deploy-contract
+```
+
+## Troubleshooting
+
+**Web3Auth issues**: Check `VITE_WEB3AUTH_CLIENT_ID` env variable and network selection
+
+**Contract deployment fails**: Verify private key format (no 0x prefix) and sufficient PAS balance
+
+**Type errors**: Run `bun run generate` in frontend directory
+
+## Resources
+
+- [Polkadot Smart Contracts](https://docs.polkadot.com/develop/smart-contracts/)
+- [Hardhat Docs](https://hardhat.org/docs)
+- [Wagmi Docs](https://wagmi.sh/)
+- [Web3Auth Docs](https://web3auth.io/docs)
+
+## License
+
+MIT

@@ -1,56 +1,32 @@
-import { Mic, Square } from "lucide-react";
+import StopButton from "./StopButton";
+import RecordButton from "./RecordButton";
+import PermissionButton from "./PermissionButton";
 
-interface AudioPlayerProps {
+interface AudioControlsProps {
+  permission: boolean;
   isRecording: boolean;
-  isCompleted: boolean;
-  duration?: number;
-  audioBlob?: Blob | null;
+  isAnalyzing: boolean;
   onStartStop: () => void;
-  onReset: () => void;
+  onRequestPermission: () => void;
 }
 
-// todo check this component fo unused props and remove
 export default function AudioControls({
+  permission,
   isRecording,
-  isCompleted,
-  duration: _duration,
-  audioBlob: _audioBlob,
+  isAnalyzing,
   onStartStop,
-  onReset: _onReset
-}: AudioPlayerProps) {
+  onRequestPermission,
+}: AudioControlsProps) {
+  const isCurrentlyRecording = permission && isRecording;
+  const isReadyToRecord = permission && !isRecording && !isAnalyzing;
+
   return (
     <div className="audio-player-container">
       <div className="audio-player-recording-area">
-        {/*todo move permissionButton here. UX-wise it will display only one button at the time*/}
-        {isRecording && (
-          <button
-            onClick={onStartStop}
-            className="audio-player-button"
-          >
-            {/*todo componentize to separate stopButton.tsx*/}
-            <div className="audio-player-recording-pulse"></div>
-            <div className="audio-player-button-inner audio-player-recording-bg">
-              <Square className="audio-player-icon" />
-            </div>
-          </button>
-        )}
-        {!isRecording && !isCompleted && (
-          // todo componentize to separate recordButton.tsx
-          <button
-            onClick={onStartStop}
-            className="audio-player-button"
-            aria-label="Start recording"
-          >
-            <div className="audio-player-button-inner audio-player-start-bg">
-              <Mic className="audio-player-icon" />
-            </div>
-          </button>
-        )}
-        {isCompleted && (
-          <div className="audio-player-analyzing">
-            Analyzing ...
-          </div>
-        )}
+        {!permission && (<PermissionButton onRequestPermission={onRequestPermission} />)}
+        {isCurrentlyRecording && (<StopButton onClick={onStartStop} />)}
+        {isReadyToRecord && (<RecordButton onClick={onStartStop} />)}
+        {isAnalyzing && (<div className="audio-player-analyzing">Analyzing ...</div>)}
       </div>
     </div>
   );
