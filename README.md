@@ -1,5 +1,7 @@
 # react-solidity-hardhat template
 
+[//]: # (todo merge 2 of READM.MDs to just on in the root of the app. Then delete 2 old ones)
+
 This template sets up a combination of Solidity smart contracts and a React front-end app that interacts with these
 smart contracts.  
 This template includes:

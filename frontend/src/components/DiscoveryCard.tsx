@@ -2,6 +2,7 @@ interface DiscoveryCardProps {
   result: any;
 }
 
+// refactor naming result to discovery
 export default function DiscoveryCard({ result }: DiscoveryCardProps) {
   if (!result) return null;
 

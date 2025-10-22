@@ -25,14 +25,12 @@ export function ArtistsList({ count, contractAddress }: ArtistsListProps) {
     </div>
   );
 }
-
-function AllArtistsCard({
-  artistIndex,
-  contractAddress,
-}: {
+interface allArtistsCartProps  {
   artistIndex: number;
   contractAddress: `0x${string}`;
-}) {
+}
+// todo move all artistcard to separate component and renamae to ArtistCard
+function AllArtistsCard({artistIndex, contractAddress,}: allArtistsCartProps) {
   const { data: artistData, isLoading } = useReadContract({
     address: contractAddress,
     abi: donateConfig.abi as Abi,
@@ -42,17 +40,13 @@ function AllArtistsCard({
 
   if (isLoading) {
     return (
-      <div className="artist-card">
         <p className="p-text">Loading artist #{artistIndex}...</p>
-      </div>
     );
   }
 
   if (!artistData || !(artistData as any)[0]) {
     return (
-      <div className="artist-card">
         <p className="p-text">No data found for artist #{artistIndex}</p>
-      </div>
     );
   }
 

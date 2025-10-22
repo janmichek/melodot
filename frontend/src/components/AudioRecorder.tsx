@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useAudioRecorder } from "../hooks/audio";
 import PermissionButton from "./PermissionButton";
-import AudioPlayer from "./AudioPlayer";
+import AudioControls from "./AudioControls";
 import DiscoveryCard from "./DiscoveryCard";
 
-export default function Shazam() {
+export default function AudioRecorder() {
   const {
     permission,
     audioBlob,
@@ -21,6 +21,7 @@ export default function Shazam() {
   const [duration, setDuration] = useState(0);
 
   const submitAudioForAnalysis = async () => {
+    console.log('submitAudioForAnalysis')
     try {
       const formData = new FormData();
       if (!audioBlob) return;
@@ -48,6 +49,13 @@ export default function Shazam() {
   useEffect(() => {
     return startDurationTimer(isRecording, setDuration);
   }, [isRecording]);
+
+  useEffect(() => {
+    console.log('duration', duration)
+    if(duration > 10) {
+      void submitAudioForAnalysis();
+    }
+  }, [duration]);
 
   const startStop = () => {
     if (!isRecording) {
@@ -89,7 +97,8 @@ export default function Shazam() {
       {!permission && (
         <PermissionButton onRequestPermission={requestPermission} />
       )}
-      <AudioPlayer
+      {duration}
+      <AudioControls
         isRecording={isRecording}
         isCompleted={isCompleted}
         duration={duration}
@@ -99,10 +108,10 @@ export default function Shazam() {
       />
       <div className="shazam-content">
         {errorMessage && <p className="shazam-error">{errorMessage}</p>}
-{/*todo explore result and print more if available*/}
-        {result &&
-          <DiscoveryCard result={result} />
-        }
+        {/*todo refactor naming result to artistData*/}
+
+        {result && <DiscoveryCard result={result} />}
+        {/*todo print full artistData result aside*/}
       </div>
     </div>
   );

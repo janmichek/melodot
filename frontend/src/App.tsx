@@ -11,7 +11,7 @@ import { passetHub, kusamaAssetHub, westend } from "./wagmi-config";
 import { useState, useEffect } from "react";
 import { LoggedInView } from "./components/LoggedInView";
 import { LoginForm } from "./components/LoginForm";
-
+// todo remove unused variables and code from this component
 function App() {
   const {
     connect,
@@ -29,7 +29,6 @@ function App() {
   const { web3Auth } = useWeb3Auth();
   const { address } = useAccount();
   const chainId = useChainId();
-  // todo how to use chainId?
 
   // Provider readiness states
   const [providerReady, setProviderReady] = useState(false);
@@ -94,10 +93,7 @@ function App() {
   }, [web3Auth, connectLoading]);
 
 
-  const contractAddress =
-    donateConfig.address[
-      passetHub.id
-    ];
+  const contractAddress = donateConfig.address[passetHub.id];
 
   return (
     <div className="container">
@@ -105,15 +101,14 @@ function App() {
         <a
           target="_blank"
           href="https://web3auth.io/docs/sdk/pnp/web/modal"
-          rel="noreferrer"
-        >
+          rel="noreferrer">
           Web3Auth{" "}
         </a>
       </h1>
 
       {isConnected ? (
         <div>
-          {/*todo move user info inside LoggedInView*/}
+          {/*todo move user info to LoggedInView*/}
 
         <LoggedInView
           connectorName={connectorName}

@@ -19,6 +19,7 @@ export function Balance() {
           symbol: passetHub.nativeCurrency.symbol, // PAS
           name: passetHub.name
         };
+        // todo ditch kusama and westend from the app completely
       case kusamaAssetHub.id:
         return {
           decimals: kusamaAssetHub.nativeCurrency.decimals, // 12

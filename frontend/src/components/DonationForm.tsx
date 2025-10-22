@@ -58,7 +58,7 @@ export function DonationForm({ contractAddress, onSuccess }: DonationFormProps) 
   return (
     <div className="contract-form-section">
       <h3 className="contract-form-title">🎵 Donate to Artist</h3>
-
+      {/*todo change UX of this component to directly submit after clicking on preset. No need to select and submit */}
       <form onSubmit={handleDonation}>
         <div className="form-group">
           <label className="form-label">Artist Music ID</label>

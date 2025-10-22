@@ -45,14 +45,19 @@ export function ContractShaz(params: {
 
   return (
     <div data-testid="contract-data" className="max-w-600">
-      {count && Number(count) > 0 ? (
-        <ArtistsList count={count as bigint} contractAddress={params.contractAddress} />
-      ) : null}
 
+
+      {/*todo move donation form to discoveryCard*/}
       <DonationForm
         contractAddress={params.contractAddress}
         onSuccess={() => refetch()}
       />
+
+      {count && Number(count) > 0 ? (
+        // todo move artist list and surrounding markup and functions into LoggedInView. After delete this ContractShaz
+        <ArtistsList count={count as bigint} contractAddress={params.contractAddress} />
+      ) : null}
+
     </div>
   );
 }

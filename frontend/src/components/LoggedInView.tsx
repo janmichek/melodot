@@ -1,6 +1,6 @@
 import { Balance } from "./Balance";
 import { ContractShaz } from "./ContractShaz";
-import Shazam from "./Shazam";
+import AudioRecorder from "./AudioRecorder";
 import { useChainId, useReadContract } from "wagmi";
 import { passetHub, kusamaAssetHub, westend } from "../wagmi-config";
 import { donateConfig } from "../generated";
@@ -48,7 +48,8 @@ export function LoggedInView({
     if (!address) return;
     const faucetUrl = getFaucetUrl(chainId, address);
     window.open(faucetUrl, "_blank", "noopener,noreferrer");
-  };
+  }
+
   return (
     <div className="grid">
       <div className="showcase-message">
@@ -62,8 +63,10 @@ export function LoggedInView({
         </p>
       </div>
 
-      <Shazam />
+      <AudioRecorder />
 
+
+      {/*todo create header for the app and move there typical info below*/}
       <h2>Connected to {connectorName}</h2>
       <div>Connected address: {address}</div>
       <div>   Name: {userInfo?.name}</div>
@@ -72,6 +75,7 @@ export function LoggedInView({
       {contractAddress && (
         <div className="contract-info-box">
           <p className="contract-info-label">Smart contract address:</p>
+          {/*todo reuse url from wagmi*/}
           <a
             href={`https://blockscout-passet-hub.parity-testnet.parity.io/address/${contractAddress}`}
             target="_blank"

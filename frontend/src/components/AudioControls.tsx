@@ -9,7 +9,8 @@ interface AudioPlayerProps {
   onReset: () => void;
 }
 
-export default function AudioPlayer({
+// todo check this component fo unused props and remove
+export default function AudioControls({
   isRecording,
   isCompleted,
   duration: _duration,
@@ -20,12 +21,13 @@ export default function AudioPlayer({
   return (
     <div className="audio-player-container">
       <div className="audio-player-recording-area">
+        {/*todo move permissionButton here. UX-wise it will display only one button at the time*/}
         {isRecording && (
           <button
             onClick={onStartStop}
             className="audio-player-button"
-            aria-label="Stop recording"
           >
+            {/*todo componentize to separate stopButton.tsx*/}
             <div className="audio-player-recording-pulse"></div>
             <div className="audio-player-button-inner audio-player-recording-bg">
               <Square className="audio-player-icon" />
@@ -33,6 +35,7 @@ export default function AudioPlayer({
           </button>
         )}
         {!isRecording && !isCompleted && (
+          // todo componentize to separate recordButton.tsx
           <button
             onClick={onStartStop}
             className="audio-player-button"

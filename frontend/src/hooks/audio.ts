@@ -77,7 +77,7 @@ export const useAudioRecorder = () => {
       console.error("Error accessing microphone:", error);
     }
   }, []);
-
+// todo remove eslint comments from this component
   const startRecording = useCallback(() => {
     if (state.mediaRecorder && !state.isRecording) {
       audioChunksRef.current = []; // Clear audio chunks on start

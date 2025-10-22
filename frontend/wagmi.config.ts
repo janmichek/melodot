@@ -2,6 +2,7 @@ import { defineConfig } from '@wagmi/cli'
 import { Abi } from 'viem'
 import { readdirSync, readFileSync, existsSync } from 'fs'
 import { join } from 'path'
+// todo why there are 2 wagmi-config files in the app? are they both used? Merge to just one, ideally this one
 
 // Path to your contract artifacts
 const ARTIFACTS_PATH = '../contracts/artifacts-pvm/contracts'

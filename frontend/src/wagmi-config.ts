@@ -1,7 +1,6 @@
 import { http, createConfig } from "wagmi";
 import { type Chain } from "viem";
 import { mainnet } from "wagmi/chains";
-
 export const passetHub = {
   id: 420420422,
   name: "Passet Hub",
