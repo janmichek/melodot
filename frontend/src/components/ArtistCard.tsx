@@ -1,5 +1,6 @@
 import { useReadContract } from "wagmi";
 import { donateConfig } from "../generated";
+import { formatPasBalance, CURRENCY_SYMBOL } from "../wagmi-config";
 import type { Abi } from "viem";
 
 interface ArtistCardProps {
@@ -31,7 +32,8 @@ export function ArtistCard({ artistIndex, contractAddress }: ArtistCardProps) {
           <p>Artist #{artistIndex} - Music ID{musicId} </p>
           <p ></p>
         {isClaimed && <span className="badge-claimed">CLAIMED</span>}
-        <p>Balance {(Number(balance) / 10 ** 10).toFixed(2)} PAS</p>
+        <p>Balance {formatPasBalance(balance)} {CURRENCY_SYMBOL}</p>
+
     </div>
   );
 }

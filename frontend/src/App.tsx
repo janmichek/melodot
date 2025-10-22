@@ -88,6 +88,9 @@ function App() {
     }
   };
 
+  // Extract artist ID for cleaner code
+  const artistId = discoveryData?.track?.artists?.[0]?.adamid;
+
   return (
     <div className="container">
       <Header
@@ -104,26 +107,21 @@ function App() {
         {!discoveryData ? (
           <AudioRecorder onAnalysisComplete={setDiscoveryData} />
         ) : (
-          <div className="discovery-section">
-            <button
-              onClick={() => setDiscoveryData(null)}
-              className="btn-secondary"
-              style={{ marginBottom: '1rem' }}
-            >
-              ← Search Again
-            </button>
+          <>
+            <DiscoveryCard
+              discovery={discoveryData}
+              onSearchAgain={() => setDiscoveryData(null)}
+            />
 
-            <DiscoveryCard discovery={discoveryData} />
-
-            {contractAddress && discoveryData.track?.artists?.[0]?.adamid && (
+            {contractAddress && artistId && (
               <DonationForm
                 contractAddress={contractAddress}
-                artistId={discoveryData.track.artists[0].adamid}
+                artistId={artistId}
                 onSuccess={() => console.log("Donation successful")}
                 onRequireAuth={handleDonateClick}
               />
             )}
-          </div>
+          </>
         )}
 
       </main>

@@ -5,7 +5,11 @@ import { DiscoveryResult } from "../types";
 
 const ATTEMPT_DURATIONS = [10, 15, 20]; // seconds for each attempt
 
-export default function AudioRecorder({ onAnalysisComplete }: { onAnalysisComplete: (data: DiscoveryResult) => void }) {
+interface AudioRecorderProps {
+  onAnalysisComplete: (data: DiscoveryResult) => void;
+}
+
+export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps) {
   const {
     permission,
     audioBlob,
@@ -115,7 +119,6 @@ export default function AudioRecorder({ onAnalysisComplete }: { onAnalysisComple
   const startStop = () => {
     if (!isRecording && !isAnalyzing) {
       // Start listening process
-      console.log('Starting listening process...');
       setCurrentAttempt(0);
       setAttemptStatus(`Attempt 1/${ATTEMPT_DURATIONS.length}`);
       setAllAttemptsFailed(false);
@@ -126,7 +129,6 @@ export default function AudioRecorder({ onAnalysisComplete }: { onAnalysisComple
   };
 
   const reset = () => {
-    console.log('Resetting...');
     setIsAnalyzing(false);
     setDuration(0);
     setCurrentAttempt(0);

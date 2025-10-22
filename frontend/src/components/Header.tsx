@@ -1,5 +1,5 @@
 import { useBalance, useChainId } from "wagmi";
-import { passetHub } from "../wagmi-config";
+import { passetHub, CURRENCY_SYMBOL } from "../wagmi-config";
 import { formatUnits } from "viem";
 
 interface HeaderProps {
@@ -51,7 +51,7 @@ export function Header({
           <div className="header-info-compact">
             <div className="header-chain-badge">{getChainName()}</div>
             <div className="header-divider">|</div>
-            <div className="header-balance">{formatBalance()} {balance?.symbol || "PAS"}</div>
+            <div className="header-balance">{formatBalance()} {balance?.symbol || CURRENCY_SYMBOL}</div>
             <div className="header-divider">|</div>
             <a
               href="https://faucet.polkadot.io/"

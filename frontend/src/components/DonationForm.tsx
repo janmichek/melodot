@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { donateConfig } from "../generated";
+import { CURRENCY_SYMBOL } from "../wagmi-config";
 import type { Abi } from "viem";
 import { parseEther } from "viem";
 
@@ -92,7 +93,7 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
               disabled={isSubmitting || isWritePending || isConfirming}
               className="btn-amount-selector"
             >
-              {isWritePending || isConfirming ? "Donating..." : `${amount} PAS`}
+              {isWritePending || isConfirming ? "Donating..." : `${amount} ${CURRENCY_SYMBOL}`}
             </button>
           ))}
         </div>

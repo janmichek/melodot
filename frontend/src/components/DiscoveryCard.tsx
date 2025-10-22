@@ -1,6 +1,11 @@
 import { DiscoveryResult } from "../types";
 
-export default function DiscoveryCard({ discovery }: { discovery: DiscoveryResult }) {
+interface DiscoveryCardProps {
+  discovery: DiscoveryResult;
+  onSearchAgain?: () => void;
+}
+
+export default function DiscoveryCard({ discovery, onSearchAgain }: DiscoveryCardProps) {
   if (!discovery) {
     console.log('DiscoveryCard: No discovery provided');
     return null;
@@ -33,6 +38,15 @@ export default function DiscoveryCard({ discovery }: { discovery: DiscoveryResul
 
   return (
     <div className="discovery-card">
+      {onSearchAgain && (
+        <button
+          onClick={onSearchAgain}
+          className="btn-secondary"
+          style={{ marginBottom: '1rem' }}
+        >
+          ← Search Again
+        </button>
+      )}
       <div className="discovery-track-info">
         <p><strong>Title:</strong> {track.title || 'Unknown'}</p>
         <p><strong>Artist:</strong> {track.subtitle || 'Unknown'}</p>
