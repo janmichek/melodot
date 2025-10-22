@@ -1487,6 +1487,40 @@ button, .card {
 	color: var(--text-muted);
 }
 
+.discovery-raw-response {
+	margin-top: 20px;
+	padding-top: 16px;
+	border-top: 1px solid var(--border-color);
+}
+
+.discovery-raw-response summary {
+	cursor: pointer;
+	font-weight: 600;
+	color: var(--text-muted);
+	font-size: 13px;
+	padding: 8px 0;
+	user-select: none;
+	transition: color 0.2s;
+}
+
+.discovery-raw-response summary:hover {
+	color: var(--text-color);
+}
+
+.discovery-raw-response pre {
+	margin-top: 12px;
+	padding: 16px;
+	background-color: var(--bg-color);
+	border: 1px solid var(--border-color);
+	border-radius: var(--radius);
+	overflow-x: auto;
+	font-size: 12px;
+	line-height: 1.5;
+	color: var(--text-color);
+	max-height: 400px;
+	overflow-y: auto;
+}
+
 /* Shazam component styles */
 .shazam-container {
 	display: flex;
@@ -1976,22 +2010,95 @@ button, .card {
 
 /* Duration display */
 .duration-display {
+	font-size: 20px;
+	font-weight: 600;
+	color: var(--text-muted);
+	text-align: center;
+}
+
+/* Attempt info container */
+.attempt-info {
 	position: absolute;
 	top: 80px;
 	left: 50%;
 	transform: translateX(-50%);
-	font-size: 48px;
-	font-weight: 700;
-	color: var(--text-color);
 	text-align: center;
 	z-index: 10;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	align-items: center;
+}
+
+.attempt-status {
+	font-size: 24px;
+	font-weight: 700;
+	color: var(--primary-color);
 	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+.attempt-info .duration-display {
+	font-size: 32px;
+	font-weight: 700;
+	color: var(--text-color);
+	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* No match message */
+.no-match-message {
+	text-align: center;
+	padding: 32px 24px;
+	background-color: rgba(239, 68, 68, 0.1);
+	border: 1px solid rgba(239, 68, 68, 0.2);
+	border-radius: var(--radius);
+	max-width: 400px;
+	margin: 0 auto;
+}
+
+.no-match-message p {
+	font-size: 18px;
+	color: var(--text-color);
+	margin-bottom: 20px;
+	font-weight: 600;
+}
+
+.no-match-message .btn-secondary {
+	background-color: var(--primary-color);
+	color: white;
+	border: none;
+	padding: 12px 24px;
+	font-size: 16px;
+	font-weight: 600;
+	border-radius: var(--radius);
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.no-match-message .btn-secondary:hover {
+	background-color: var(--primary-hover);
+	transform: translateY(-1px);
+}
+
 @media (max-width: 640px) {
-	.duration-display {
-		font-size: 36px;
+	.attempt-info {
 		top: 60px;
+	}
+
+	.attempt-status {
+		font-size: 18px;
+	}
+
+	.attempt-info .duration-display {
+		font-size: 24px;
+	}
+
+	.no-match-message {
+		padding: 24px 16px;
+		max-width: 90%;
+	}
+
+	.no-match-message p {
+		font-size: 16px;
 	}
 }
 
@@ -2068,5 +2175,153 @@ button, .card {
 
 	.discovery-section {
 		padding: 16px;
+	}
+}
+
+/* Contract Info Footer Styles - Minimalist */
+.contract-footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: rgba(23, 28, 42, 0.95);
+	backdrop-filter: blur(8px);
+	border-top: 1px solid rgba(59, 65, 92, 0.3);
+	z-index: 100;
+}
+
+.contract-footer-content {
+	padding: 6px 16px;
+}
+
+.contract-info-inline {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	font-size: 11px;
+	color: var(--text-muted);
+}
+
+.contract-info-item {
+	font-family: var(--font-sans);
+}
+
+.contract-info-separator {
+	opacity: 0.5;
+}
+
+.contract-info-link {
+	color: var(--text-muted);
+	text-decoration: none;
+	font-family: monospace;
+	transition: color 0.2s;
+}
+
+.contract-info-link:hover {
+	color: var(--primary-color);
+}
+
+.contract-info-toggle {
+	background: none;
+	border: none;
+	color: var(--text-muted);
+	font-family: var(--font-sans);
+	font-size: 11px;
+	cursor: pointer;
+	padding: 0;
+	margin: 0;
+	transition: color 0.2s;
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	line-height: 1;
+	min-height: auto;
+}
+
+.contract-info-toggle:hover {
+	color: var(--primary-color);
+}
+
+.contract-footer-artists {
+	margin-top: 8px;
+	padding-top: 8px;
+	border-top: 1px solid rgba(59, 65, 92, 0.2);
+	font-size: 9px;
+}
+
+/* Make ArtistsList more compact in footer */
+.contract-footer-artists .artists-list-title {
+	font-size: 9px;
+	margin-bottom: 4px;
+	opacity: 0.6;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+}
+
+.contract-footer-artists .artists-list-container {
+	gap: 4px;
+}
+
+.contract-footer-artists .artist-card {
+	padding: 4px 6px;
+	font-size: 8px;
+	background-color: rgba(35, 41, 61, 0.3);
+	border: 1px solid rgba(59, 65, 92, 0.2);
+	gap: 4px;
+}
+
+.contract-footer-artists .artist-card-label {
+	font-size: 7px;
+	opacity: 0.5;
+	margin-bottom: 2px;
+}
+
+.contract-footer-artists .artist-card-value {
+	font-size: 8px;
+	font-weight: 500;
+}
+
+.contract-footer-artists .artist-card-balance {
+	font-size: 9px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.contract-info-inline {
+		font-size: 9px;
+		gap: 4px;
+	}
+
+	.contract-footer-content {
+		padding: 4px 12px;
+	}
+
+	.contract-info-toggle {
+		font-size: 9px;
+		gap: 2px;
+	}
+
+	.contract-footer-artists .artists-list-title {
+		font-size: 8px;
+	}
+
+	.contract-footer-artists .artist-card {
+		padding: 3px 5px;
+		font-size: 7px;
+	}
+
+	.contract-footer-artists .artist-card-label {
+		font-size: 6px;
+	}
+
+	.contract-footer-artists .artist-card-value {
+		font-size: 7px;
+	}
+
+	.contract-footer-artists .artist-card-balance {
+		font-size: 8px;
 	}
 }

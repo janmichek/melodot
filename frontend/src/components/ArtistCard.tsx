@@ -23,22 +23,15 @@ export function ArtistCard({ artistIndex, contractAddress }: ArtistCardProps) {
   if (!artistData) {
     return <p className="p-text">No data found for artist #{artistIndex}</p>;
   }
-  console.log('artistData', artistData)
+
   const [musicId, balance, isClaimed] = artistData as [string, bigint, boolean];
 
   return (
     <div className="artist-card">
-      <div className="artist-card-header">
-        <div className="artist-card-content">
-          <p className="artist-card-label">Artist #{artistIndex} - Music ID</p>
-          <p className="artist-card-value">{musicId}</p>
-        </div>
+          <p>Artist #{artistIndex} - Music ID{musicId} </p>
+          <p ></p>
         {isClaimed && <span className="badge-claimed">CLAIMED</span>}
-      </div>
-      <div>
-        <p className="artist-card-label">Balance</p>
-        <p className="artist-card-balance">{Number(balance) / 1e18} PAS</p>
-      </div>
+        <p>Balance {(Number(balance) / 10 ** 10).toFixed(2)} PAS</p>
     </div>
   );
 }

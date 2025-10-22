@@ -49,13 +49,14 @@ export function ContractShaz({ contractAddress }: ContractShazProps) {
 
       <DonationForm
         contractAddress={contractAddress}
+        artistId="test-artist-123"
         onSuccess={() => refetch()}
       />
-
+a
       {count && Number(count) > 0 ? (
         <ArtistsList count={count as bigint} contractAddress={contractAddress} />
       ) : null}
-
+bb
     </div>
   );
 }

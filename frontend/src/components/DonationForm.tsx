@@ -6,14 +6,12 @@ import { parseEther } from "viem";
 
 interface DonationFormProps {
   contractAddress: `0x${string}`;
+  artistId: string;
   onSuccess?: () => void;
   onRequireAuth?: () => void;
 }
 
-// Mock artist ID for testing - replace with actual artist ID from discovery
-const MOCK_ARTIST_ID = "artist-123-mock";
-
-export function DonationForm({ contractAddress, onSuccess, onRequireAuth }: DonationFormProps) {
+export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAuth }: DonationFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { isConnected } = useAccount();
 
@@ -41,14 +39,13 @@ export function DonationForm({ contractAddress, onSuccess, onRequireAuth }: Dona
 
     if (isSubmitting || isWritePending || isConfirming) return;
 
-    // instead og mock artist id use id from discovery
     try {
       setIsSubmitting(true);
       writeContract({
         address: contractAddress,
         abi: donateConfig.abi as Abi,
         functionName: "donateToArtist",
-        args: [MOCK_ARTIST_ID],
+        args: [artistId],
         value: parseEther(amount.toString()),
       });
     } catch (err) {
@@ -84,7 +81,7 @@ export function DonationForm({ contractAddress, onSuccess, onRequireAuth }: Dona
     <div className="contract-form-section">
       <h3 className="contract-form-title">🎵 Donate to Artist</h3>
       <div className="form-group">
-        <p className="form-label">Artist ID: {MOCK_ARTIST_ID}</p>
+        <p className="form-label">Artist ID: {artistId}</p>
         <p className="form-label">Select amount to donate instantly:</p>
         <div className="amount-selector-group">
           {[1, 2, 10].map((amount) => (

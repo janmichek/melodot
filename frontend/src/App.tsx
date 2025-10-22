@@ -12,6 +12,7 @@ import { Header } from "./components/Header";
 import AudioRecorder from "./components/AudioRecorder";
 import DiscoveryCard from "./components/DiscoveryCard";
 import { DonationForm } from "./components/DonationForm";
+import { ContractInfoFooter } from "./components/ContractInfoFooter";
 import { DiscoveryResult } from "./types";
 
 function App() {
@@ -114,9 +115,10 @@ function App() {
 
             <DiscoveryCard discovery={discoveryData} />
 
-            {contractAddress && (
+            {contractAddress && discoveryData.track?.artists?.[0]?.adamid && (
               <DonationForm
                 contractAddress={contractAddress}
+                artistId={discoveryData.track.artists[0].adamid}
                 onSuccess={() => console.log("Donation successful")}
                 onRequireAuth={handleDonateClick}
               />
@@ -125,6 +127,8 @@ function App() {
         )}
 
       </main>
+
+      {contractAddress && <ContractInfoFooter contractAddress={contractAddress} />}
     </div>
   );
 }
