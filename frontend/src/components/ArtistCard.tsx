@@ -1,16 +1,15 @@
-import { useReadContract } from "wagmi";
-import { donateConfig } from "../generated";
-import { formatPasBalance, CURRENCY_SYMBOL } from "../wagmi-config";
-import type { Abi } from "viem";
+import {useReadContract} from "wagmi";
+import {donateConfig} from "../generated";
+import {formatPasBalance, CURRENCY_SYMBOL} from "../wagmi-config";
+import type {Abi} from "viem";
 
 interface ArtistCardProps {
   artistIndex: number;
   contractAddress: `0x${string}`;
 }
 
-export function ArtistCard({ artistIndex, contractAddress }: ArtistCardProps) {
-
-  const { data: artistData, isLoading } = useReadContract({
+export function ArtistCard({artistIndex, contractAddress}: ArtistCardProps) {
+  const {data: artistData, isLoading} = useReadContract({
     address: contractAddress,
     abi: donateConfig.abi as Abi,
     functionName: "artists",
@@ -29,11 +28,9 @@ export function ArtistCard({ artistIndex, contractAddress }: ArtistCardProps) {
 
   return (
     <div className="artist-card">
-          <p>Artist #{artistIndex} - Music ID{musicId} </p>
-          <p ></p>
-        {isClaimed && <span className="badge-claimed">CLAIMED</span>}
-        <p>Balance {formatPasBalance(balance)} {CURRENCY_SYMBOL}</p>
-
+      <p>Artist #{artistIndex} - Music ID{musicId} </p>
+      {isClaimed && <span className="badge-claimed">CLAIMED</span>}
+      <p>Balance {formatPasBalance(balance)} {CURRENCY_SYMBOL}</p>
     </div>
   );
 }

@@ -1,4 +1,3 @@
-import { ButtonProps } from "../types";
 interface PermissionButtonProps {
   onRequestPermission: () => void;
 }

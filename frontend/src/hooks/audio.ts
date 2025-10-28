@@ -6,7 +6,6 @@ interface AudioRecorderState {
   permission: boolean;
   errorMessage: string | null;
   isRecording: boolean;
-  isPaused: boolean;
 }
 
 export const useAudioRecorder = () => {
@@ -16,7 +15,6 @@ export const useAudioRecorder = () => {
     permission: false,
     errorMessage: null,
     isRecording: false,
-    isPaused: false,
   });
   const audioChunksRef = useRef<Blob[]>([]);
 
@@ -35,15 +33,7 @@ export const useAudioRecorder = () => {
       });
 
       mediaRecorder.onstart = () => {
-        setState((prev) => ({ ...prev, isRecording: true, isPaused: false }));
-      };
-
-      mediaRecorder.onresume = () => {
-        setState((prev) => ({ ...prev, isPaused: false }));
-      };
-
-      mediaRecorder.onpause = () => {
-        setState((prev) => ({ ...prev, isPaused: true }));
+        setState((prev) => ({ ...prev, isRecording: true }));
       };
 
       mediaRecorder.ondataavailable = (event) => {
@@ -58,7 +48,6 @@ export const useAudioRecorder = () => {
           ...prev,
           audioBlob,
           isRecording: false,
-          isPaused: false,
         }));
       };
 
@@ -68,6 +57,7 @@ export const useAudioRecorder = () => {
         permission: true,
         errorMessage: null,
       }));
+
     } catch (error) {
       setState((prev) => ({
         ...prev,
@@ -77,34 +67,21 @@ export const useAudioRecorder = () => {
       console.error("Error accessing microphone:", error);
     }
   }, []);
+
   const startRecording = useCallback(() => {
     if (state.mediaRecorder && !state.isRecording) {
       audioChunksRef.current = []; // Clear audio chunks on start
       state.mediaRecorder.start();
-      setState((prev) => ({ ...prev, isRecording: true, isPaused: false }));
+      setState((prev) => ({ ...prev, isRecording: true}));
     }
   }, [state.mediaRecorder, state.isRecording]);
 
   const stopRecording = useCallback(() => {
     if (state.mediaRecorder && state.isRecording) {
       state.mediaRecorder.stop();
-      setState((prev) => ({ ...prev, isRecording: false, isPaused: false }));
+      setState((prev) => ({ ...prev, isRecording: false}));
     }
   }, [state.mediaRecorder, state.isRecording]);
-
-  const resumeRecording = useCallback(() => {
-    if (state.mediaRecorder && state.isPaused) {
-      state.mediaRecorder.resume();
-      setState((prev) => ({ ...prev, isPaused: false }));
-    }
-  }, [state.mediaRecorder, state.isPaused]);
-
-  const pauseRecording = useCallback(() => {
-    if (state.mediaRecorder && state.isRecording && !state.isPaused) {
-      state.mediaRecorder.pause();
-      setState((prev) => ({ ...prev, isPaused: true }));
-    }
-  }, [state.mediaRecorder, state.isRecording, state.isPaused]);
 
   const resetRecording = useCallback(() => {
     if (state.mediaRecorder) {
@@ -114,7 +91,6 @@ export const useAudioRecorder = () => {
         ...prev,
         audioBlob: null,
         isRecording: false,
-        isPaused: false,
       }));
     }
   }, [state.mediaRecorder]);
@@ -124,8 +100,6 @@ export const useAudioRecorder = () => {
     requestPermission,
     startRecording,
     stopRecording,
-    pauseRecording,
-    resumeRecording,
     resetRecording,
   };
 };

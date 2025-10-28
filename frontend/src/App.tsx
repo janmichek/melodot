@@ -25,27 +25,24 @@ function App() {
     disconnect,
     loading: disconnectLoading,
   } = useWeb3AuthDisconnect();
+
   const { web3Auth } = useWeb3Auth();
   const { address } = useAccount();
 
-  // Provider readiness state
   const [providerReady, setProviderReady] = useState(false);
-
-  // Discovery state - lifted from AudioRecorder
   const [discoveryData, setDiscoveryData] = useState<DiscoveryResult | null>(null);
 
-  // Track Web3Auth provider initialization
   useEffect(() => {
-    const checkProviderStatus = () => {
+    const verifyProviderReady = () => {
       if (web3Auth) {
         try {
           const isInitialized = web3Auth.status === "ready";
           const isNotConnecting = !connectLoading;
-          const canLogin = isInitialized && isNotConnecting;
+          const isReadyToLogin = isInitialized && isNotConnecting;
 
-          setProviderReady(canLogin);
+          setProviderReady(isReadyToLogin);
 
-          if (canLogin) {
+          if (isReadyToLogin) {
             return true;
           }
         } catch (error) {
@@ -58,12 +55,13 @@ function App() {
       return false;
     };
 
-    if (checkProviderStatus()) {
+    if (verifyProviderReady()) {
       return;
     }
 
     const interval = setInterval(() => {
-      if (checkProviderStatus()) {
+      // Poll Web3Auth provider status every 200ms until it's ready, then stop polling
+      if (verifyProviderReady()) {
         clearInterval(interval);
       }
     }, 200);
@@ -86,9 +84,9 @@ function App() {
     if (!isConnected) {
       void connect();
     }
+    // and next?
   };
 
-  // Extract artist ID for cleaner code
   const artistId = discoveryData?.track?.artists?.[0]?.adamid;
 
   return (
@@ -117,7 +115,7 @@ function App() {
               <DonationForm
                 contractAddress={contractAddress}
                 artistId={artistId}
-                onSuccess={() => console.log("Donation successful")}
+                onSuccess={() => alert("Donation successful")}
                 onRequireAuth={handleDonateClick}
               />
             )}
@@ -126,7 +124,7 @@ function App() {
 
       </main>
 
-      {contractAddress && <ContractInfoFooter contractAddress={contractAddress} />}
+     <ContractInfoFooter contractAddress={contractAddress} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { createElement } from 'react';
-
+// NOTE: Test configuration needs to be updated for current project structure and added to package.json scripts
 // Mock Web3Auth hooks
 vi.mock('@web3auth/modal/react', () => ({
   useWeb3AuthConnect: vi.fn(() => ({

@@ -16,7 +16,6 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { isConnected } = useAccount();
 
-  // Write contract hook
   const {
     data: hash,
     writeContract,
@@ -25,15 +24,15 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
     reset: resetWrite,
   } = useWriteContract();
 
-  // Wait for transaction confirmation
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-  });
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed
+  } = useWaitForTransactionReceipt({hash,});
+  // todo make transaction loading better
 
-  // Handle direct donation with preset amount
-  const handleDirectDonation = async (amount: number) => {
-    // Check if user is connected, if not trigger auth modal
-    if (!isConnected) {
+
+  const donate = async (amount: number) => {
+     if (!isConnected) {
       onRequireAuth?.();
       return;
     }
@@ -89,7 +88,7 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
             <button
               key={amount}
               type="button"
-              onClick={() => handleDirectDonation(amount)}
+              onClick={() => donate(amount)}
               disabled={isSubmitting || isWritePending || isConfirming}
               className="btn-amount-selector"
             >
@@ -113,7 +112,6 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
         </div>
       )}
 
-      {/* Error Display */}
       {writeError && (
         <div className="error-box">❌ Error: {writeError.message}</div>
       )}

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useBalance, useChainId } from "wagmi";
 import { passetHub, CURRENCY_SYMBOL } from "../wagmi-config";
 import { formatUnits } from "viem";
@@ -21,15 +22,13 @@ export function Header({
   disconnectLoading,
   providerReady,
 }: HeaderProps) {
+  const [copied, setCopied] = useState(false);
   const chainId = useChainId();
-  const { data: balance } = useBalance({
+  const { data: balance , isLoading} = useBalance({
     address: address,
     chainId: passetHub.id,
   });
 
-  const formatAddress = (addr: string) => {
-    return `${addr.slice(0, 4)}...${addr.slice(-3)}`;
-  };
 
   const getChainName = () => {
     if (chainId === passetHub.id) return "Passet Hub";
@@ -37,11 +36,12 @@ export function Header({
     return "Unknown";
   };
 
-  const formatBalance = () => {
-    if (!balance) return "0";
-    const formatted = formatUnits(balance.value, balance.decimals);
-    const num = parseFloat(formatted);
-    return num.toFixed(2);
+  const handleCopyAddress = () => {
+    if (address) {
+      navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (
@@ -51,25 +51,34 @@ export function Header({
           <div className="header-info-compact">
             <div className="header-chain-badge">{getChainName()}</div>
             <div className="header-divider">|</div>
-            <div className="header-balance">{formatBalance()} {balance?.symbol || CURRENCY_SYMBOL}</div>
+            <div className="header-balance">
+              {/*todo balance is not formatted right*/}
+              {balance?.value !== undefined
+                ? `${formatUnits(balance.value, balance.decimals)} ${balance.symbol || CURRENCY_SYMBOL}`
+                : '---'}
+              {/*todo use isLoading instead*/}
+            </div>
             <div className="header-divider">|</div>
             <a
               href="https://faucet.polkadot.io/"
               target="_blank"
               rel="noopener noreferrer"
               className="header-faucet-link"
-              title="Get test tokens"
-            >
+              title="Get test tokens">
               Faucet
             </a>
             <div className="header-divider">|</div>
-            <div className="header-address">{formatAddress(address)}</div>
+            <div
+              className={`header-address ${copied ? 'header-address-copied' : ''}`}
+              onClick={handleCopyAddress}
+              title={copied ? "Copied!" : "Click to copy address"}>
+              {copied ? "✓ Copied!" : `${address.slice(0, 4)}...${address.slice(-3)}`}
+            </div>
             <button
               onClick={onDisconnect}
               className="header-disconnect-btn"
               disabled={disconnectLoading}
-              title="Disconnect wallet"
-            >
+              title="Disconnect wallet">
               ✕
             </button>
           </div>
@@ -77,8 +86,7 @@ export function Header({
           <button
             onClick={onConnect}
             className="header-connect-btn"
-            disabled={connectLoading || !providerReady}
-          >
+            disabled={connectLoading || !providerReady}>
             {connectLoading ? "•••" : "Connect"}
           </button>
         )}

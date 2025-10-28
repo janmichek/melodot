@@ -1,9 +1,3 @@
-// Shared component props
-export interface ButtonProps {
-  onClick: () => void;
-}
-
-// Simplified types for what we actually use in the app
 export interface DiscoveryResult {
   track?: {
     title?: string;

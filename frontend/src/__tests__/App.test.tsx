@@ -97,7 +97,7 @@ describe('App Component', () => {
       render(<App />);
 
       expect(screen.getByText(/Interact directly with Polkadot Asset Hub - no MetaMask required/)).toBeInTheDocument();
-      expect(screen.getByText(/Check Your Balance/)).toBeInTheDocument();
+      expect(screen.getByText(/Check Your BalanceLabel/)).toBeInTheDocument();
       // Send Transactions section is commented out in the component
       // expect(screen.getByText(/Send Transactions/)).toBeInTheDocument();
       expect(screen.getByText(/Smart Contract Interactions/)).toBeInTheDocument();

@@ -6,7 +6,8 @@ interface AudioControlsProps {
   permission: boolean;
   isRecording: boolean;
   isAnalyzing: boolean;
-  onStartStop: () => void;
+  onStart: () => void;
+  onStop: () => void;
   onRequestPermission: () => void;
 }
 
@@ -14,7 +15,8 @@ export default function AudioControls({
   permission,
   isRecording,
   isAnalyzing,
-  onStartStop,
+  onStart,
+  onStop,
   onRequestPermission,
 }: AudioControlsProps) {
   const isCurrentlyRecording = permission && isRecording;
@@ -24,8 +26,8 @@ export default function AudioControls({
     <div className="audio-player-container">
       <div className="audio-player-recording-area">
         {!permission && (<PermissionButton onRequestPermission={onRequestPermission} />)}
-        {isCurrentlyRecording && (<StopButton onClick={onStartStop} />)}
-        {isReadyToRecord && (<RecordButton onClick={onStartStop} />)}
+        {isReadyToRecord && (<RecordButton onClick={onStart} />)}
+        {isCurrentlyRecording && (<StopButton onClick={onStop} />)}
         {isAnalyzing && (<div className="audio-player-analyzing">Analyzing ...</div>)}
       </div>
     </div>

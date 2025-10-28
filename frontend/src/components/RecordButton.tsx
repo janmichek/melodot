@@ -1,7 +1,10 @@
 import { Mic } from "lucide-react";
-import { ButtonProps } from "../types";
 
-export default function RecordButton({ onClick }: ButtonProps) {
+interface RecordButtonProps {
+  onClick: () => void;
+}
+
+export default function RecordButton({ onClick }: RecordButtonProps) {
   return (
     <button
       onClick={onClick}

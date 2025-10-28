@@ -26,15 +26,17 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...{ channel: 'chrome' },
-        // Use persistent context for session storage
-        storageState: path.join(__dirname, 'tests/session-state.json')
+        // Storage state is optional - only used if file exists
+        // storageState: path.join(__dirname, 'tests/session-state.json')
       },
     }
   ],
 
   webServer: {
-    command: 'npm run dev',
+    command: 'bun run start',
     port: 5174,
     reuseExistingServer: !process.env.CI,
+    timeout: 120000,
   }
 });
+// NOTE: Playwright tests needed for 3 basic user flows: 1) Connect wallet, 2) Record audio and identify song, 3) Donate to artist

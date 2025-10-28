@@ -1,7 +1,10 @@
 import { Square } from "lucide-react";
-import { ButtonProps } from "../types";
 
-export default function StopButton({ onClick }: ButtonProps) {
+interface StopButtonProps {
+  onClick: () => void;
+}
+
+export default function StopButton({ onClick }: StopButtonProps) {
   return (
     <button onClick={onClick} className="audio-player-button">
       <div className="audio-player-recording-pulse"></div>

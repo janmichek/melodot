@@ -30,12 +30,10 @@ export const wagmiConfig = createConfig({
   },
 });
 
-// Utility function to format balance with proper decimals
 export const formatPasBalance = (balance: bigint | number | string): string => {
   const decimals = passetHub.nativeCurrency.decimals;
   const numBalance = typeof balance === 'bigint' ? Number(balance) : typeof balance === 'string' ? Number(balance) : balance;
   return (numBalance / 10 ** decimals).toFixed(2);
 };
 
-// Export currency symbol for easy access
 export const CURRENCY_SYMBOL = passetHub.nativeCurrency.symbol;

@@ -16,9 +16,13 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "src/components/sendTransaction.tsx", "src/components/switchNetwork.tsx", "src/components/writeContract.tsx",
-    "src/components/Balance.tsx"
+  "include": [
+    "src",
+    "src/components/sendTransaction.tsx",
+    "src/components/switchNetwork.tsx",
+    "src/components/writeContract.tsx",
+    "src/components/BalanceLabel.tsx",
+    "vite.config.ts"
   ],
-  "exclude": ["src/**/*.test.*", "src/**/*.spec.*", "src/test/**/*"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "exclude": ["src/**/*.test.*", "src/**/*.spec.*", "src/test/**/*"]
 }

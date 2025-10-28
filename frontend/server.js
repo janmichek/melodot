@@ -1,7 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
+import dotenv from 'dotenv';
 
+// Load environment variables from .env.local
+dotenv.config({ path: '.env.local' });
+
+// Backend proxy server for Shazam API calls to keep API keys secure and handle CORS
+// Located here as a separate Express server since this is a Vite React app (not Next.js)
+// Migration options: 1) Keep as is, 2) Move to serverless functions (Vercel/Netlify), 3) Migrate to Next.js API routes
 const app = express();
 const upload = multer();
 
@@ -23,11 +30,10 @@ app.post('/api/analyze-audio', upload.single('file'), async (req, res) => {
     const formData = new FormData();
     const blob = new Blob([file.buffer], { type: file.mimetype });
     formData.append('file', blob, file.originalname || 'audio.webm');
-
     const response = await fetch('https://shazam-core.p.rapidapi.com/v1/tracks/recognize', {
       method: 'POST',
       headers: {
-        'X-RapidAPI-Key': 'f9d2d5b1aemshf28fd91ecdffa27p1bf5bcjsn3f1c0b54fd62',
+        'X-RapidAPI-Key': process.env.VITE_RAPIDAPI_KEY,
         'X-RapidAPI-Host': 'shazam-core.p.rapidapi.com',
       },
       body: formData,
@@ -86,7 +92,7 @@ app.get('/api/artist-info', async (req, res) => {
       `https://shazam-core.p.rapidapi.com/v2/artists/search?query=${encodeURIComponent(artist)}&limit=1`,
       {
         headers: {
-          'X-RapidAPI-Key': 'f9d2d5b1aemshf28fd91ecdffa27p1bf5bcjsn3f1c0b54fd62',
+          'X-RapidAPI-Key': process.env.VITE_RAPIDAPI_KEY,
           'X-RapidAPI-Host': 'shazam-core.p.rapidapi.com',
         },
       }
