@@ -1,12 +1,25 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Donate
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ *
+ */
 export const donateAbi = [
   { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
   {
     type: 'function',
     inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'artistIds',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'string', type: 'string' }],
     name: 'artists',
     outputs: [
-      { name: 'musicId', internalType: 'string', type: 'string' },
-      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'totalBalance', internalType: 'uint256', type: 'uint256' },
       { name: 'isClaimed', internalType: 'bool', type: 'bool' },
     ],
     stateMutability: 'view',
@@ -20,10 +33,31 @@ export const donateAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'id', internalType: 'string', type: 'string' }],
+    inputs: [{ name: 'artistId', internalType: 'string', type: 'string' }],
+    name: 'claimArtist',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'artistId', internalType: 'string', type: 'string' }],
     name: 'donateToArtist',
     outputs: [],
     stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'artistId', internalType: 'string', type: 'string' }],
+    name: 'getArtistBalance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'artistId', internalType: 'string', type: 'string' }],
+    name: 'getArtistStatus',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -39,17 +73,16 @@ export const donateAbi = [
     outputs: [],
     stateMutability: 'payable',
   },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'withdraw',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
 ] as const
 
+/**
+ *
+ */
 export const donateAddress = {
-  420420422: '0x610114a18441C012840483D00BDeE489B9f704c5',
+  420420422: '0x7e1CF432F4990E7a0a74fe9897F110066b38a237',
 } as const
 
+/**
+ *
+ */
 export const donateConfig = { address: donateAddress, abi: donateAbi } as const

@@ -6,90 +6,68 @@ contract Donate {
     address private owner;
     uint256 public balance;
 
-    struct Artist {
-        string musicId;
-        uint balance;
+    struct ArtistData {
+        uint256 totalBalance;
         bool isClaimed;
     }
 
-    struct Donation {
-        address donor;
-        uint musicId;
-        uint256 amount;
-        uint256 timestamp;
-    }
+    // Store artist data by ID (string => ArtistData)
+    mapping(string => ArtistData) public artists;
+
+    // Keep track of all artist IDs for iteration
+    string[] public artistIds;
 
     constructor() {
         owner = msg.sender;
     }
 
-/*
-Possible Solutions:
-
-1. Events + Indexing (Best approach)
-- Emit an event in the contract when an artist
-is created/donated to
-- Use a service like The Graph, or client-side
-indexing to track all artist IDs
-- Query the indexed list of IDs
-2. Array alongside mapping (Requires contract
-change)
-- Add string[] public artistIds; to the contract
-- Push new artist IDs to the array when created
-- Iterate through the array to fetch all artists
-- ⚠️ This would require redeploying the contract
-3. Client-side tracking (Current solution)
-- Keep track of artist IDs as users interact
-with them (already implemented)
-- Store known artist IDs in localStorage or a
-database
-- This is what the component currently does when
-you query or donate
-4. Subgraph/Indexer (Production-ready)
-- Use The Graph protocol to index blockchain
-events
-- Query all historical donations and extract
-artist IDs
-- Most scalable solution for production
-
-Would you like me to implement any of these
-solutions? The easiest immediate fix would be to
-modify the contract to include an array of artist
-IDs, but that requires a redeploy.
-
-*/
-//mapping(string => Artist) public artists;
-    // mapping(uint256 => Donation[]) public projectDonations;
-    Artist[] public artists;
-
-    function tip() external payable {
-        payable(owner).transfer(msg.value);
-    }
-
     function getArtistsCount() public view returns (uint) {
-        return artists.length;
+        return artistIds.length;
     }
 
-    function donateToArtist(string memory id) external payable {
-        uint donatedAmount = msg.value;
-       //  uint tip = donatedAmount / 10;
-      //  uint artistRoyality = (donatedAmount / 10) * 9;
-        // payable(owner).transfer(tip);
-        Artist memory newArtist = Artist(id,msg.value, false );
-//        artists[id] = newArtist;
-        artists.push(newArtist);
+    function donateToArtist(string memory artistId) external payable {
+        uint256 donatedAmount = msg.value;
+        require(donatedAmount > 0, "Donation amount must be greater than 0");
+
+        // If artist doesn't exist yet, add them to the list
+        if (artists[artistId].totalBalance == 0) {
+            artistIds.push(artistId);
+        }
+
+        // Add donation to artist's balance
+        artists[artistId].totalBalance += donatedAmount;
         balance += donatedAmount;
-        /*   artists[id].balance += artistRoyality;*/
     }
 
-        function withdraw() external {
-                 require(msg.sender == owner, "Not owner");
-            (bool success, bytes memory data) = owner.call{ value: address(this).balance }("");
-        require(success);
+    function getArtistBalance(string memory artistId) public view returns (uint256) {
+        return artists[artistId].totalBalance;
+    }
+
+    function getArtistStatus(string memory artistId) public view returns (bool) {
+        return artists[artistId].isClaimed;
+    }
+
+    function claimArtist(string memory artistId) external returns (uint256) {
+        require(bytes(artistId).length > 0, "Artist ID cannot be empty");
+
+        uint256 claimedAmount = artists[artistId].totalBalance;
+        require(claimedAmount > 0, "No balance to claim");
+        require(!artists[artistId].isClaimed, "Artist already claimed");
+
+        // Mark artist as claimed
+        artists[artistId].isClaimed = true;
+
+        return claimedAmount;
+    }
+
+//    function withdraw() external {
+//                 require(msg.sender == owner, "Not owner");
+//            (bool success, bytes memory data) = owner.call{ value: address(this).balance }("");
+//        require(success);
 
 
         // emit Approved(contractBalance);
-    }
+//    }
 
     /*
     function claim(address id) public view returns (uint256) {

@@ -15,7 +15,7 @@ interface DonationFormProps {
 export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAuth }: DonationFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { isConnected } = useAccount();
-
+  console.log('artistId', artistId)
   const {
     data: hash,
     writeContract,
