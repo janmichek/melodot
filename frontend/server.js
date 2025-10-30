@@ -15,6 +15,17 @@ const upload = multer();
 app.use(cors());
 app.use(express.json());
 
+// In-memory session storage (for production, use Redis or a database)
+const sessions = new Map();
+
+// Spotify OAuth configuration
+const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
+const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
+const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
+const SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize';
+const SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token';
+const SPOTIFY_API_URL = 'https://api.spotify.com/v1';
+
 // Analyze audio endpoint
 app.post('/api/analyze-audio', upload.single('file'), async (req, res) => {
   try {
@@ -143,6 +154,131 @@ app.get('/api/artist-info', async (req, res) => {
       error: 'Failed to fetch artist info',
       details: errorMessage
     });
+  }
+});
+
+// Spotify OAuth - Login endpoint
+app.post('/api/spotify/login', (req, res) => {
+  try {
+    if (!SPOTIFY_CLIENT_ID) {
+      return res.status(500).json({ error: 'Spotify client ID not configured' });
+    }
+
+    const state = Math.random().toString(36).substring(7);
+    const scope = 'user-read-private user-read-email';
+
+    const authUrl = `${SPOTIFY_AUTH_URL}?${new URLSearchParams({
+      response_type: 'code',
+      client_id: SPOTIFY_CLIENT_ID,
+      scope: scope,
+      redirect_uri: SPOTIFY_REDIRECT_URI,
+      state: state,
+    })}`;
+
+    console.log('Spotify OAuth URL:', authUrl);
+    console.log('Redirect URI:', SPOTIFY_REDIRECT_URI);
+
+    res.json({ authUrl, state });
+  } catch (error) {
+    console.error('Spotify login error:', error);
+    res.status(500).json({ error: 'Failed to initiate login' });
+  }
+});
+
+// Spotify OAuth - Callback endpoint
+app.post('/api/spotify/callback', async (req, res) => {
+  try {
+    const { code } = req.body;
+
+    if (!code) {
+      return res.status(400).json({ error: 'Authorization code is required' });
+    }
+
+    if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET) {
+      return res.status(500).json({ error: 'Spotify credentials not configured' });
+    }
+
+    // Exchange code for access token
+    const tokenResponse = await fetch(SPOTIFY_TOKEN_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ' + Buffer.from(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET).toString('base64'),
+      },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: SPOTIFY_REDIRECT_URI,
+      }),
+    });
+
+    if (!tokenResponse.ok) {
+      const errorText = await tokenResponse.text();
+      console.error('Spotify token error:', errorText);
+      return res.status(tokenResponse.status).json({ error: 'Failed to get access token' });
+    }
+
+    const tokenData = await tokenResponse.json();
+    const { access_token, refresh_token } = tokenData;
+
+    // Generate session ID
+    const sessionId = Math.random().toString(36).substring(7) + Date.now().toString(36);
+
+    // Store session
+    sessions.set(sessionId, {
+      accessToken: access_token,
+      refreshToken: refresh_token,
+      createdAt: Date.now(),
+    });
+
+    res.json({ sessionId });
+  } catch (error) {
+    console.error('Spotify callback error:', error);
+    res.status(500).json({ error: 'Failed to complete authentication' });
+  }
+});
+
+// Spotify - Get user profile
+app.get('/api/spotify/profile', async (req, res) => {
+  try {
+    const { sessionId } = req.query;
+
+    if (!sessionId) {
+      return res.status(400).json({ error: 'Session ID is required' });
+    }
+
+    const session = sessions.get(sessionId);
+    if (!session) {
+      return res.status(401).json({ error: 'Invalid or expired session' });
+    }
+
+    // Fetch user profile from Spotify
+    const profileResponse = await fetch(`${SPOTIFY_API_URL}/me`, {
+      headers: {
+        'Authorization': `Bearer ${session.accessToken}`,
+      },
+    });
+
+    if (!profileResponse.ok) {
+      sessions.delete(sessionId);
+      return res.status(profileResponse.status).json({ error: 'Failed to fetch profile' });
+    }
+
+    const profile = await profileResponse.json();
+
+    res.json({
+      id: profile.id,
+      displayName: profile.display_name,
+      email: profile.email,
+      country: profile.country,
+      product: profile.product,
+      followers: profile.followers?.total || 0,
+      images: profile.images || [],
+      uri: profile.uri,
+    });
+  } catch (error) {
+    console.error('Spotify profile error:', error);
+    res.status(500).json({ error: 'Failed to fetch profile' });
   }
 });
 
