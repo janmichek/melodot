@@ -22,15 +22,10 @@ const sessions = new Map();
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
-const SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize';
-const SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token';
-const SPOTIFY_API_URL = 'https://api.spotify.com/v1';
 
 // Analyze audio endpoint
 app.post('/api/analyze-audio', upload.single('file'), async (req, res) => {
   try {
-    console.log('Starting audio analysis request...');
-
     const file = req.file;
 
     if (!file) {
@@ -167,16 +162,13 @@ app.post('/api/spotify/login', (req, res) => {
     const state = Math.random().toString(36).substring(7);
     const scope = 'user-read-private user-read-email';
 
-    const authUrl = `${SPOTIFY_AUTH_URL}?${new URLSearchParams({
+    const authUrl = `https://accounts.spotify.com/authorize?${new URLSearchParams({
       response_type: 'code',
       client_id: SPOTIFY_CLIENT_ID,
       scope: scope,
       redirect_uri: SPOTIFY_REDIRECT_URI,
       state: state,
     })}`;
-
-    console.log('Spotify OAuth URL:', authUrl);
-    console.log('Redirect URI:', SPOTIFY_REDIRECT_URI);
 
     res.json({ authUrl, state });
   } catch (error) {
@@ -199,7 +191,7 @@ app.post('/api/spotify/callback', async (req, res) => {
     }
 
     // Exchange code for access token
-    const tokenResponse = await fetch(SPOTIFY_TOKEN_URL, {
+    const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -253,7 +245,7 @@ app.get('/api/spotify/profile', async (req, res) => {
     }
 
     // Fetch user profile from Spotify
-    const profileResponse = await fetch(`${SPOTIFY_API_URL}/me`, {
+    const profileResponse = await fetch('https://api.spotify.com/v1/me', {
       headers: {
         'Authorization': `Bearer ${session.accessToken}`,
       },
