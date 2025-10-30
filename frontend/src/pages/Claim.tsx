@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSpotifyAuth } from "../hooks/useSpotifyAuth";
-import { useReadContract, useAccount } from "wagmi";
+import { useReadContract, useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import {
   useWeb3AuthConnect,
   useWeb3AuthDisconnect,
@@ -10,12 +10,19 @@ import { donateConfig } from "../generated";
 import { passetHub, formatPasBalance, CURRENCY_SYMBOL } from "../wagmi-config";
 import { Header } from "../components/Header";
 import { ContractInfoFooter } from "../components/ContractInfoFooter";
+import type { Abi } from "viem";
+import { isAddress } from "viem";
 
 export function Claim() {
   const [manualArtistId, setManualArtistId] = useState('');
   const [artistBalance, setArtistBalance] = useState<bigint | null>(null);
   const [artistClaimed, setArtistClaimed] = useState(false);
   const [providerReady, setProviderReady] = useState(false);
+  const [withdrawAddress, setWithdrawAddress] = useState('');
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [claimError, setClaimError] = useState<string | null>(null);
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [withdrawError, setWithdrawError] = useState<string | null>(null);
 
   // Web3Auth wallet connection
   const {
@@ -46,7 +53,7 @@ export function Claim() {
   // Read artist balance from contract
   const { data: balanceData } = useReadContract({
     address: contractAddress,
-    abi: donateConfig.abi,
+    abi: donateConfig.abi as Abi,
     functionName: 'getArtistBalance',
     args: manualArtistId ? [manualArtistId] : undefined,
   });
@@ -54,10 +61,74 @@ export function Claim() {
   // Read artist claimed status from contract
   const { data: claimedData } = useReadContract({
     address: contractAddress,
-    abi: donateConfig.abi,
+    abi: donateConfig.abi as Abi,
     functionName: 'getArtistStatus',
     args: manualArtistId ? [manualArtistId] : undefined,
   });
+
+  const {
+    writeContract: claimWriteContract,
+    isPending: isClaimPending
+  } = useWriteContract();
+
+  const { writeContract: withdrawWriteContract, isPending: isWithdrawPending } = useWriteContract();
+  const { data: claimHash } = useWaitForTransactionReceipt({ hash: undefined as any });
+
+  // Handle claim artist
+  const handleClaimArtist = async () => {
+    if (!manualArtistId || !contractAddress) {
+      setClaimError('Artist ID is required');
+      return;
+    }
+
+    setIsClaiming(true);
+    setClaimError(null);
+
+    try {
+      await claimWriteContract({
+        address: contractAddress,
+        abi: donateConfig.abi as Abi,
+        functionName: 'claimArtist',
+        args: [manualArtistId],
+      });
+    } catch (error: any) {
+      setClaimError(error?.message || 'Failed to claim artist');
+      setIsClaiming(false);
+    }
+  };
+
+  // Handle withdraw donation
+  const handleWithdraw = async () => {
+    if (!manualArtistId) {
+      setWithdrawError('Please select an artist first');
+      return;
+    }
+
+    if (!withdrawAddress || !isAddress(withdrawAddress as `0x${string}`)) {
+      setWithdrawError('Invalid recipient address');
+      return;
+    }
+
+    if (!contractAddress) {
+      setWithdrawError('Contract address not found');
+      return;
+    }
+
+    setIsWithdrawing(true);
+    setWithdrawError(null);
+
+    try {
+      withdrawWriteContract({
+        address: contractAddress,
+        abi: donateConfig.abi as Abi,
+        functionName: 'withdrawDonate',
+        args: [manualArtistId, withdrawAddress as `0x${string}`],
+      });
+    } catch (error: any) {
+      setWithdrawError(error?.message || 'Failed to withdraw');
+      setIsWithdrawing(false);
+    }
+  };
 
   // Setup Web3Auth provider
   useEffect(() => {
@@ -201,11 +272,7 @@ export function Claim() {
                 <h3>Artist Information</h3>
                 <p><strong>Artist ID:</strong> {manualArtistId}</p>
                 <p>
-
-
-
                   <strong>Balance:</strong>{' '}
-
                   <span style={{ fontSize: '1.2rem', color: '#1DB954', fontWeight: 'bold' }}>
                     {artistBalance !== null ? `${formatPasBalance(artistBalance)} ${CURRENCY_SYMBOL}` : 'Loading...'}
                   </span>
@@ -224,6 +291,105 @@ export function Claim() {
                   <p style={{ color: '#ff9800', marginTop: '1rem' }}>
                     ℹ️ No donations found for this artist ID
                   </p>
+                )}
+
+                {/* Claim Button - Show only if available to claim and has balance */}
+                {!artistClaimed && artistBalance !== null && artistBalance > 0n && isConnected && (
+                  <div style={{ marginTop: '1.5rem' }}>
+                    <button
+                      onClick={handleClaimArtist}
+                      disabled={isClaiming || isClaimPending}
+                      style={{
+                        padding: '0.75rem 2rem',
+                        fontSize: '1rem',
+                        backgroundColor: '#1DB954',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: isClaiming || isClaimPending ? 'not-allowed' : 'pointer',
+                        opacity: isClaiming || isClaimPending ? 0.6 : 1,
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {isClaiming || isClaimPending ? 'Claiming...' : 'Claim Artist Balance'}
+                    </button>
+                    {claimError && (
+                      <div style={{ color: 'red', marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                        {claimError}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {!isConnected && !artistClaimed && artistBalance !== null && artistBalance > 0n && (
+                  <div style={{
+                    marginTop: '1.5rem',
+                    padding: '1rem',
+                    backgroundColor: '#fff3cd',
+                    border: '1px solid #ffc107',
+                    borderRadius: '8px',
+                    color: '#856404'
+                  }}>
+                    ⚠️ Connect your wallet to claim this artist balance
+                  </div>
+                )}
+
+                {/* Withdraw Interface - Show only if already claimed */}
+                {artistClaimed && (
+                  <div style={{
+                    marginTop: '1.5rem',
+                    padding: '1rem',
+                    backgroundColor: '#e8f5e9',
+                    border: '2px solid #4CAF50',
+                    borderRadius: '8px'
+                  }}>
+                    <h4 style={{ color: '#2e7d32', marginTop: 0 }}>Withdraw Claimed Balance</h4>
+                    <p style={{ color: '#666', marginBottom: '1rem' }}>
+                      Send your claimed balance to a wallet address
+                    </p>
+                    <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
+                      <input
+                        type="text"
+                        placeholder="Enter recipient address (0x...)"
+                        value={withdrawAddress}
+                        onChange={(e) => setWithdrawAddress(e.target.value)}
+                        style={{
+                          padding: '0.75rem',
+                          fontSize: '0.9rem',
+                          border: '1px solid #ddd',
+                          borderRadius: '4px',
+                          fontFamily: 'monospace'
+                        }}
+                      />
+                      <button
+                        onClick={handleWithdraw}
+                        disabled={!isConnected || !isAddress(withdrawAddress as `0x${string}`) || isWithdrawing || isWithdrawPending}
+                        style={{
+                          padding: '0.75rem 2rem',
+                          fontSize: '1rem',
+                          backgroundColor: '#4CAF50',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          cursor: !isConnected || !isAddress(withdrawAddress as `0x${string}`) || isWithdrawing || isWithdrawPending ? 'not-allowed' : 'pointer',
+                          opacity: !isConnected || !isAddress(withdrawAddress as `0x${string}`) || isWithdrawing || isWithdrawPending ? 0.6 : 1,
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {isWithdrawing || isWithdrawPending ? 'Withdrawing...' : 'Withdraw All'}
+                      </button>
+                      {withdrawError && (
+                        <div style={{ color: 'red', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                          {withdrawError}
+                        </div>
+                      )}
+                      {!isAddress(withdrawAddress as `0x${string}`) && withdrawAddress && (
+                        <p style={{ color: '#d32f2f', fontSize: '0.9rem', margin: '0.5rem 0 0 0' }}>
+                          ❌ Invalid address
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
             )}

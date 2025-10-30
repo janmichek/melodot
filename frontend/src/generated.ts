@@ -68,10 +68,13 @@ export const donateAbi = [
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'tip',
+    inputs: [
+      { name: 'artistId', internalType: 'string', type: 'string' },
+      { name: 'recipient', internalType: 'address', type: 'address' },
+    ],
+    name: 'withdrawDonate',
     outputs: [],
-    stateMutability: 'payable',
+    stateMutability: 'nonpayable',
   },
 ] as const
 
@@ -79,7 +82,7 @@ export const donateAbi = [
  *
  */
 export const donateAddress = {
-  420420422: '0x7e1CF432F4990E7a0a74fe9897F110066b38a237',
+  420420422: '0x1AeFE7B4Ef9D26C35050d1d8bBFC76c7B7b95fd5',
 } as const
 
 /**

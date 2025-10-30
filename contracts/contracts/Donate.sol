@@ -60,7 +60,25 @@ contract Donate {
         return claimedAmount;
     }
 
-//    function withdraw() external {
+    function withdrawDonate(string memory artistId, address recipient) external {
+        require(bytes(artistId).length > 0, "Artist ID cannot be empty");
+        require(recipient != address(0), "Invalid recipient address");
+        require(artists[artistId].isClaimed, "Artist has not claimed their balance");
+
+        uint256 amount = artists[artistId].totalBalance;
+        require(amount > 0, "No balance to withdraw");
+
+        // Reset artist balance after withdrawal
+        artists[artistId].totalBalance = 0;
+        balance -= amount;
+
+        (bool success, ) = payable(recipient).call{ value: amount }("");
+        require(success, "Withdrawal failed");
+    }
+
+    /*
+     *
+     *///    function withdraw() external {
 //                 require(msg.sender == owner, "Not owner");
 //            (bool success, bytes memory data) = owner.call{ value: address(this).balance }("");
 //        require(success);
