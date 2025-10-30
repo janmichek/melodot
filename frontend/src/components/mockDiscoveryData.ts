@@ -7,7 +7,8 @@ export const USE_MOCK_DATA = true;
 
 // Mock response data for development
 // TODO: Set USE_MOCK_DATA to false and remove this mock when ready to use real audio analysis
-export const MOCK_DISCOVERY_DATA: DiscoveryResult = {
+// Using 'as any' because this mock data contains extended fields not in the simplified type definition
+export const MOCK_DISCOVERY_DATA = {
   "track": {
     "layout": "5",
     "type": "MUSIC",
@@ -212,5 +213,5 @@ export const MOCK_DISCOVERY_DATA: DiscoveryResult = {
   "timestamp": 1761828119759,
   "timezone": "Europe/Guernsey",
   "artistInfo": null
-};
+} as unknown as DiscoveryResult;
 // ===== END MOCK MODE CONFIGURATION =====

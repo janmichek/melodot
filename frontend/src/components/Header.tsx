@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useBalance, useChainId } from "wagmi";
 import { passetHub, CURRENCY_SYMBOL } from "../wagmi-config";
 import { formatUnits } from "viem";
+import { Link, useLocation } from "react-router-dom";
 
 interface HeaderProps {
   isConnected: boolean;
@@ -24,6 +25,7 @@ export function Header({
 }: HeaderProps) {
   const [copied, setCopied] = useState(false);
   const chainId = useChainId();
+  const location = useLocation();
   const { data: balance , isLoading} = useBalance({
     address: address,
     chainId: passetHub.id,
@@ -47,6 +49,14 @@ export function Header({
   return (
     <header className="dapp-header-subtle">
       <div className="header-content-subtle">
+        <nav className="header-nav">
+          <Link to="/" className={`header-nav-link ${location.pathname === '/' ? 'active' : ''}`}>
+            Home
+          </Link>
+          <Link to="/claim" className={`header-nav-link ${location.pathname === '/claim' ? 'active' : ''}`}>
+            Claim
+          </Link>
+        </nav>
         {isConnected && address ? (
           <div className="header-info-compact">
             <div className="header-chain-badge">{getChainName()}</div>
