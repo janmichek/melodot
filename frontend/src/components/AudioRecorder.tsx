@@ -181,7 +181,6 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
           backgroundColor: '#fff3cd',
           border: '1px solid #ffc107',
           borderRadius: '4px',
-          marginBottom: '15px',
           textAlign: 'center'
         }}>
 
@@ -198,7 +197,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
           >
             Load Mock Track Data
           </button>
-          <p style={{ color: '#856404' }}>
+          <p>
             To disable mock mode: Set USE_MOCK_DATA = false in mockDiscoveryData.ts
           </p>
         </div>
