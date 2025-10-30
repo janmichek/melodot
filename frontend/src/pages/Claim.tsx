@@ -53,7 +53,6 @@ export function Claim() {
   const { writeContract: withdrawWriteContract, isPending: isWithdrawPending } = useWriteContract();
   const { data: claimHash } = useWaitForTransactionReceipt({ hash: undefined as any });
 
-  // Handle claim artist
   const handleClaimArtist = async () => {
     if (!manualArtistId || !contractAddress) {
       setClaimError('Artist ID is required');
@@ -69,6 +68,8 @@ export function Claim() {
         abi: donateConfig.abi as Abi,
         functionName: 'claimArtist',
         args: [manualArtistId],
+        gas: BigInt(300000),
+        // Fixed gas limit to avoid gas estimation issues
       });
     } catch (error: any) {
       setClaimError(error?.message || 'Failed to claim artist');
@@ -102,6 +103,7 @@ export function Claim() {
         abi: donateConfig.abi as Abi,
         functionName: 'withdrawDonate',
         args: [manualArtistId, withdrawAddress as `0x${string}`],
+        gas: BigInt(300000), // Fixed gas limit to avoid gas estimation issues
       });
     } catch (error: any) {
       setWithdrawError(error?.message || 'Failed to withdraw');

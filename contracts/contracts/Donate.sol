@@ -2,8 +2,10 @@
 pragma solidity ^0.8.19;
 
 contract Donate {
-    address private owner;
+    address public owner;
     uint256 public balance;
+    uint256 public tipFeeBalance;
+    uint256 private constant TIP_FEE_PERCENTAGE = 1; // 1% tip fee
 
     struct ArtistData {
         uint256 totalBalance;
@@ -28,13 +30,18 @@ contract Donate {
         uint256 donatedAmount = msg.value;
         require(donatedAmount > 0, "Donation amount must be greater than 0");
 
+        // Calculate 1% tip fee
+        uint256 tipFee = (donatedAmount * TIP_FEE_PERCENTAGE) / 100;
+        uint256 artistAmount = donatedAmount - tipFee;
+
         // If artist doesn't exist yet, add them to the list
         if (artists[artistId].totalBalance == 0) {
             artistIds.push(artistId);
         }
 
-        // Add donation to artist's balance
-        artists[artistId].totalBalance += donatedAmount;
+        // Add donation to artist's balance and collect tip fee
+        artists[artistId].totalBalance += artistAmount;
+        tipFeeBalance += tipFee;
         balance += donatedAmount;
     }
 
@@ -69,6 +76,23 @@ contract Donate {
 
         // Reset artist balance after withdrawal
         artists[artistId].totalBalance = 0;
+        balance -= amount;
+
+        (bool success, ) = payable(recipient).call{ value: amount }("");
+        require(success, "Withdrawal failed");
+    }
+
+    function getTipFeeBalance() external view returns (uint256) {
+        return tipFeeBalance;
+    }
+
+    function withdrawTipFees(address recipient) external {
+        require(msg.sender == owner, "Only owner can withdraw tip fees");
+        require(recipient != address(0), "Invalid recipient address");
+        require(tipFeeBalance > 0, "No tip fees to withdraw");
+
+        uint256 amount = tipFeeBalance;
+        tipFeeBalance = 0;
         balance -= amount;
 
         (bool success, ) = payable(recipient).call{ value: amount }("");

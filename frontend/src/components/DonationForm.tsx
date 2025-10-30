@@ -47,6 +47,7 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
         functionName: "donateToArtist",
         args: [artistId],
         value: parseEther(amount.toString()),
+        // gas: BigInt(300000), // Fixed gas limit to avoid gas estimation issues
       });
     } catch (err) {
       console.error("Error donating:", err);

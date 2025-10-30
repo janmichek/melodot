@@ -68,11 +68,39 @@ export const donateAbi = [
   },
   {
     type: 'function',
+    inputs: [],
+    name: 'getTipFeeBalance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'tipFeeBalance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [
       { name: 'artistId', internalType: 'string', type: 'string' },
       { name: 'recipient', internalType: 'address', type: 'address' },
     ],
     name: 'withdrawDonate',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'recipient', internalType: 'address', type: 'address' }],
+    name: 'withdrawTipFees',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -82,7 +110,7 @@ export const donateAbi = [
  *
  */
 export const donateAddress = {
-  420420422: '0x1AeFE7B4Ef9D26C35050d1d8bBFC76c7B7b95fd5',
+  420420422: '0x3Ea4eD25290E704fFD187b99Ce1E6EaBf81c90Bd',
 } as const
 
 /**

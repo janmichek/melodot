@@ -56,6 +56,9 @@ export function Header({
           <Link to="/claim" className={`header-nav-link ${location.pathname === '/claim' ? 'active' : ''}`}>
             Claim
           </Link>
+          <Link to="/admin" className={`header-nav-link ${location.pathname === '/admin' ? 'active' : ''}`}>
+            Admin
+          </Link>
         </nav>
         {isConnected && address ? (
           <div className="header-info-compact">
