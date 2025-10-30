@@ -1,41 +1,22 @@
 import { useState, useEffect } from "react";
 import { useSpotifyAuth } from "../hooks/useSpotifyAuth";
-import { useReadContract, useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import {
-  useWeb3AuthConnect,
-  useWeb3AuthDisconnect,
-  useWeb3Auth,
-} from "@web3auth/modal/react";
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { Layout, useWeb3AuthContext } from "../components/Layout";
 import { donateConfig } from "../generated";
-import { passetHub, formatPasBalance, CURRENCY_SYMBOL } from "../wagmi-config";
-import { Header } from "../components/Header";
-import { ContractInfoFooter } from "../components/ContractInfoFooter";
+import { formatPasBalance, CURRENCY_SYMBOL } from "../wagmi-config";
 import type { Abi } from "viem";
 import { isAddress } from "viem";
 
 export function Claim() {
+  const { isConnected, connect, contractAddress, providerReady } = useWeb3AuthContext();
   const [manualArtistId, setManualArtistId] = useState('');
   const [artistBalance, setArtistBalance] = useState<bigint | null>(null);
   const [artistClaimed, setArtistClaimed] = useState(false);
-  const [providerReady, setProviderReady] = useState(false);
   const [withdrawAddress, setWithdrawAddress] = useState('');
   const [isClaiming, setIsClaiming] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
-
-  // Web3Auth wallet connection
-  const {
-    connect,
-    isConnected,
-    loading: connectLoading,
-  } = useWeb3AuthConnect();
-  const {
-    disconnect,
-    loading: disconnectLoading,
-  } = useWeb3AuthDisconnect();
-  const { web3Auth } = useWeb3Auth();
-  const { address } = useAccount();
 
   // Spotify auth hook
   const {
@@ -47,8 +28,6 @@ export function Claim() {
     logout,
     handleCallback,
   } = useSpotifyAuth();
-
-  const contractAddress = donateConfig.address[passetHub.id];
 
   // Read artist balance from contract
   const { data: balanceData } = useReadContract({
@@ -130,48 +109,6 @@ export function Claim() {
     }
   };
 
-  // Setup Web3Auth provider
-  useEffect(() => {
-    const verifyProviderReady = () => {
-      if (web3Auth) {
-        try {
-          const isInitialized = web3Auth.status === "ready";
-          const isNotConnecting = !connectLoading;
-          const isReadyToLogin = isInitialized && isNotConnecting;
-          setProviderReady(isReadyToLogin);
-          return isReadyToLogin;
-        } catch (error) {
-          console.error("Error checking Web3Auth status:", error);
-          setProviderReady(false);
-        }
-      } else {
-        setProviderReady(false);
-      }
-      return false;
-    };
-
-    if (verifyProviderReady()) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      if (verifyProviderReady()) {
-        clearInterval(interval);
-      }
-    }, 200);
-
-    const timeout = setTimeout(() => {
-      clearInterval(interval);
-      console.warn("Web3Auth initialization timeout");
-      setProviderReady(false);
-    }, 30000);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
-  }, [web3Auth, connectLoading]);
-
   // Update artist balance and claimed status
   useEffect(() => {
     // todo is the resigning needed? Can i use it directly from ?
@@ -218,19 +155,8 @@ export function Claim() {
   };
 
   return (
-    <div className="container">
-      <Header
-        isConnected={isConnected}
-        address={address}
-        onConnect={() => connect()}
-        onDisconnect={() => disconnect()}
-        connectLoading={connectLoading}
-        disconnectLoading={disconnectLoading}
-        providerReady={providerReady}
-      />
-
-      <main className="main-content">
-        <div className="claim-container">
+    <Layout>
+      <div className="claim-container">
           <h1 style={{ marginBottom: '2rem' }}>Artist Claiming</h1>
 
           {/* Manual Artist ID Verification */}
@@ -496,9 +422,6 @@ export function Claim() {
             )}
           </div>
         </div>
-      </main>
-
-      <ContractInfoFooter contractAddress={donateConfig.address[passetHub.id]} />
-    </div>
+    </Layout>
   );
 }

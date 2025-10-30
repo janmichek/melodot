@@ -1,0 +1,131 @@
+import { useState, useEffect, ReactNode } from "react";
+import {
+  useWeb3AuthConnect,
+  useWeb3AuthDisconnect,
+  useWeb3Auth,
+} from "@web3auth/modal/react";
+import { useAccount } from "wagmi";
+import { donateConfig } from "../generated";
+import { passetHub } from "../wagmi-config";
+import { Header } from "./Header";
+import { ContractInfoFooter } from "./ContractInfoFooter";
+
+interface LayoutProps {
+  children: ReactNode;
+}
+
+export interface Web3AuthContextType {
+  isConnected: boolean;
+  address: `0x${string}` | undefined;
+  connect: () => void;
+  disconnect: () => void;
+  connectLoading: boolean;
+  disconnectLoading: boolean;
+  providerReady: boolean;
+  contractAddress: `0x${string}`;
+}
+
+export function useWeb3AuthContext() {
+  const {
+    connect,
+    isConnected,
+    loading: connectLoading,
+  } = useWeb3AuthConnect();
+  const {
+    disconnect,
+    loading: disconnectLoading,
+  } = useWeb3AuthDisconnect();
+
+  const { web3Auth } = useWeb3Auth();
+  const { address } = useAccount();
+  const [providerReady, setProviderReady] = useState(false);
+
+  useEffect(() => {
+    const verifyProviderReady = () => {
+      if (web3Auth) {
+        try {
+          const isInitialized = web3Auth.status === "ready";
+          const isNotConnecting = !connectLoading;
+          const isReadyToLogin = isInitialized && isNotConnecting;
+
+          setProviderReady(isReadyToLogin);
+
+          if (isReadyToLogin) {
+            return true;
+          }
+        } catch (error) {
+          console.error("Error checking Web3Auth status:", error);
+          setProviderReady(false);
+        }
+      } else {
+        setProviderReady(false);
+      }
+      return false;
+    };
+
+    if (verifyProviderReady()) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      if (verifyProviderReady()) {
+        clearInterval(interval);
+      }
+    }, 200);
+
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      console.warn("Web3Auth initialization timeout");
+      setProviderReady(false);
+    }, 30000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [web3Auth, connectLoading]);
+
+  const contractAddress = donateConfig.address[passetHub.id];
+
+  return {
+    isConnected,
+    address,
+    connect,
+    disconnect,
+    connectLoading,
+    disconnectLoading,
+    providerReady,
+    contractAddress,
+  };
+}
+
+export function Layout({ children }: LayoutProps) {
+  const {
+    isConnected,
+    address,
+    connect,
+    disconnect,
+    connectLoading,
+    disconnectLoading,
+    providerReady,
+    contractAddress,
+  } = useWeb3AuthContext();
+
+  return (
+    <div className="container">
+      <Header
+        isConnected={isConnected}
+        address={address}
+        onConnect={() => connect()}
+        onDisconnect={() => disconnect()}
+        connectLoading={connectLoading}
+        disconnectLoading={disconnectLoading}
+        providerReady={providerReady}
+      />
+
+      <main className="main-content">{children}</main>
+
+      <ContractInfoFooter contractAddress={contractAddress} />
+    </div>
+  );
+}

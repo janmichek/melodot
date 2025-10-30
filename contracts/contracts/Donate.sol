@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: GPL-3.0
-
 pragma solidity ^0.8.19;
 
 contract Donate {
@@ -75,35 +74,36 @@ contract Donate {
         (bool success, ) = payable(recipient).call{ value: amount }("");
         require(success, "Withdrawal failed");
     }
+}
 
-    /*
-     *
-     *///    function withdraw() external {
+
+
+/*
+ *
+ *///    function withdraw() external {
 //                 require(msg.sender == owner, "Not owner");
 //            (bool success, bytes memory data) = owner.call{ value: address(this).balance }("");
 //        require(success);
 
 
-        // emit Approved(contractBalance);
+// emit Approved(contractBalance);
 //    }
 
-    /*
-    function claim(address id) public view returns (uint256) {
-        return 5;
-    }
-    */
-    /*
-    function withdraw() external {
-        address artistAddress = 0;
-        uint artistBalance = address(this).balance;
-        payable(beneficiary).transfer(artistAddress);
-        // emit Approved(contractBalance);
-    }
-    */
+/*
+function claim(address id) public view returns (uint256) {
+    return 5;
 }
+*/
+/*
+function withdraw() external {
+    address artistAddress = 0;
+    uint artistBalance = address(this).balance;
+    payable(beneficiary).transfer(artistAddress);
+    // emit Approved(contractBalance);
+}
+*/
 
 /*
-
    event ProjectCreated(
         uint256 indexed projectId,
         address indexed owner,
