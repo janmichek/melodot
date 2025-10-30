@@ -7,11 +7,8 @@ interface DiscoveryCardProps {
 
 export default function DiscoveryCard({ discovery, onSearchAgain }: DiscoveryCardProps) {
   if (!discovery) {
-    console.log('DiscoveryCard: No discovery provided');
     return null;
   }
-
-  console.log('DiscoveryCard: Rendering with discovery', discovery);
 
   const track = discovery.track;
 
@@ -22,13 +19,6 @@ export default function DiscoveryCard({ discovery, onSearchAgain }: DiscoveryCar
       </div>
     );
   }
-
-  console.log('DiscoveryCard: Track data', {
-    title: track.title,
-    subtitle: track.subtitle,
-    sections: track.sections,
-    images: track.images,
-  });
 
   // Find metadata in sections
   const metadata = track.sections?.find((section) => section.type === 'SONG')?.metadata;
@@ -77,18 +67,8 @@ export default function DiscoveryCard({ discovery, onSearchAgain }: DiscoveryCar
         {discovery.artistInfo && (
           <div className="discovery-artist-section">
             <p className="discovery-artist-title">
-              MusicBrainz Artist Details:
-              {/*todo check the responses*/}
+              Artist Details
             </p>
-
-            <div className="discovery-artist-details">
-              {discovery.artistInfo.type && (
-                <p><strong>Type:</strong> {discovery.artistInfo.type}</p>
-              )}
-              {discovery.artistInfo.country && (
-                <p><strong>Country:</strong> {discovery.artistInfo.country}</p>
-              )}
-            </div>
 
             {discovery.artistInfo.socialLinks && (
               <>

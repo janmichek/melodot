@@ -1,3 +1,18 @@
+/* Global Base Styles */
+body {
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+		"Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+		sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+code {
+	font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+		monospace;
+}
+
 /* Modern, mobile-first CSS with Dark Theme */
 :root {
 	/* Web3Auth Docs Inspired Colors (Dark Mode - Bluish) */
@@ -1139,4 +1154,296 @@ button:disabled {
 	.btn-amount-selector {
 		width: 100%;
 	}
+}
+
+/* Claim Page Styles */
+.claim-page-title {
+	margin-bottom: 2rem;
+}
+
+.claim-section {
+	border: 2px solid #1DB954;
+	border-radius: 8px;
+	padding: 2rem;
+	margin-bottom: 2rem;
+}
+
+.claim-artist-section {
+	background-color: #f0fff4;
+}
+
+.claim-spotify-section {
+	background-color: #f9f9f9;
+}
+
+.claim-section h2 {
+	margin-bottom: 1rem;
+	color: #1DB954;
+}
+
+.claim-section-description {
+	margin-bottom: 1.5rem;
+	color: #666;
+}
+
+.claim-artist-input-group {
+	display: flex;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.claim-artist-input {
+	flex: 1;
+	padding: 0.75rem;
+	font-size: 1rem;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	background-color: var(--bg-hover);
+	color: var(--text-color);
+	font-family: var(--font-sans);
+	transition: border-color 0.2s ease;
+}
+
+.claim-artist-input:focus {
+	outline: none;
+	border-color: #1DB954;
+	box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.2);
+}
+
+.claim-artist-info-box {
+	background-color: white;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	padding: 1.5rem;
+}
+
+.claim-artist-info-box h3 {
+	margin-top: 0;
+	color: var(--text-color);
+}
+
+.claim-artist-balance {
+	font-size: 1.2rem;
+	color: #1DB954;
+	font-weight: bold;
+}
+
+.claim-artist-status {
+	font-weight: bold;
+}
+
+.claim-artist-status.claimed {
+	color: #ff4444;
+}
+
+.claim-artist-status.available {
+	color: #1DB954;
+}
+
+.claim-no-balance-message {
+	color: #ff9800;
+	margin-top: 1rem;
+}
+
+.claim-action-section {
+	margin-top: 1.5rem;
+}
+
+.claim-button {
+	padding: 0.75rem 2rem;
+	font-size: 1rem;
+	background-color: #1DB954;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: bold;
+	transition: all 0.2s;
+}
+
+.claim-button:hover:not(:disabled) {
+	background-color: #1ed760;
+	transform: translateY(-1px);
+}
+
+.claim-button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.claim-error-message {
+	color: red;
+	margin-top: 0.5rem;
+	font-size: 0.9rem;
+}
+
+.claim-wallet-warning {
+	margin-top: 1.5rem;
+	padding: 1rem;
+	background-color: #fff3cd;
+	border: 1px solid #ffc107;
+	border-radius: 8px;
+	color: #856404;
+}
+
+.claim-withdraw-section {
+	margin-top: 1.5rem;
+	padding: 1rem;
+	background-color: #e8f5e9;
+	border: 2px solid #4CAF50;
+	border-radius: 8px;
+}
+
+.claim-withdraw-section h4 {
+	color: #2e7d32;
+	margin-top: 0;
+}
+
+.claim-withdraw-description {
+	color: #666;
+	margin-bottom: 1rem;
+}
+
+.claim-withdraw-input-group {
+	display: flex;
+	gap: 1rem;
+	flex-direction: column;
+}
+
+.claim-withdraw-input {
+	padding: 0.75rem;
+	font-size: 0.9rem;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-family: monospace;
+	background-color: var(--bg-hover);
+	color: var(--text-color);
+	transition: border-color 0.2s ease;
+}
+
+.claim-withdraw-input:focus {
+	outline: none;
+	border-color: #4CAF50;
+	box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+.claim-withdraw-button {
+	padding: 0.75rem 2rem;
+	font-size: 1rem;
+	background-color: #4CAF50;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: bold;
+	transition: all 0.2s;
+}
+
+.claim-withdraw-button:hover:not(:disabled) {
+	background-color: #45a049;
+	transform: translateY(-1px);
+}
+
+.claim-withdraw-button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.claim-withdraw-error {
+	color: red;
+	font-size: 0.9rem;
+	margin-top: 0.5rem;
+}
+
+.claim-invalid-address {
+	color: #d32f2f;
+	font-size: 0.9rem;
+	margin: 0.5rem 0 0 0;
+}
+
+.claim-spotify-auth-content {
+	text-align: center;
+}
+
+.claim-spotify-auth-description {
+	margin-bottom: 1.5rem;
+}
+
+.claim-spotify-button {
+	padding: 0.75rem 2rem;
+	font-size: 1rem;
+	background-color: #1DB954;
+	color: white;
+	border: none;
+	border-radius: 24px;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.claim-spotify-button:hover:not(:disabled) {
+	background-color: #1ed760;
+	transform: translateY(-1px);
+}
+
+.claim-spotify-button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.claim-spotify-error {
+	color: red;
+	padding: 1rem;
+	margin-bottom: 1rem;
+	border: 1px solid red;
+	border-radius: 4px;
+}
+
+.claim-profile-section h3 {
+	margin-bottom: 1.5rem;
+	color: var(--text-color);
+}
+
+.claim-profile-card {
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	padding: 1.5rem;
+	background-color: white;
+}
+
+.claim-profile-image-container {
+	text-align: center;
+	margin-bottom: 1.5rem;
+}
+
+.claim-profile-image {
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.claim-profile-details {
+	line-height: 1.8;
+	font-size: 0.95rem;
+}
+
+.claim-profile-actions {
+	margin-top: 1.5rem;
+	text-align: center;
+}
+
+.claim-logout-button {
+	padding: 0.5rem 1.5rem;
+	font-size: 1rem;
+	background-color: #ff4444;
+	color: white;
+	border: none;
+	border-radius: 24px;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.claim-logout-button:hover {
+	background-color: #ff2222;
+	transform: translateY(-1px);
 }

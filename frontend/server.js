@@ -3,27 +3,20 @@ import cors from 'cors';
 import multer from 'multer';
 import dotenv from 'dotenv';
 
-// Load environment variables from .env.local
 dotenv.config({ path: '.env.local' });
 
-// Backend proxy server for Shazam API calls to keep API keys secure and handle CORS
-// Located here as a separate Express server since this is a Vite React app (not Next.js)
-// Migration options: 1) Keep as is, 2) Move to serverless functions (Vercel/Netlify), 3) Migrate to Next.js API routes
 const app = express();
 const upload = multer();
 
 app.use(cors());
 app.use(express.json());
 
-// In-memory session storage (for production, use Redis or a database)
 const sessions = new Map();
 
-// Spotify OAuth configuration
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
 
-// Analyze audio endpoint
 app.post('/api/analyze-audio', upload.single('file'), async (req, res) => {
   try {
     const file = req.file;
@@ -35,7 +28,7 @@ app.post('/api/analyze-audio', upload.single('file'), async (req, res) => {
     // Create FormData for Shazam API
     const formData = new FormData();
     const blob = new Blob([file.buffer], { type: file.mimetype });
-    formData.append('file', blob, file.originalname || 'audio.webm');
+    formData.append('file', blob, 'audio.webm');
     const response = await fetch('https://shazam-core.p.rapidapi.com/v1/tracks/recognize', {
       method: 'POST',
       headers: {
@@ -48,15 +41,10 @@ app.post('/api/analyze-audio', upload.single('file'), async (req, res) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Shazam API error:', errorText);
-      return res.status(response.status).json({
-        error: 'Shazam API error',
-        details: errorText
-      });
     }
 
     const result = await response.json();
 
-    // Fetch artist social links if we have a track
     let artistInfo = null;
     if (result?.track?.subtitle) {
       try {
@@ -107,10 +95,6 @@ app.get('/api/artist-info', async (req, res) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Shazam API error:', errorText);
-      return res.status(response.status).json({
-        error: 'Shazam API error',
-        details: errorText
-      });
     }
 
     const data = await response.json();

@@ -3,9 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 interface SpotifyProfile {
   id: string;
   displayName: string;
-  email: string;
   country: string;
-  product: string;
   followers: number;
   images: Array<{ url: string; height: number; width: number }>;
   uri: string;

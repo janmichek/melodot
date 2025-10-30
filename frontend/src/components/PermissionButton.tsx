@@ -1,3 +1,5 @@
+import { Mic } from 'lucide-react';
+
 interface PermissionButtonProps {
   onRequestPermission: () => void;
 }
@@ -6,7 +8,10 @@ export default function PermissionButton({ onRequestPermission }: PermissionButt
   return (
     <button
       onClick={onRequestPermission}
-      className="permission-button">
+      className="permission-button"
+      style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}
+    >
+      <Mic size={20} />
       Enable Microphone
     </button>
   );

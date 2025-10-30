@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useReadContract } from "wagmi";
 import type { Abi } from "viem";
 import { donateConfig } from "../generated";
-import { passetHub, formatPasBalance, CURRENCY_SYMBOL } from "../wagmi-config";
+import { passetHub, formatPasBalance, CURRENCY_SYMBOL, formatAddress } from "../wagmi-config";
 import { ArtistsList } from "./ArtistsList";
 
 interface ContractInfoFooterProps {
@@ -38,7 +38,7 @@ export function ContractInfoFooter({ contractAddress }: ContractInfoFooterProps)
           rel="noopener noreferrer"
           className="footer-link"
         >
-          {contractAddress.slice(0, 6)}...{contractAddress.slice(-4)}
+          {formatAddress(contractAddress, 6, 4)}
         </a>
         <span>•</span>
         {artistCount > 0 ? (

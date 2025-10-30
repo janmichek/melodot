@@ -3,7 +3,7 @@ import RecordButton from "./RecordButton";
 import PermissionButton from "./PermissionButton";
 
 interface AudioControlsProps {
-  permission: boolean;
+  hasPermission: boolean;
   isRecording: boolean;
   isAnalyzing: boolean;
   onStart: () => void;
@@ -12,24 +12,22 @@ interface AudioControlsProps {
 }
 
 export default function AudioControls({
-  permission,
+  hasPermission,
   isRecording,
   isAnalyzing,
   onStart,
   onStop,
   onRequestPermission,
 }: AudioControlsProps) {
-  const isCurrentlyRecording = permission && isRecording;
-  const isReadyToRecord = permission && !isRecording && !isAnalyzing;
+  const isCurrentlyRecording = hasPermission && isRecording;
+  const isReadyToRecord = hasPermission && !isRecording && !isAnalyzing;
 
   return (
-    <div className="audio-player-container">
-      <div className="audio-player-recording-area">
-        {!permission && (<PermissionButton onRequestPermission={onRequestPermission} />)}
-        {isReadyToRecord && (<RecordButton onClick={onStart} />)}
-        {isCurrentlyRecording && (<StopButton onClick={onStop} />)}
-        {isAnalyzing && (<div className="audio-player-analyzing">Analyzing ...</div>)}
-      </div>
+    <div className="audio-player-container audio-player-recording-area">
+      {!hasPermission && (<PermissionButton onRequestPermission={onRequestPermission} />)}
+      {isReadyToRecord && (<RecordButton onClick={onStart} />)}
+      {isCurrentlyRecording && (<StopButton onClick={onStop} />)}
+      {/*{isAnalyzing && (<div className="audio-player-analyzing">Analyzing ...</div>)}*/}
     </div>
   );
 }

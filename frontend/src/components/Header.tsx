@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useBalance, useChainId } from "wagmi";
-import { passetHub, CURRENCY_SYMBOL } from "../wagmi-config";
+import { passetHub, CURRENCY_SYMBOL, formatAddress } from "../wagmi-config";
 import { formatUnits } from "viem";
 import { Link, useLocation } from "react-router-dom";
 
@@ -14,6 +14,24 @@ interface HeaderProps {
   providerReady: boolean;
 }
 
+function Navigation() {
+  const location = useLocation();
+
+  return (
+    <nav className="header-nav">
+      <Link to="/" className={`header-nav-link ${location.pathname === '/' ? 'active' : ''}`}>
+        Home
+      </Link>
+      <Link to="/claim" className={`header-nav-link ${location.pathname === '/claim' ? 'active' : ''}`}>
+        Claim
+      </Link>
+      <Link to="/admin" className={`header-nav-link ${location.pathname === '/admin' ? 'active' : ''}`}>
+        Admin
+      </Link>
+    </nav>
+  );
+}
+
 export function Header({
   isConnected,
   address,
@@ -25,12 +43,10 @@ export function Header({
 }: HeaderProps) {
   const [copied, setCopied] = useState(false);
   const chainId = useChainId();
-  const location = useLocation();
-  const { data: balance , isLoading} = useBalance({
+  const { data: balance, isLoading } = useBalance({
     address: address,
     chainId: passetHub.id,
   });
-
 
   const getChainName = () => {
     if (chainId === passetHub.id) return "Passet Hub";
@@ -49,27 +65,15 @@ export function Header({
   return (
     <header className="dapp-header-subtle">
       <div className="header-content-subtle">
-        <nav className="header-nav">
-          <Link to="/" className={`header-nav-link ${location.pathname === '/' ? 'active' : ''}`}>
-            Home
-          </Link>
-          <Link to="/claim" className={`header-nav-link ${location.pathname === '/claim' ? 'active' : ''}`}>
-            Claim
-          </Link>
-          <Link to="/admin" className={`header-nav-link ${location.pathname === '/admin' ? 'active' : ''}`}>
-            Admin
-          </Link>
-        </nav>
+        <Navigation />
         {isConnected && address ? (
           <div className="header-info-compact">
             <div className="header-chain-badge">{getChainName()}</div>
             <div className="header-divider">|</div>
             <div className="header-balance">
-              {/*todo balance is not formatted right*/}
-              {balance?.value !== undefined
+              {isLoading ? '...' : balance?.value !== undefined
                 ? `${formatUnits(balance.value, balance.decimals)} ${balance.symbol || CURRENCY_SYMBOL}`
                 : '---'}
-              {/*todo use isLoading instead*/}
             </div>
             <div className="header-divider">|</div>
             <a
@@ -85,7 +89,7 @@ export function Header({
               className={`header-address ${copied ? 'header-address-copied' : ''}`}
               onClick={handleCopyAddress}
               title={copied ? "Copied!" : "Click to copy address"}>
-              {copied ? "✓ Copied!" : `${address.slice(0, 4)}...${address.slice(-3)}`}
+              {copied ? "✓ Copied!" : formatAddress(address, 4, 3)}
             </div>
             <button
               onClick={onDisconnect}

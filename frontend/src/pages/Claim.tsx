@@ -1,22 +1,19 @@
 import { useState, useEffect } from "react";
 import { useSpotifyAuth } from "../hooks/useSpotifyAuth";
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useReadContract, useWriteContract } from "wagmi";
 import { Layout, useWeb3AuthContext } from "../components/Layout";
 import { donateConfig } from "../generated";
 import { formatPasBalance, CURRENCY_SYMBOL } from "../wagmi-config";
+import { ArtistWithdrawForm } from "../components/ArtistWithdrawForm";
 import type { Abi } from "viem";
-import { isAddress } from "viem";
 
 export function Claim() {
   const { isConnected, connect, contractAddress, providerReady } = useWeb3AuthContext();
   const [manualArtistId, setManualArtistId] = useState('');
   const [artistBalance, setArtistBalance] = useState<bigint | null>(null);
   const [artistClaimed, setArtistClaimed] = useState(false);
-  const [withdrawAddress, setWithdrawAddress] = useState('');
   const [isClaiming, setIsClaiming] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
-  const [isWithdrawing, setIsWithdrawing] = useState(false);
-  const [withdrawError, setWithdrawError] = useState<string | null>(null);
 
   // Spotify auth hook
   const {
@@ -50,8 +47,6 @@ export function Claim() {
     isPending: isClaimPending
   } = useWriteContract();
 
-  const { writeContract: withdrawWriteContract, isPending: isWithdrawPending } = useWriteContract();
-  const { data: claimHash } = useWaitForTransactionReceipt({ hash: undefined as any });
 
   const handleClaimArtist = async () => {
     if (!manualArtistId || !contractAddress) {
@@ -77,43 +72,9 @@ export function Claim() {
     }
   };
 
-  // Handle withdraw donation
-  const handleWithdraw = async () => {
-    if (!manualArtistId) {
-      setWithdrawError('Please select an artist first');
-      return;
-    }
-
-    if (!withdrawAddress || !isAddress(withdrawAddress as `0x${string}`)) {
-      setWithdrawError('Invalid recipient address');
-      return;
-    }
-
-    if (!contractAddress) {
-      setWithdrawError('Contract address not found');
-      return;
-    }
-
-    setIsWithdrawing(true);
-    setWithdrawError(null);
-
-    try {
-      withdrawWriteContract({
-        address: contractAddress,
-        abi: donateConfig.abi as Abi,
-        functionName: 'withdrawDonate',
-        args: [manualArtistId, withdrawAddress as `0x${string}`],
-        gas: BigInt(300000), // Fixed gas limit to avoid gas estimation issues
-      });
-    } catch (error: any) {
-      setWithdrawError(error?.message || 'Failed to withdraw');
-      setIsWithdrawing(false);
-    }
-  };
 
   // Update artist balance and claimed status
   useEffect(() => {
-    // todo is the resigning needed? Can i use it directly from ?
     if (balanceData !== undefined) {
       setArtistBalance(balanceData as bigint);
     }
@@ -159,90 +120,60 @@ export function Claim() {
   return (
     <Layout>
       <div className="claim-container">
-          <h1 style={{ marginBottom: '2rem' }}>Artist Claiming</h1>
+          <h1 className="claim-page-title">Artist Claiming</h1>
 
           {/* Manual Artist ID Verification */}
-          <div style={{
-            border: '2px solid #1DB954',
-            borderRadius: '8px',
-            padding: '2rem',
-            marginBottom: '2rem',
-            backgroundColor: '#f0fff4'
-          }}>
-            <h2 style={{ marginBottom: '1rem', color: '#1DB954' }}>Manual Artist Verification</h2>
-            <p style={{ marginBottom: '1.5rem', color: '#666' }}>
+          <div className="claim-section claim-artist-section">
+            <h2>Manual Artist Verification</h2>
+            <p className="claim-section-description">
               Enter your Spotify Artist ID to check your balance and claim status
             </p>
 
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div className="claim-artist-input-group">
               <input
                 type="text"
                 placeholder="Enter Spotify Artist ID (e.g., 1234567890)"
                 value={manualArtistId}
                 onChange={(e) => setManualArtistId(e.target.value)}
-                style={{
-                  flex: 1,
-                  padding: '0.75rem',
-                  fontSize: '1rem',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
+                className="claim-artist-input"
               />
             </div>
 
             {manualArtistId && (
-              <div style={{
-                backgroundColor: 'white',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                padding: '1.5rem'
-              }}>
+              <div className="claim-artist-info-box">
                 <h3>Artist Information</h3>
                 <p><strong>Artist ID:</strong> {manualArtistId}</p>
                 <p>
                   <strong>Balance:</strong>{' '}
-                  <span style={{ fontSize: '1.2rem', color: '#1DB954', fontWeight: 'bold' }}>
+                  <span className="claim-artist-balance">
                     {artistBalance !== null ? `${formatPasBalance(artistBalance)} ${CURRENCY_SYMBOL}` : 'Loading...'}
                   </span>
                 </p>
                 <p>
                   <strong>Status:</strong>{' '}
-                  <span style={{
-                    color: artistClaimed ? '#ff4444' : '#1DB954',
-                    fontWeight: 'bold'
-                  }}>
+                  <span className={`claim-artist-status ${artistClaimed ? 'claimed' : 'available'}`}>
                     {artistClaimed ? '✓ Already Claimed' : '○ Available to Claim'}
                   </span>
                 </p>
 
                 {artistBalance === 0n && (
-                  <p style={{ color: '#ff9800', marginTop: '1rem' }}>
+                  <p className="claim-no-balance-message">
                     ℹ️ No donations found for this artist ID
                   </p>
                 )}
 
                 {/* Claim Button - Show only if available to claim and has balance */}
                 {!artistClaimed && artistBalance !== null && artistBalance > 0n && isConnected && (
-                  <div style={{ marginTop: '1.5rem' }}>
+                  <div className="claim-action-section">
                     <button
                       onClick={handleClaimArtist}
                       disabled={isClaiming || isClaimPending}
-                      style={{
-                        padding: '0.75rem 2rem',
-                        fontSize: '1rem',
-                        backgroundColor: '#1DB954',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: isClaiming || isClaimPending ? 'not-allowed' : 'pointer',
-                        opacity: isClaiming || isClaimPending ? 0.6 : 1,
-                        fontWeight: 'bold'
-                      }}
+                      className="claim-button"
                     >
                       {isClaiming || isClaimPending ? 'Claiming...' : 'Claim Artist Balance'}
                     </button>
                     {claimError && (
-                      <div style={{ color: 'red', marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                      <div className="claim-error-message">
                         {claimError}
                       </div>
                     )}
@@ -250,102 +181,34 @@ export function Claim() {
                 )}
 
                 {!isConnected && !artistClaimed && artistBalance !== null && artistBalance > 0n && (
-                  <div style={{
-                    marginTop: '1.5rem',
-                    padding: '1rem',
-                    backgroundColor: '#fff3cd',
-                    border: '1px solid #ffc107',
-                    borderRadius: '8px',
-                    color: '#856404'
-                  }}>
+                  <div className="claim-wallet-warning">
                     ⚠️ Connect your wallet to claim this artist balance
                   </div>
                 )}
 
                 {/* Withdraw Interface - Show only if already claimed */}
-                {artistClaimed && (
-                  <div style={{
-                    marginTop: '1.5rem',
-                    padding: '1rem',
-                    backgroundColor: '#e8f5e9',
-                    border: '2px solid #4CAF50',
-                    borderRadius: '8px'
-                  }}>
-                    <h4 style={{ color: '#2e7d32', marginTop: 0 }}>Withdraw Claimed Balance</h4>
-                    <p style={{ color: '#666', marginBottom: '1rem' }}>
-                      Send your claimed balance to a wallet address
-                    </p>
-                    <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
-                      <input
-                        type="text"
-                        placeholder="Enter recipient address (0x...)"
-                        value={withdrawAddress}
-                        onChange={(e) => setWithdrawAddress(e.target.value)}
-                        style={{
-                          padding: '0.75rem',
-                          fontSize: '0.9rem',
-                          border: '1px solid #ddd',
-                          borderRadius: '4px',
-                          fontFamily: 'monospace'
-                        }}
-                      />
-                      <button
-                        onClick={handleWithdraw}
-                        disabled={!isConnected || !isAddress(withdrawAddress as `0x${string}`) || isWithdrawing || isWithdrawPending}
-                        style={{
-                          padding: '0.75rem 2rem',
-                          fontSize: '1rem',
-                          backgroundColor: '#4CAF50',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '8px',
-                          cursor: !isConnected || !isAddress(withdrawAddress as `0x${string}`) || isWithdrawing || isWithdrawPending ? 'not-allowed' : 'pointer',
-                          opacity: !isConnected || !isAddress(withdrawAddress as `0x${string}`) || isWithdrawing || isWithdrawPending ? 0.6 : 1,
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        {isWithdrawing || isWithdrawPending ? 'Withdrawing...' : 'Withdraw All'}
-                      </button>
-                      {withdrawError && (
-                        <div style={{ color: 'red', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                          {withdrawError}
-                        </div>
-                      )}
-                      {!isAddress(withdrawAddress as `0x${string}`) && withdrawAddress && (
-                        <p style={{ color: '#d32f2f', fontSize: '0.9rem', margin: '0.5rem 0 0 0' }}>
-                          ❌ Invalid address
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                {artistClaimed && contractAddress && manualArtistId && (
+                  <ArtistWithdrawForm
+                    contractAddress={contractAddress}
+                    artistId={manualArtistId}
+                  />
                 )}
               </div>
             )}
           </div>
 
           {/* Spotify Authentication */}
-          <div style={{
-            border: '2px solid #1DB954',
-            borderRadius: '8px',
-            padding: '2rem',
-            backgroundColor: '#f9f9f9'
-          }}>
-            <h2 style={{ marginBottom: '1rem' }}>Spotify Authentication</h2>
+          <div className="claim-section claim-spotify-section">
+            <h2>Spotify Authentication</h2>
 
             {!isAuthenticated ? (
-              <div style={{ textAlign: 'center' }}>
-                <p style={{ marginBottom: '1.5rem' }}>
+              <div className="claim-spotify-auth-content">
+                <p className="claim-spotify-auth-description">
                   Connect your Spotify account to view your profile information.
                 </p>
 
                 {error && (
-                  <div style={{
-                    color: 'red',
-                    padding: '1rem',
-                    marginBottom: '1rem',
-                    border: '1px solid red',
-                    borderRadius: '4px'
-                  }}>
+                  <div className="claim-spotify-error">
                     Error: {error}
                   </div>
                 )}
@@ -353,67 +216,38 @@ export function Claim() {
                 <button
                   onClick={handleLogin}
                   disabled={loading}
-                  style={{
-                    padding: '0.75rem 2rem',
-                    fontSize: '1rem',
-                    backgroundColor: '#1DB954',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '24px',
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                    opacity: loading ? 0.6 : 1,
-                  }}
+                  className="claim-spotify-button"
                 >
                   {loading ? 'Connecting...' : 'Connect with Spotify'}
                 </button>
               </div>
             ) : (
               <div>
-                <h3 style={{ marginBottom: '1.5rem' }}>Your Spotify Profile</h3>
+                <h3 className="claim-profile-section">Your Spotify Profile</h3>
 
                 {profile && (
-                  <div style={{
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    padding: '1.5rem',
-                    backgroundColor: '#fff'
-                  }}>
+                  <div className="claim-profile-card">
                     {profile.images && profile.images.length > 0 && (
-                      <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                      <div className="claim-profile-image-container">
                         <img
                           src={profile.images[0].url}
                           alt={profile.displayName}
-                          style={{
-                            width: '100px',
-                            height: '100px',
-                            borderRadius: '50%',
-                            objectFit: 'cover',
-                          }}
+                          className="claim-profile-image"
                         />
                       </div>
                     )}
 
-                    <div style={{ lineHeight: '1.8', fontSize: '0.95rem' }}>
+                    <div className="claim-profile-details">
                       <p><strong>Display Name:</strong> {profile.displayName}</p>
-                      <p><strong>Email:</strong> {profile.email}</p>
                       <p><strong>Country:</strong> {profile.country}</p>
-                      <p><strong>Subscription:</strong> {profile.product}</p>
                       <p><strong>Followers:</strong> {profile.followers?.toLocaleString()}</p>
                       <p><strong>Spotify ID:</strong> {profile.id}</p>
                     </div>
 
-                    <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+                    <div className="claim-profile-actions">
                       <button
                         onClick={logout}
-                        style={{
-                          padding: '0.5rem 1.5rem',
-                          fontSize: '1rem',
-                          backgroundColor: '#ff4444',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '24px',
-                          cursor: 'pointer',
-                        }}
+                        className="claim-logout-button"
                       >
                         Logout
                       </button>

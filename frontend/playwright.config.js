@@ -39,4 +39,3 @@ export default defineConfig({
     timeout: 120000,
   }
 });
-// NOTE: Playwright tests needed for 3 basic user flows: 1) Connect wallet, 2) Record audio and identify song, 3) Donate to artist

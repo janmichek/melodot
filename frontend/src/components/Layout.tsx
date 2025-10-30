@@ -10,9 +10,6 @@ import { passetHub } from "../wagmi-config";
 import { Header } from "./Header";
 import { ContractInfoFooter } from "./ContractInfoFooter";
 
-interface LayoutProps {
-  children: ReactNode;
-}
 
 export interface Web3AuthContextType {
   isConnected: boolean;
@@ -99,7 +96,7 @@ export function useWeb3AuthContext() {
   };
 }
 
-export function Layout({ children }: LayoutProps) {
+export function Layout({ children }: {children: ReactNode;}) {
   const {
     isConnected,
     address,

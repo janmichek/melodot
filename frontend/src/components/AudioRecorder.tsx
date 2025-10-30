@@ -4,7 +4,7 @@ import AudioControls from "./AudioControls";
 import { DiscoveryResult } from "../types";
 import { USE_MOCK_DATA, MOCK_DISCOVERY_DATA } from "./mockDiscoveryData";
 
-const ATTEMPT_DURATIONS = [10, 15, 20]; // seconds for each attempt
+const ATTEMPT_DURATIONS = [2, 5, 10, 15]; // seconds for each attempt
 
 interface AudioRecorderProps {
   onAnalysisComplete: (data: DiscoveryResult) => void;
@@ -22,15 +22,17 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
     resetRecording,
   } = useAudioRecorder();
 
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   const [duration, setDuration] = useState(0);
-  const [currentAttempt, setCurrentAttempt] = useState(0);
+  const [attemptIndex, setAttemptIndex] = useState(0);
   const [allAttemptsFailed, setAllAttemptsFailed] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const isProcessingAttempt = useRef(false);
 
+  // Analyze audio when ready
   useEffect(() => {
     if (isAnalyzing && audioBlob && !isProcessingAttempt.current) {
-      void submitAudioForAnalysis();
+      void analyze();
     }
   }, [isAnalyzing, audioBlob]);
 
@@ -42,26 +44,21 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
   // Auto-stop recording when duration threshold is reached for current attempt
   useEffect(() => {
     if (isRecording && !isProcessingAttempt.current) {
-      const targetDuration = ATTEMPT_DURATIONS[currentAttempt];
-      console.log(`Duration: ${duration}s / Target: ${targetDuration}s`);
+      const targetDuration = ATTEMPT_DURATIONS[attemptIndex];
 
       if (duration >= targetDuration) {
-        console.log(`Reached ${targetDuration}s, stopping recording for analysis`);
         setIsAnalyzing(true);
         stopRecording();
       }
     }
-  }, [duration, isRecording, currentAttempt]);
+  }, [duration, isRecording, attemptIndex]);
 
-  async function submitAudioForAnalysis() {
+  async function analyze() {
     if (isProcessingAttempt.current) return;
     isProcessingAttempt.current = true;
 
-    console.log(`submitAudioForAnalysis - Attempt ${currentAttempt + 1}/${ATTEMPT_DURATIONS.length}`);
-
     // ===== MOCK MODE: Return mock data immediately =====
     if (USE_MOCK_DATA) {
-      console.log('MOCK MODE: Using mock discovery data instead of real audio analysis');
       // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 500));
       onAnalysisComplete(MOCK_DISCOVERY_DATA);
@@ -85,33 +82,27 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
       if (!response.ok) {throw new Error(`HTTP error! status: ${response.status}`);}
 
       const data = await response.json();
-      console.log('Analysis complete - Full response:', data);
-      console.log('Track structure:', JSON.stringify(data.track, null, 2));
 
       if (data && data.track) {
-        console.log('Track found! Stopping attempts.');
         onAnalysisComplete(data);
         reset();
         isProcessingAttempt.current = false;
         return;
       }
 
-      console.log('Track not found in this attempt');
-      handleNextAttempt();
+      startNextAttempt();
     } catch (error) {
-      console.error("Error uploading file:", error);
-      handleNextAttempt();
+      startNextAttempt();
     }
     // ===== END REAL AUDIO ANALYSIS =====
   }
 
-  function handleNextAttempt() {
+  function startNextAttempt() {
     isProcessingAttempt.current = false;
 
-    if (currentAttempt < ATTEMPT_DURATIONS.length - 1) {
-      const nextAttempt = currentAttempt + 1;
-      console.log(`Starting attempt ${nextAttempt + 1} with ${ATTEMPT_DURATIONS[nextAttempt]}s duration`);
-      setCurrentAttempt(nextAttempt);
+    if (attemptIndex < ATTEMPT_DURATIONS.length - 1) {
+      const nextAttempt = attemptIndex + 1;
+      setAttemptIndex(nextAttempt);
       setDuration(0);
       resetRecording();
       setTimeout(() => startRecording(), 100);
@@ -122,9 +113,9 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
     }
   }
 
-  function handleStartRecording() {
+  function record() {
     if (!isRecording && !isAnalyzing) {
-      setCurrentAttempt(0);
+      setAttemptIndex(0);
       setAllAttemptsFailed(false);
       setDuration(0);
       isProcessingAttempt.current = false;
@@ -132,7 +123,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
     }
   }
 
-  function handleStopRecording() {
+  function stop() {
     if (isRecording) {
       stopRecording();
       setIsAnalyzing(false);
@@ -143,7 +134,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
   function reset() {
     setIsAnalyzing(false);
     setDuration(0);
-    setCurrentAttempt(0);
+    setAttemptIndex(0);
     setAllAttemptsFailed(false);
     isProcessingAttempt.current = false;
     resetRecording();
@@ -168,7 +159,6 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
 
   // Mock mode: Skip recording and use mock data immediately
   function handleMockMode() {
-    console.log('MOCK MODE: Triggered manually');
     onAnalysisComplete(MOCK_DISCOVERY_DATA);
   }
 
@@ -212,16 +202,18 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
 
       {!allAttemptsFailed && !USE_MOCK_DATA && (
         <AudioControls
-          permission={permission}
+          hasPermission={permission}
           isRecording={isRecording || isAnalyzing}
           isAnalyzing={isAnalyzing}
-          onStart={handleStartRecording}
-          onStop={handleStopRecording}
+          onStart={record}
+          onStop={stop}
           onRequestPermission={requestPermission}
         />
       )}
 
-      {errorMessage && <p className="shazam-error">{errorMessage}</p>}
+      {errorMessage &&
+        <p className="shazam-error">{errorMessage}</p>
+      }
     </div>
   );
 }

@@ -13,13 +13,13 @@ interface DonationFormProps {
 }
 
 export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAuth }: DonationFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDonating, setIsDonating] = useState(false);
   const { isConnected } = useAccount();
-  console.log('artistId', artistId)
+
   const {
     data: hash,
     writeContract,
-    isPending: isWritePending,
+    isPending: isWriting,
     error: writeError,
     reset: resetWrite,
   } = useWriteContract();
@@ -28,7 +28,6 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
     isLoading: isConfirming,
     isSuccess: isConfirmed
   } = useWaitForTransactionReceipt({hash,});
-  // todo make transaction loading better
 
 
   const donate = async (amount: number) => {
@@ -37,10 +36,10 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
       return;
     }
 
-    if (isSubmitting || isWritePending || isConfirming) return;
+    if (isDonating || isWriting || isConfirming) return;
 
     try {
-      setIsSubmitting(true);
+      setIsDonating(true);
       writeContract({
         address: contractAddress,
         abi: donateConfig.abi as Abi,
@@ -52,7 +51,7 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
     } catch (err) {
       console.error("Error donating:", err);
     } finally {
-      setIsSubmitting(false);
+      setIsDonating(false);
     }
   };
 
@@ -90,10 +89,11 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
               key={amount}
               type="button"
               onClick={() => donate(amount)}
-              disabled={isSubmitting || isWritePending || isConfirming}
+              disabled={isDonating || isWriting || isConfirming}
               className="btn-amount-selector"
+              style={{ display: isWriting || isConfirming ? 'none' : 'inline-flex' }}
             >
-              {isWritePending || isConfirming ? "Donating..." : `${amount} ${CURRENCY_SYMBOL}`}
+              {`${amount} ${CURRENCY_SYMBOL}`}
             </button>
           ))}
         </div>

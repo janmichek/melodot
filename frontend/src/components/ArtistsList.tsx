@@ -14,14 +14,12 @@ export function ArtistsList({ count, contractAddress }: ArtistsListProps) {
   const [isLoading, setIsLoading] = useState(false);
   const publicClient = usePublicClient();
 
-  // Fetch all artist IDs from contract
   useEffect(() => {
     const fetchArtistIds = async () => {
       if (!publicClient || count === 0n) return;
 
       setIsLoading(true);
       try {
-        const ids: string[] = [];
         const promises = [];
 
         // Create promises for all artistIds calls

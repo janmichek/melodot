@@ -7,10 +7,11 @@
     "start": "concurrently \"bun run dev\" \"bun run server\"",
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview",
     "lint": "eslint",
     "generate": "wagmi generate",
     "server": "node server.js",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
     "test:e2e": "playwright test"
   },
   "dependencies": {

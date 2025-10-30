@@ -1,4 +1,4 @@
-import "./index.css";
+import "./App.css";
 
 import ReactDOM from "react-dom/client";
 import { Web3AuthProvider } from "@web3auth/modal/react";

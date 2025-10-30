@@ -3,10 +3,9 @@ import { DiscoveryResult } from "../types";
 // ===== MOCK MODE CONFIGURATION =====
 // Set to true to use mocked data instead of real audio analysis
 // This allows working on the donation flow without analyzing audio
-export const USE_MOCK_DATA = true;
+export const USE_MOCK_DATA = false;
 
 // Mock response data for development
-// TODO: Set USE_MOCK_DATA to false and remove this mock when ready to use real audio analysis
 // Using 'as any' because this mock data contains extended fields not in the simplified type definition
 export const MOCK_DISCOVERY_DATA = {
   "track": {
