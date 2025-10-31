@@ -9,7 +9,7 @@ interface ContractInfoFooterProps {
   contractAddress: `0x${string}`;
 }
 
-export function ContractInfoFooter({ contractAddress }: ContractInfoFooterProps) {
+export function Footer({ contractAddress }: ContractInfoFooterProps) {
   const [isArtistsExpanded, setIsArtistsExpanded] = useState(false);
 
   const { data: count } = useReadContract({

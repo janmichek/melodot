@@ -8,7 +8,7 @@ import { useAccount } from "wagmi";
 import { donateConfig } from "../generated";
 import { passetHub } from "../wagmi-config";
 import { Header } from "./Header";
-import { ContractInfoFooter } from "./ContractInfoFooter";
+import { Footer } from "./Footer";
 
 
 export interface Web3AuthContextType {
@@ -122,7 +122,7 @@ export function Layout({ children }: {children: ReactNode;}) {
 
       <main className="main-content">{children}</main>
 
-      <ContractInfoFooter contractAddress={contractAddress} />
+      <Footer contractAddress={contractAddress} />
     </div>
   );
 }

@@ -29,22 +29,14 @@ export function Admin() {
   return (
     <Layout>
       {!isConnected && (
-        <div style={{ padding: "32px 24px", textAlign: "center" }}>
-          <h2 style={{ marginBottom: "16px", color: "var(--text-color)" }}>Connect Wallet</h2>
-          <p style={{ marginBottom: "24px", color: "var(--text-muted)" }}>
+        <div className="admin-auth-container">
+          <h2 className="admin-auth-title">Connect Wallet</h2>
+          <p className="admin-auth-description">
             Please connect your wallet to access the admin panel
           </p>
           <button
             onClick={() => void connect()}
-            style={{
-              backgroundColor: "var(--primary-color)",
-              color: "white",
-              padding: "12px 24px",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontWeight: "600",
-            }}
+            className="admin-auth-button"
           >
             Connect Wallet
           </button>
@@ -52,9 +44,9 @@ export function Admin() {
       )}
 
       {isConnected && !isOwner && (
-        <div style={{ padding: "32px 24px", textAlign: "center" }}>
-          <h2 style={{ marginBottom: "16px", color: "var(--text-color)" }}>Access Denied</h2>
-          <p style={{ marginBottom: "24px", color: "var(--text-muted)" }}>
+        <div className="admin-denied-container">
+          <h2 className="admin-denied-title">Access Denied</h2>
+          <p className="admin-denied-description">
             You are not authorized to access this panel. Only the contract owner can withdraw tip fees.
           </p>
         </div>
