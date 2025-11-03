@@ -16,7 +16,7 @@ export interface Toast {
 
 interface ToastContextType {
   toasts: Toast[];
-  addToast: (toast: Omit<Toast, 'id'>) => string | void;
+  addToast: (toast: Omit<Toast, 'id'>) => string;
   removeToast: (id: string) => void;
   clearToasts: () => void;
 }
@@ -25,6 +25,10 @@ export const ToastContext = createContext<ToastContextType | undefined>(undefine
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const removeToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
 
   const addToast = useCallback(
     (toast: Omit<Toast, 'id'>) => {
@@ -44,18 +48,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           removeToast(id);
           newToast.onDismiss?.();
         }, newToast.duration);
-
-        return () => clearTimeout(timer);
       }
 
       return id;
     },
-    []
+    [removeToast]
   );
-
-  const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
-  }, []);
 
   const clearToasts = useCallback(() => {
     setToasts([]);
