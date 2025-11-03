@@ -13,6 +13,13 @@ interface DiscoveryResult {
   [key: string]: any;
 }
 
+// Disable body parsing for formidable to handle multipart/form-data
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 /**
  * Analyzes audio using Shazam API
  * Requires VITE_RAPIDAPI_KEY environment variable
