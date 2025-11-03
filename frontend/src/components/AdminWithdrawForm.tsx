@@ -95,7 +95,7 @@ export function AdminWithdrawForm({
         <div className="admin-info-row">
           <span className="admin-label">Available Balance:</span>
           <BalanceDisplay
-            balance={tipFeeBalance}
+            balance={platformFeeBalance}
             showSymbol={true}
             size="small"
           />

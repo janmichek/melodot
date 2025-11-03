@@ -152,7 +152,7 @@ export function ArtistWithdrawForm({
       <div className="claim-withdraw-input-group">
         <AddressInput
           value={withdrawAddress}
-          onChange={(e) => setWithdrawAddress(e.target.value)}
+          onChange={setWithdrawAddress}
           className="claim-withdraw-input"
           disabled={isWithdrawPending || isConfirming}
         />
