@@ -10,29 +10,31 @@ interface SpotifyProfile {
 }
 
 interface SpotifyAuthState {
-  sessionId: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
   profile: SpotifyProfile | null;
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
 }
 
-const API_BASE_URL = 'http://localhost:5174/api';
+const API_BASE_URL = '/api';
 
 export const useSpotifyAuth = () => {
   const [authState, setAuthState] = useState<SpotifyAuthState>({
-    sessionId: null,
+    accessToken: null,
+    refreshToken: null,
     profile: null,
     isAuthenticated: false,
     loading: false,
     error: null,
   });
 
-  // Load session from localStorage on mount
+  // Load tokens from localStorage on mount
   useEffect(() => {
-    const savedSessionId = localStorage.getItem('spotify_session_id');
-    if (savedSessionId) {
-      fetchProfile(savedSessionId);
+    const savedAccessToken = localStorage.getItem('spotify_access_token');
+    if (savedAccessToken) {
+      fetchProfile(savedAccessToken);
     }
   }, []);
 
@@ -52,12 +54,13 @@ export const useSpotifyAuth = () => {
       }
 
       const data = await response.json();
-      const { sessionId } = data;
+      const { accessToken, refreshToken } = data;
 
-      localStorage.setItem('spotify_session_id', sessionId);
-      await fetchProfile(sessionId);
+      localStorage.setItem('spotify_access_token', accessToken);
+      localStorage.setItem('spotify_refresh_token', refreshToken);
+      await fetchProfile(accessToken);
 
-      return sessionId;
+      return accessToken;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       setAuthState(prev => ({
@@ -70,23 +73,25 @@ export const useSpotifyAuth = () => {
   }, []);
 
   // Fetch user profile
-  const fetchProfile = async (sessionId: string) => {
+  const fetchProfile = async (accessToken: string) => {
     setAuthState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/spotify/profile?sessionId=${sessionId}`
+        `${API_BASE_URL}/spotify/profile?accessToken=${accessToken}`
       );
 
       if (!response.ok) {
-        localStorage.removeItem('spotify_session_id');
-        throw new Error('Session expired');
+        localStorage.removeItem('spotify_access_token');
+        localStorage.removeItem('spotify_refresh_token');
+        throw new Error('Token expired or invalid');
       }
 
       const profile = await response.json();
 
       setAuthState({
-        sessionId,
+        accessToken,
+        refreshToken: localStorage.getItem('spotify_refresh_token'),
         profile,
         isAuthenticated: true,
         loading: false,
@@ -95,7 +100,8 @@ export const useSpotifyAuth = () => {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       setAuthState({
-        sessionId: null,
+        accessToken: null,
+        refreshToken: null,
         profile: null,
         isAuthenticated: false,
         loading: false,
@@ -137,10 +143,12 @@ export const useSpotifyAuth = () => {
 
   // Logout
   const logout = useCallback(() => {
-    localStorage.removeItem('spotify_session_id');
+    localStorage.removeItem('spotify_access_token');
+    localStorage.removeItem('spotify_refresh_token');
     localStorage.removeItem('spotify_auth_state');
     setAuthState({
-      sessionId: null,
+      accessToken: null,
+      refreshToken: null,
       profile: null,
       isAuthenticated: false,
       loading: false,
