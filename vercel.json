@@ -3,7 +3,7 @@
   "outputDirectory": "frontend/dist",
   "installCommand": "bun install && cd frontend && bun install",
   "functions": {
-    "frontend/api/**/*.ts": {
+    "api/**/*.ts": {
       "runtime": "@vercel/node@3.2.29"
     }
   }
