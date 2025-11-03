@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { donateConfig } from "../generated";
-import { CURRENCY_SYMBOL, formatAddressShort, formatPasBalance } from "../wagmi-config";
+import { formatAddressShort } from "../wagmi-config";
+import { BalanceDisplay } from "./ui/BalanceDisplay";
+import { useToast } from "../hooks/useToast";
 import type { Abi } from "viem";
 
 interface AdminWithdrawFormProps {
@@ -16,6 +18,8 @@ export function AdminWithdrawForm({
   platformFeeBalance,
 }: AdminWithdrawFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toastId, setToastId] = useState<string>('');
+  const { pending: showPendingToast, success: showSuccessToast, error: showErrorToast } = useToast();
 
   const {
     data: hash,
@@ -28,6 +32,41 @@ export function AdminWithdrawForm({
     isLoading: isConfirming,
     isSuccess: isConfirmed,
   } = useWaitForTransactionReceipt({ hash });
+
+  // Show pending toast when transaction is being written
+  useEffect(() => {
+    if (isWithdrawing && hash) {
+      const id = showPendingToast('Withdrawal Status', {
+        message: '⏳ Processing withdrawal...',
+        hash,
+        autoHide: false,
+      });
+      setToastId(id);
+    }
+  }, [isWithdrawing, hash, showPendingToast]);
+
+  // Show success toast when transaction is confirmed
+  useEffect(() => {
+    if (isConfirmed && hash && toastId) {
+      showSuccessToast('Withdrawal Successful', {
+        message: '✅ Platform fees withdrawn!',
+        hash,
+        autoHide: true,
+        duration: 5000,
+      });
+    }
+  }, [isConfirmed, hash, toastId, showSuccessToast]);
+
+  // Show error toast if write fails
+  useEffect(() => {
+    if (writeError) {
+      showErrorToast('Withdrawal Failed', {
+        message: writeError.message || 'Failed to process withdrawal',
+        autoHide: true,
+        duration: 5000,
+      });
+    }
+  }, [writeError, showErrorToast]);
 
   const withdrawPlatformFees = async () => {
     if (isSubmitting || isWithdrawing || isConfirming) return;
@@ -47,8 +86,6 @@ export function AdminWithdrawForm({
     }
   };
 
-  const formattedPlatformFee = platformFeeBalance ? formatPasBalance(platformFeeBalance) : "0.00";
-
   return (
     <div className="admin-card">
       <h3 className="admin-card-title">💰 Platform Fee Withdrawal</h3>
@@ -57,7 +94,11 @@ export function AdminWithdrawForm({
       <div className="admin-info-box">
         <div className="admin-info-row">
           <span className="admin-label">Available Balance:</span>
-          <span className="admin-value">{formattedPlatformFee} {CURRENCY_SYMBOL}</span>
+          <BalanceDisplay
+            balance={tipFeeBalance}
+            showSymbol={true}
+            size="small"
+          />
         </div>
         <div className="admin-info-row">
           <span className="admin-label">Recipient Address:</span>
@@ -72,24 +113,6 @@ export function AdminWithdrawForm({
       >
         {isWithdrawing || isConfirming ? "Processing..." : "Withdraw Platform Fees"}
       </button>
-
-      {hash && (
-        <div
-          className={`tx-status-box ${
-            isConfirmed ? "tx-status-success" : "tx-status-pending"
-          }`}
-        >
-          {isConfirming && <p className="p-text">⏳ Waiting for confirmation...</p>}
-          {isConfirmed && (
-            <p className="tx-status-text">✅ Withdrawal successful!</p>
-          )}
-          <p className="tx-hash">Tx: {hash}</p>
-        </div>
-      )}
-
-      {writeError && (
-        <div className="error-box">❌ Error: {writeError.message}</div>
-      )}
     </div>
   );
 }

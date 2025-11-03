@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { donateConfig } from "../generated";
+import { AddressInput } from "./ui/AddressInput";
+import { useToast } from "../hooks/useToast";
 import type { Abi } from "viem";
 import { isAddress } from "viem";
 
@@ -18,7 +20,9 @@ export function ArtistWithdrawForm({
   const [withdrawAddress, setWithdrawAddress] = useState('');
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | undefined>();
+  const [toastId, setToastId] = useState<string>('');
   const { isConnected } = useAccount();
+  const { pending: showPendingToast, success: showSuccessToast, error: showErrorToast } = useToast();
 
   const {
     writeContract: withdrawWriteContract,
@@ -77,38 +81,67 @@ export function ArtistWithdrawForm({
     }
   }, [withdrawHash]);
 
+  // Show pending toast when transaction is being written
+  useEffect(() => {
+    if (isWithdrawPending && withdrawHash) {
+      const id = showPendingToast('Withdrawal Status', {
+        message: '⏳ Processing withdrawal...',
+        hash: withdrawHash,
+        autoHide: false,
+      });
+      setToastId(id);
+    }
+  }, [isWithdrawPending, withdrawHash, showPendingToast]);
+
+  // Show success toast when transaction is confirmed
+  useEffect(() => {
+    if (isConfirmed && withdrawHash && toastId) {
+      showSuccessToast('Withdrawal Successful', {
+        message: '✅ Funds withdrawn to your address!',
+        hash: withdrawHash,
+        autoHide: true,
+        duration: 5000,
+        onDismiss: () => {
+          setWithdrawAddress('');
+          setTxHash(undefined);
+          setWithdrawError(null);
+          onWithdrawSuccess?.();
+          // Refresh page after 2 seconds
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        },
+      });
+    }
+  }, [isConfirmed, withdrawHash, toastId, showSuccessToast, onWithdrawSuccess]);
+
   // Handle write errors
   useEffect(() => {
     if (writeError) {
       const errorMessage = writeError?.message || 'Failed to initiate withdrawal';
       setWithdrawError(errorMessage);
+      showErrorToast('Withdrawal Failed', {
+        message: errorMessage,
+        autoHide: true,
+        duration: 5000,
+      });
       console.error('Write error:', writeError);
     }
-  }, [writeError]);
+  }, [writeError, showErrorToast]);
 
   // Handle confirmation errors
   useEffect(() => {
     if (confirmError) {
       const errorMessage = confirmError?.message || 'Transaction failed to confirm';
       setWithdrawError(errorMessage);
+      showErrorToast('Confirmation Failed', {
+        message: errorMessage,
+        autoHide: true,
+        duration: 5000,
+      });
       console.error('Confirm error:', confirmError);
     }
-  }, [confirmError]);
-
-  // Handle successful confirmation
-  useEffect(() => {
-    if (isConfirmed) {
-      console.log('Withdrawal confirmed successfully');
-      setWithdrawAddress('');
-      setTxHash(undefined);
-      setWithdrawError(null);
-      onWithdrawSuccess?.();
-      // Refresh page after 2 seconds
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-    }
-  }, [isConfirmed, onWithdrawSuccess]);
+  }, [confirmError, showErrorToast]);
 
   return (
     <div className="claim-withdraw-section">
@@ -117,9 +150,7 @@ export function ArtistWithdrawForm({
         Send your claimed balance to a wallet address
       </p>
       <div className="claim-withdraw-input-group">
-        <input
-          type="text"
-          placeholder="Enter recipient address (0x...)"
+        <AddressInput
           value={withdrawAddress}
           onChange={(e) => setWithdrawAddress(e.target.value)}
           className="claim-withdraw-input"
@@ -132,25 +163,6 @@ export function ArtistWithdrawForm({
         >
           {isWithdrawPending ? 'Sending transaction...' : isConfirming ? 'Confirming...' : 'Withdraw All'}
         </button>
-
-        {txHash && !withdrawError && (
-          <div className={`tx-status-box ${isConfirmed ? 'tx-status-success' : 'tx-status-pending'}`}>
-            {isConfirming && <p>⏳ Waiting for confirmation...</p>}
-            {isConfirmed && <p className="tx-status-text">✅ Withdrawal successful!</p>}
-            <p className="tx-hash">Tx: {txHash.slice(0, 10)}...</p>
-          </div>
-        )}
-
-        {withdrawError && (
-          <div className="claim-withdraw-error">
-            {withdrawError}
-          </div>
-        )}
-        {!isAddress(withdrawAddress as `0x${string}`) && withdrawAddress && (
-          <p className="claim-invalid-address">
-            ❌ Invalid address
-          </p>
-        )}
       </div>
     </div>
   );

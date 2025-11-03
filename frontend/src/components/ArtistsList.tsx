@@ -1,30 +1,38 @@
 import { useState, useEffect } from "react";
-import { usePublicClient } from "wagmi";
+import { usePublicClient, useReadContract } from "wagmi";
 import type { Abi } from "viem";
 import { donateConfig } from "../generated";
-import { ArtistCard } from "./ArtistCard";
+import { BalanceDisplay } from "./ui/BalanceDisplay";
 
 interface ArtistsListProps {
   count: bigint;
   contractAddress: `0x${string}`;
 }
 
+interface ArtistItem {
+  id: string;
+  totalBalance: bigint;
+  isClaimed: boolean;
+}
+
 export function ArtistsList({ count, contractAddress }: ArtistsListProps) {
-  const [artistIds, setArtistIds] = useState<string[]>([]);
+  const [artistItems, setArtistItems] = useState<ArtistItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const publicClient = usePublicClient();
 
   useEffect(() => {
-    const fetchArtistIds = async () => {
-      if (!publicClient || count === 0n) return;
+    const fetchArtistData = async () => {
+      if (!publicClient || count === 0n) {
+        setArtistItems([]);
+        return;
+      }
 
       setIsLoading(true);
       try {
-        const promises = [];
-
-        // Create promises for all artistIds calls
+        // Fetch all artist IDs
+        const idPromises = [];
         for (let i = 0; i < Number(count); i++) {
-          promises.push(
+          idPromises.push(
             publicClient.readContract({
               address: contractAddress,
               abi: donateConfig.abi as Abi,
@@ -34,16 +42,39 @@ export function ArtistsList({ count, contractAddress }: ArtistsListProps) {
           );
         }
 
-        const results = await Promise.all(promises);
-        setArtistIds(results as string[]);
+        const artistIds = await Promise.all(idPromises);
+
+        // Fetch data for each artist
+        const dataPromises = (artistIds as string[]).map((artistId) =>
+          publicClient.readContract({
+            address: contractAddress,
+            abi: donateConfig.abi as Abi,
+            functionName: "artists",
+            args: [artistId],
+          })
+        );
+
+        const artistDataResults = await Promise.all(dataPromises);
+
+        // Map to artist items
+        const items = (artistIds as string[]).map((artistId, index) => {
+          const [totalBalance, isClaimed] = artistDataResults[index] as [bigint, boolean];
+          return {
+            id: artistId,
+            totalBalance,
+            isClaimed,
+          };
+        });
+
+        setArtistItems(items);
       } catch (error) {
-        console.error("Failed to fetch artist IDs:", error);
+        console.error("Failed to fetch artist data:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchArtistIds();
+    fetchArtistData();
   }, [count, publicClient, contractAddress]);
 
   return (
@@ -52,16 +83,41 @@ export function ArtistsList({ count, contractAddress }: ArtistsListProps) {
         All Artists in Contract ({count.toString()})
       </h3>
       {isLoading && <p className="p-text">Loading artists...</p>}
-      {!isLoading && artistIds.length === 0 && (
+      {!isLoading && artistItems.length === 0 && (
         <p className="p-text">No artists found</p>
       )}
       <div className="artists-list-container">
-        {artistIds.map((artistId) => (
-          <ArtistCard
-            key={artistId}
-            artistId={artistId}
-            contractAddress={contractAddress}
-          />
+        {artistItems.map((artist) => (
+          <div key={artist.id} className="artist-card">
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "0.5rem",
+              }}
+            >
+              <p style={{ margin: 0 }}>Artist: {artist.id}</p>
+              <span
+                style={{
+                  fontSize: "0.75rem",
+                  fontWeight: "bold",
+                  padding: "0.25rem 0.5rem",
+                  borderRadius: "3px",
+                  backgroundColor: artist.isClaimed ? "#4CAF50" : "#FF9800",
+                  color: "white",
+                }}
+              >
+                {artist.isClaimed ? "✓ CLAIMED" : "○ AVAILABLE"}
+              </span>
+            </div>
+            <BalanceDisplay
+              balance={artist.totalBalance}
+              label="Balance"
+              showSymbol={true}
+              size="small"
+            />
+          </div>
         ))}
       </div>
     </div>

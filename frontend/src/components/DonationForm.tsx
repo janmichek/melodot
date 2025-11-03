@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { donateConfig } from "../generated";
 import { CURRENCY_SYMBOL } from "../wagmi-config";
+import { useToast } from "../hooks/useToast";
 import type { Abi } from "viem";
 import { parseEther } from "viem";
 
@@ -15,6 +16,8 @@ interface DonationFormProps {
 export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAuth }: DonationFormProps) {
   const [isDonating, setIsDonating] = useState(false);
   const { isConnected } = useAccount();
+  const { pending: showPendingToast, success: showSuccessToast, error: showErrorToast } = useToast();
+  const [toastId, setToastId] = useState<string>('');
 
   const {
     data: hash,
@@ -29,6 +32,44 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
     isSuccess: isConfirmed
   } = useWaitForTransactionReceipt({hash,});
 
+  // Show pending toast when transaction is being written
+  useEffect(() => {
+    if (isWriting && hash) {
+      const id = showPendingToast('Donation Status', {
+        message: '⏳ Processing donation...',
+        hash,
+        autoHide: false,
+      });
+      setToastId(id);
+    }
+  }, [isWriting, hash, showPendingToast]);
+
+  // Show success toast when transaction is confirmed
+  useEffect(() => {
+    if (isConfirmed && hash && toastId) {
+      showSuccessToast('Donation Successful', {
+        message: '✅ Donation confirmed on-chain!',
+        hash,
+        autoHide: true,
+        duration: 5000,
+        onDismiss: () => {
+          onSuccess?.();
+          resetWrite();
+        },
+      });
+    }
+  }, [isConfirmed, hash, toastId, showSuccessToast, onSuccess, resetWrite]);
+
+  // Show error toast if write fails
+  useEffect(() => {
+    if (writeError) {
+      showErrorToast('Donation Failed', {
+        message: writeError.message || 'Failed to process donation',
+        autoHide: true,
+        duration: 5000,
+      });
+    }
+  }, [writeError, showErrorToast]);
 
   const donate = async (amount: number) => {
      if (!isConnected) {
@@ -55,28 +96,6 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
     }
   };
 
-  /**
-   * Handle successful transaction completion
-   *
-   * This useEffect is necessary for two important reasons:
-   * 1. Trigger the onSuccess callback when the transaction is confirmed on-chain
-   * 2. Reset the form state after displaying the success message for 3 seconds
-   *
-   * We use useEffect instead of handling this in the write function because
-   * transaction confirmation happens asynchronously after the write is submitted.
-   * The isConfirmed state comes from useWaitForTransactionReceipt hook which
-   * monitors the blockchain for transaction confirmation.
-   */
-  useEffect(() => {
-    if (isConfirmed) {
-      onSuccess?.();
-      // Reset after a brief delay to allow user to see the success message
-      setTimeout(() => {
-        resetWrite();
-      }, 3000);
-    }
-  }, [isConfirmed, onSuccess, resetWrite]);
-
   return (
     <div className="contract-form-section">
       <h3 className="contract-form-title">🎵 Donate to Artist</h3>
@@ -98,24 +117,6 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
           ))}
         </div>
       </div>
-
-      {hash && (
-        <div
-          className={`tx-status-box ${
-            isConfirmed ? "tx-status-success" : "tx-status-pending"
-          }`}
-        >
-          {isConfirming && <p className="p-text">⏳ Waiting for confirmation...</p>}
-          {isConfirmed && (
-            <p className="tx-status-text">✅ Donation successful!</p>
-          )}
-          <p className="tx-hash">Tx: {hash}</p>
-        </div>
-      )}
-
-      {writeError && (
-        <div className="error-box">❌ Error: {writeError.message}</div>
-      )}
     </div>
   );
 }
