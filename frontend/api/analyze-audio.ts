@@ -50,10 +50,23 @@ export default async function handler(
       keepExtensions: true,
     });
 
-    const [, files] = await form.parse(req);
+    let files;
+    try {
+      const result = await form.parse(req as any);
+      files = result[1];
+      console.log('Form parsed successfully, files:', Object.keys(files));
+    } catch (parseError) {
+      console.error('Formidable parse error:', parseError);
+      return res.status(500).json({
+        error: 'Failed to parse form data',
+        details: parseError instanceof Error ? parseError.message : 'Unknown parse error',
+      });
+    }
+
     const uploadedFile = Array.isArray(files.file) ? files.file[0] : files.file;
 
     if (!uploadedFile) {
+      console.error('No file in parsed data. Available fields:', Object.keys(files));
       return res.status(400).json({ error: 'No audio file provided' });
     }
 
