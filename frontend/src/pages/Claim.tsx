@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSpotifyAuth } from "../hooks/useSpotifyAuth";
-import { useReadContract, useWriteContract } from "wagmi";
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { Layout, useWeb3AuthContext } from "../components/Layout";
 import { donateConfig } from "../generated";
 import { formatPasBalance, CURRENCY_SYMBOL } from "../wagmi-config";
@@ -42,11 +42,24 @@ export function Claim() {
     args: manualArtistId ? [manualArtistId] : undefined,
   });
 
+  // todo is it necessary?
+  const [txHash, setTxHash] = useState<string | undefined>();
+
   const {
     writeContract: claimWriteContract,
-    isPending: isClaimPending
+    isPending: isClaimPending,
+    data: claimHash
   } = useWriteContract();
 
+  // Watch for transaction confirmation
+  // todo minimize code
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+    error: confirmError
+  } = useWaitForTransactionReceipt({
+    hash: txHash,
+  });
 
   const handleClaimArtist = async () => {
     if (!manualArtistId || !contractAddress) {
@@ -56,21 +69,54 @@ export function Claim() {
 
     setIsClaiming(true);
     setClaimError(null);
+    setTxHash(undefined);
 
     try {
-      await claimWriteContract({
+      const hash = await claimWriteContract({
         address: contractAddress,
         abi: donateConfig.abi as Abi,
         functionName: 'claimArtist',
         args: [manualArtistId],
-        gas: BigInt(300000),
-        // Fixed gas limit to avoid gas estimation issues
       });
+// todo minimize code
+      if (hash) {
+        setTxHash(hash);
+      } else {
+        setIsClaiming(false);
+      }
     } catch (error: any) {
-      setClaimError(error?.message || 'Failed to claim artist');
+      const errorMessage = error?.details?.errors?.[0]?.message ||
+                         error?.shortMessage ||
+                         error?.message ||
+                         error?.cause?.message ||
+                         'Failed to claim artist';
+      setClaimError(errorMessage);
       setIsClaiming(false);
     }
   };
+
+  // todo minimize
+  // Handle transaction confirmation
+  useEffect(() => {
+    if (isConfirmed) {
+      setIsClaiming(false);
+      setClaimError(null);
+      setTxHash(undefined);
+      // Refresh the claim status
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    }
+  }, [isConfirmed]);
+
+  // Handle confirmation errors
+  useEffect(() => {
+    if (confirmError) {
+      const errorMessage = confirmError?.message || 'Transaction failed to confirm';
+      setClaimError(errorMessage);
+      setIsClaiming(false);
+    }
+  }, [confirmError]);
 
 
   // Update artist balance and claimed status
@@ -167,14 +213,19 @@ export function Claim() {
                   <div className="claim-action-section">
                     <button
                       onClick={handleClaimArtist}
-                      disabled={isClaiming || isClaimPending}
+                      disabled={isClaiming || isClaimPending || isConfirming}
                       className="claim-button"
                     >
-                      {isClaiming || isClaimPending ? 'Claiming...' : 'Claim Artist Balance'}
+                      {isClaimPending ? 'Sending transaction...' : isConfirming ? 'Confirming...' : isClaiming ? 'Processing...' : 'Claim Artist Balance'}
                     </button>
                     {claimError && (
                       <div className="claim-error-message">
                         {claimError}
+                      </div>
+                    )}
+                    {txHash && !claimError && (
+                      <div className="claim-success-message">
+                        Transaction submitted: {txHash.slice(0, 10)}...
                       </div>
                     )}
                   </div>

@@ -14,34 +14,19 @@ if (!privateKey) {
 }
 
 const config: HardhatUserConfig = {
+  // todo update to 0.8.28
   solidity: "0.8.19",
   resolc: {
     compilerSource: "npm",
     settings: {},
   },
   networks: {
-    hardhat: {
-      // polkavm: true,
-      // forking: {
-      //   url: "https://testnet-passet-hub-eth-rpc.polkadot.io"
-      // },
-      // adapterConfig: {
-      //   adapterBinaryPath: "./bin/eth-rpc",
-      //   dev: true,
-      // },
-    },
-    localhost: {
-      url: "http://127.0.0.1:8545/",
-    },
     passetHub: {
       polkavm: true,
       url: "https://testnet-passet-hub-eth-rpc.polkadot.io",
       accounts: privateKey ? [privateKey] : [],
     },
-    sepolia: {
-      url: 'https://ethereum-sepolia.core.chainstack.com/1dd00f4a6fb0dd5721ee3f07d546910a',
-      accounts:  privateKey ? [privateKey] : [],
-  },
+
   },
 };
 

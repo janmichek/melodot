@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { donateConfig } from "../generated";
 import type { Abi } from "viem";
@@ -17,10 +17,21 @@ export function ArtistWithdrawForm({
 }: ArtistWithdrawFormProps) {
   const [withdrawAddress, setWithdrawAddress] = useState('');
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
-  const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [txHash, setTxHash] = useState<string | undefined>();
   const { isConnected } = useAccount();
 
-  const { writeContract: withdrawWriteContract, isPending: isWithdrawPending } = useWriteContract();
+  const {
+    writeContract: withdrawWriteContract,
+    isPending: isWithdrawPending,
+    data: withdrawHash,
+    error: writeError,
+  } = useWriteContract();
+
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+    error: confirmError,
+  } = useWaitForTransactionReceipt({ hash: txHash });
 
   const handleWithdraw = async () => {
     if (!artistId) {
@@ -38,8 +49,8 @@ export function ArtistWithdrawForm({
       return;
     }
 
-    setIsWithdrawing(true);
     setWithdrawError(null);
+    setTxHash(undefined);
 
     try {
       withdrawWriteContract({
@@ -47,21 +58,57 @@ export function ArtistWithdrawForm({
         abi: donateConfig.abi as Abi,
         functionName: 'withdrawDonate',
         args: [artistId, withdrawAddress as `0x${string}`],
-        gas: BigInt(300000), // Fixed gas limit to avoid gas estimation issues
       });
-
-      // Clear form on success
-      if (!isWithdrawPending) {
-        setTimeout(() => {
-          setWithdrawAddress('');
-          onWithdrawSuccess?.();
-        }, 1000);
-      }
     } catch (error: any) {
-      setWithdrawError(error?.message || 'Failed to withdraw');
-      setIsWithdrawing(false);
+      const errorMessage = error?.details?.errors?.[0]?.message ||
+                          error?.shortMessage ||
+                          error?.message ||
+                          'Failed to withdraw';
+      setWithdrawError(errorMessage);
+      console.error('Withdraw error:', error);
     }
   };
+
+  // Track the hash when the write transaction completes
+  useEffect(() => {
+    if (withdrawHash) {
+      setTxHash(withdrawHash);
+      console.log('Withdrawal transaction submitted:', withdrawHash);
+    }
+  }, [withdrawHash]);
+
+  // Handle write errors
+  useEffect(() => {
+    if (writeError) {
+      const errorMessage = writeError?.message || 'Failed to initiate withdrawal';
+      setWithdrawError(errorMessage);
+      console.error('Write error:', writeError);
+    }
+  }, [writeError]);
+
+  // Handle confirmation errors
+  useEffect(() => {
+    if (confirmError) {
+      const errorMessage = confirmError?.message || 'Transaction failed to confirm';
+      setWithdrawError(errorMessage);
+      console.error('Confirm error:', confirmError);
+    }
+  }, [confirmError]);
+
+  // Handle successful confirmation
+  useEffect(() => {
+    if (isConfirmed) {
+      console.log('Withdrawal confirmed successfully');
+      setWithdrawAddress('');
+      setTxHash(undefined);
+      setWithdrawError(null);
+      onWithdrawSuccess?.();
+      // Refresh page after 2 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    }
+  }, [isConfirmed, onWithdrawSuccess]);
 
   return (
     <div className="claim-withdraw-section">
@@ -76,14 +123,24 @@ export function ArtistWithdrawForm({
           value={withdrawAddress}
           onChange={(e) => setWithdrawAddress(e.target.value)}
           className="claim-withdraw-input"
+          disabled={isWithdrawPending || isConfirming}
         />
         <button
           onClick={handleWithdraw}
-          disabled={!isConnected || !isAddress(withdrawAddress as `0x${string}`) || isWithdrawing || isWithdrawPending}
+          disabled={!isConnected || !isAddress(withdrawAddress as `0x${string}`) || isWithdrawPending || isConfirming}
           className="claim-withdraw-button"
         >
-          {isWithdrawing || isWithdrawPending ? 'Withdrawing...' : 'Withdraw All'}
+          {isWithdrawPending ? 'Sending transaction...' : isConfirming ? 'Confirming...' : 'Withdraw All'}
         </button>
+
+        {txHash && !withdrawError && (
+          <div className={`tx-status-box ${isConfirmed ? 'tx-status-success' : 'tx-status-pending'}`}>
+            {isConfirming && <p>⏳ Waiting for confirmation...</p>}
+            {isConfirmed && <p className="tx-status-text">✅ Withdrawal successful!</p>}
+            <p className="tx-hash">Tx: {txHash.slice(0, 10)}...</p>
+          </div>
+        )}
+
         {withdrawError && (
           <div className="claim-withdraw-error">
             {withdrawError}

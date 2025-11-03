@@ -16,11 +16,11 @@ export function Admin() {
     query: { enabled: !!contractAddress }
   });
 
-  // Read total tip fee accumulated (1% of all donations)
-  const { data: tipFeeBalance } = useReadContract({
+  // Read total platform fee accumulated (1% of all donations)
+  const { data: platformFeeBalance } = useReadContract({
     address: contractAddress as `0x${string}` | undefined,
     abi: donateConfig.abi as Abi,
-    functionName: "getTipFeeBalance",
+    functionName: "getPlatformFeeBalance",
     query: { enabled: !!contractAddress }
   });
 
@@ -56,7 +56,7 @@ export function Admin() {
         <AdminWithdrawForm
           contractAddress={contractAddress}
           ownerAddress={address as `0x${string}`}
-          tipFeeBalance={tipFeeBalance as bigint | undefined}
+          platformFeeBalance={platformFeeBalance as bigint | undefined}
         />
       ) : null}
     </Layout>

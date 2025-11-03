@@ -1,202 +1,269 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.19;
 
-contract Donate {
-    address public owner;
+/// @title Donate - Artist Donation Platform
+/// @notice Based on thirdweb's Ownable and PlatformFee patterns (Apache 2.0)
+/// @author Original: Your Team | Patterns from: thirdweb
+
+/**
+ * ============================================================================
+ * Ownable Contract Extension (Apache-2.0 by thirdweb)
+ * ============================================================================
+ */
+abstract contract Ownable {
+    address private _owner;
+
+    error OwnableUnauthorized();
+
+    modifier onlyOwner() {
+        if (msg.sender != _owner) {
+            revert OwnableUnauthorized();
+        }
+        _;
+    }
+
+    function owner() public view returns (address) {
+        return _owner;
+    }
+
+    function setOwner(address _newOwner) external {
+        if (!_canSetOwner()) {
+            revert OwnableUnauthorized();
+        }
+        _setupOwner(_newOwner);
+    }
+
+    function _setupOwner(address _newOwner) internal {
+        address _prevOwner = _owner;
+        _owner = _newOwner;
+        emit OwnerUpdated(_prevOwner, _newOwner);
+    }
+
+    function _canSetOwner() internal view virtual returns (bool);
+
+    event OwnerUpdated(address indexed prevOwner, address indexed newOwner);
+}
+
+/**
+ * ============================================================================
+ * PlatformFee Contract Extension (Apache-2.0 by thirdweb)
+ * ============================================================================
+ */
+abstract contract PlatformFee {
+    address private platformFeeRecipient;
+    uint16 private platformFeeBps; // basis points (100 bps = 1%)
+
+    error PlatformFeeUnauthorized();
+    error PlatformFeeInvalidRecipient(address recipient);
+    error PlatformFeeExceededMaxFeeBps(uint256 max, uint256 actual);
+
+    function getPlatformFeeInfo() public view returns (address, uint16) {
+        return (platformFeeRecipient, platformFeeBps);
+    }
+
+    function setPlatformFeeInfo(address _platformFeeRecipient, uint256 _platformFeeBps) external {
+        if (!_canSetPlatformFeeInfo()) {
+            revert PlatformFeeUnauthorized();
+        }
+        _setupPlatformFeeInfo(_platformFeeRecipient, _platformFeeBps);
+    }
+
+    function _setupPlatformFeeInfo(address _platformFeeRecipient, uint256 _platformFeeBps) internal {
+        if (_platformFeeBps > 10_000) {
+            revert PlatformFeeExceededMaxFeeBps(10_000, _platformFeeBps);
+        }
+        if (_platformFeeRecipient == address(0)) {
+            revert PlatformFeeInvalidRecipient(_platformFeeRecipient);
+        }
+
+        platformFeeBps = uint16(_platformFeeBps);
+        platformFeeRecipient = _platformFeeRecipient;
+
+        emit PlatformFeeInfoUpdated(_platformFeeRecipient, _platformFeeBps);
+    }
+
+    function _canSetPlatformFeeInfo() internal view virtual returns (bool);
+
+    event PlatformFeeInfoUpdated(address indexed platformFeeRecipient, uint256 platformFeeBps);
+}
+
+/**
+ * ============================================================================
+ * Donate Contract - Artist Donation Platform
+ * ============================================================================
+ */
+contract Donate is Ownable, PlatformFee {
     uint256 public balance;
-    uint256 public tipFeeBalance;
-    uint256 private constant TIP_FEE_PERCENTAGE = 1; // 1% tip fee
 
     struct ArtistData {
-        uint256 totalBalance;
+        uint256 balance;
         bool isClaimed;
     }
 
-    // Store artist data by ID (string => ArtistData)
+    // Custom errors (more gas efficient than require)
+    error InvalidDonationAmount();
+    error EmptyArtistId();
+    error NoBalanceToClaim();
+    error ArtistAlreadyClaimed();
+    error InvalidRecipientAddress();
+    error NoBalanceToWithdraw();
+    error WithdrawalFailed();
+    error NotArtistClaimed();
+
+    // Store artist data by ID
     mapping(string => ArtistData) public artists;
 
     // Keep track of all artist IDs for iteration
     string[] public artistIds;
 
+    // Events
+    event DonationReceived(
+        string indexed artistId,
+        address indexed donor,
+        uint256 donatedAmount,
+        uint256 platformFeeAmount,
+        uint256 artistFee
+    );
+
+    event ArtistClaimed(string indexed artistId, address indexed claimer, uint256 amount);
+
+    event ArtistWithdrawal(string indexed artistId, address indexed recipient, uint256 amount);
+
+    event PlatformFeeWithdrawn(address indexed recipient, uint256 amount);
+
     constructor() {
-        owner = msg.sender;
+        _setupOwner(msg.sender);
+        _setupPlatformFeeInfo(msg.sender, 100); // 100 basis points (1%)
     }
 
     function getArtistsCount() public view returns (uint) {
         return artistIds.length;
     }
 
-    function donateToArtist(string memory artistId) external payable {
-        uint256 donatedAmount = msg.value;
-        require(donatedAmount > 0, "Donation amount must be greater than 0");
-
-        // Calculate 1% tip fee
-        uint256 tipFee = (donatedAmount * TIP_FEE_PERCENTAGE) / 100;
-        uint256 artistAmount = donatedAmount - tipFee;
-
-        // If artist doesn't exist yet, add them to the list
-        if (artists[artistId].totalBalance == 0) {
-            artistIds.push(artistId);
-        }
-
-        // Add donation to artist's balance and collect tip fee
-        artists[artistId].totalBalance += artistAmount;
-        tipFeeBalance += tipFee;
-        balance += donatedAmount;
-    }
-
-    function getArtistBalance(string memory artistId) public view returns (uint256) {
-        return artists[artistId].totalBalance;
-    }
-
     function getArtistStatus(string memory artistId) public view returns (bool) {
         return artists[artistId].isClaimed;
     }
 
-    function claimArtist(string memory artistId) external returns (uint256) {
-        require(bytes(artistId).length > 0, "Artist ID cannot be empty");
+    function getArtistBalance(string memory artistId) public view returns (uint256) {
+        return artists[artistId].balance;
+//        todo can i merge with getArtistStatus
+    }
 
-        uint256 claimedAmount = artists[artistId].totalBalance;
-        require(claimedAmount > 0, "No balance to claim");
-        require(!artists[artistId].isClaimed, "Artist already claimed");
+    function getPlatformFeeBalance() public view returns (uint256) {
+        // Calculate total fees collected so far (balance - all artist balances)
+        uint256 totalArtistBalances = 0;
+        for (uint i = 0; i < artistIds.length; i++) {
+            totalArtistBalances += artists[artistIds[i]].balance;
+        }
+        return balance - totalArtistBalances;
+    }
+
+    function donateToArtist(string memory artistId) external payable {
+        uint256 donatedAmount = msg.value;
+        if (donatedAmount == 0) {
+            revert InvalidDonationAmount();
+        }
+
+        // Get platform fee info
+        (, uint16 feeBps) = getPlatformFeeInfo();
+
+        uint256 platformFee = (donatedAmount * feeBps) / 10_000;
+        uint256 artistFee = donatedAmount - platformFee;
+
+        // If artist doesn't exist yet, add them to the list
+        if (artists[artistId].balance == 0) {
+            artistIds.push(artistId);
+        }
+
+        // Add donation to artist's balance
+        artists[artistId].balance += artistFee;
+        balance += donatedAmount;
+
+        emit DonationReceived(artistId, msg.sender, donatedAmount, platformFee, artistFee);
+    }
+
+//      todo  are evenets important if so then use them
+    function claimArtist(string memory artistId) external {
+        if (bytes(artistId).length == 0) {
+            revert EmptyArtistId();
+        }
+
+        if (artists[artistId].isClaimed) {
+            revert ArtistAlreadyClaimed();
+        }
+
+        uint256 amount = artists[artistId].balance;
 
         // Mark artist as claimed
         artists[artistId].isClaimed = true;
 
-        return claimedAmount;
+        emit ArtistClaimed(artistId, msg.sender, amount);
     }
 
+//    todo rename
     function withdrawDonate(string memory artistId, address recipient) external {
-        require(bytes(artistId).length > 0, "Artist ID cannot be empty");
-        require(recipient != address(0), "Invalid recipient address");
-        require(artists[artistId].isClaimed, "Artist has not claimed their balance");
+        if (bytes(artistId).length == 0) {
+            revert EmptyArtistId();
+        }
+        if (recipient == address(0)) {
+            revert InvalidRecipientAddress();
+        }
+        if (!artists[artistId].isClaimed) {
+            revert NotArtistClaimed();
+        }
 
-        uint256 amount = artists[artistId].totalBalance;
-        require(amount > 0, "No balance to withdraw");
+        uint256 amount = artists[artistId].balance;
+        if (amount == 0) {
+            revert NoBalanceToWithdraw();
+        }
 
         // Reset artist balance after withdrawal
-        artists[artistId].totalBalance = 0;
+        artists[artistId].balance = 0;
         balance -= amount;
 
         (bool success, ) = payable(recipient).call{ value: amount }("");
-        require(success, "Withdrawal failed");
+        if (!success) {
+            revert WithdrawalFailed();
+        }
+
+        emit ArtistWithdrawal(artistId, recipient, amount);
     }
 
-    function getTipFeeBalance() external view returns (uint256) {
-        return tipFeeBalance;
-    }
 
-    function withdrawTipFees(address recipient) external {
-        require(msg.sender == owner, "Only owner can withdraw tip fees");
-        require(recipient != address(0), "Invalid recipient address");
-        require(tipFeeBalance > 0, "No tip fees to withdraw");
+    function withdrawPlatformFees(address recipient) external onlyOwner {
+        if (recipient == address(0)) {
+            revert InvalidRecipientAddress();
+        }
 
-        uint256 amount = tipFeeBalance;
-        tipFeeBalance = 0;
+        uint256 amount = getPlatformFeeBalance();
+        if (amount == 0) {
+            revert NoBalanceToWithdraw();
+        }
+
+        // Reset balance (all fees withdrawn)
         balance -= amount;
 
         (bool success, ) = payable(recipient).call{ value: amount }("");
-        require(success, "Withdrawal failed");
+        if (!success) {
+            revert WithdrawalFailed();
+        }
+
+        emit PlatformFeeWithdrawn(recipient, amount);
     }
-}
-
-
-
-/*
- *
- *///    function withdraw() external {
-//                 require(msg.sender == owner, "Not owner");
-//            (bool success, bytes memory data) = owner.call{ value: address(this).balance }("");
-//        require(success);
-
-
-// emit Approved(contractBalance);
-//    }
-
-/*
-function claim(address id) public view returns (uint256) {
-    return 5;
-}
-*/
-/*
-function withdraw() external {
-    address artistAddress = 0;
-    uint artistBalance = address(this).balance;
-    payable(beneficiary).transfer(artistAddress);
-    // emit Approved(contractBalance);
-}
-*/
-
-/*
-   event ProjectCreated(
-        uint256 indexed projectId,
-        address indexed owner,
-        string name
-    );
-
-    event DonationReceived(
-        uint256 indexed projectId,
-        address indexed donor,
-        uint256 amount
-    );
-    */
-
-
-      /*
-
-  error InsufficientBalance();
-  error NoActiveUserFound();
-  error UserAlreadyExists();
-
-mapping(uint => Artist) public artists;
-
-  function donate() external {
-
-    if(
-        //no artist for Id
-    ) {
-createArtsit();
-    }
-
-    transferToArtist();
-  }
-
-  function createArtist() external {
-    if (artists[msg.sender].isActive) {
-      revert UserAlreadyExists();
-    }
-
-    Artist memory newUser = Artist(100, true);
-
-  }
-
-  function transfer(address recipient, uint amount) external {
-    if (artists[msg.sender].balance < amount) {
-      revert InsufficientBalance();
-    }
-
-    if (!artists[recipient].isActive || !artists[msg.sender].isActive) {
-      revert NoActiveUserFound();
-    }
-
-    artists[msg.sender].balance -= amount;
-    artists[recipient].balance += amount;
-  }
-
-
-
-
-
-*/
 
     /**
-mapping(address => bool) public members;
+     * @dev Internal function to check if owner can be set
+     * Only the current owner can set a new owner
+     */
+    function _canSetOwner() internal view override returns (bool) {
+        return msg.sender == owner();
+    }
 
-  function addMember(address newMember) external {
-    members[newMember] = true;
-  }
-
-  function isMember(address member) external view returns (bool) {
-    return members[member];
-  }
-*/
+    /**
+     * @dev Internal function to check if platform fee info can be set
+     * Only the owner can set platform fee info
+     */
+    function _canSetPlatformFeeInfo() internal view override returns (bool) {
+        return msg.sender == owner();
+    }
+}
