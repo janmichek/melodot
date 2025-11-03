@@ -5,7 +5,7 @@ import { donateConfig } from "../generated";
 import type { Abi } from "viem";
 
 export function Admin() {
-  const { contractAddress, connect, isConnected } = useWeb3AuthContext();
+  const { contractAddress, isConnected } = useWeb3AuthContext();
   const { address } = useAccount();
 
   // Read contract owner
@@ -28,30 +28,6 @@ export function Admin() {
 
   return (
     <Layout>
-      {!isConnected && (
-        <div className="admin-auth-container">
-          <h2 className="admin-auth-title">Connect Wallet</h2>
-          <p className="admin-auth-description">
-            Please connect your wallet to access the admin panel
-          </p>
-          <button
-            onClick={() => void connect()}
-            className="admin-auth-button"
-          >
-            Connect Wallet
-          </button>
-        </div>
-      )}
-
-      {isConnected && !isOwner && (
-        <div className="admin-denied-container">
-          <h2 className="admin-denied-title">Access Denied</h2>
-          <p className="admin-denied-description">
-            You are not authorized to access this panel. Only the contract owner can withdraw tip fees.
-          </p>
-        </div>
-      )}
-
       {isConnected && isOwner && contractAddress && address ? (
         <AdminWithdrawForm
           contractAddress={contractAddress}

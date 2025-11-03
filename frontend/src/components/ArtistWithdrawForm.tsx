@@ -31,7 +31,7 @@ export function ArtistWithdrawForm({
     isLoading: isConfirming,
     isSuccess: isConfirmed,
     error: confirmError,
-  } = useWaitForTransactionReceipt({ hash: txHash });
+  } = useWaitForTransactionReceipt({ hash: txHash as `0x${string}` });
 
   const handleWithdraw = async () => {
     if (!artistId) {

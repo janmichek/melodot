@@ -97,28 +97,11 @@ export function useWeb3AuthContext() {
 }
 
 export function Layout({ children }: {children: ReactNode;}) {
-  const {
-    isConnected,
-    address,
-    connect,
-    disconnect,
-    connectLoading,
-    disconnectLoading,
-    providerReady,
-    contractAddress,
-  } = useWeb3AuthContext();
+  const { contractAddress } = useWeb3AuthContext();
 
   return (
     <div className="container">
-      <Header
-        isConnected={isConnected}
-        address={address}
-        onConnect={() => connect()}
-        onDisconnect={() => disconnect()}
-        connectLoading={connectLoading}
-        disconnectLoading={disconnectLoading}
-        providerReady={providerReady}
-      />
+      <Header />
 
       <main className="main-content">{children}</main>
 

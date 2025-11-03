@@ -58,7 +58,7 @@ export function Claim() {
     isSuccess: isConfirmed,
     error: confirmError
   } = useWaitForTransactionReceipt({
-    hash: txHash,
+    hash: txHash as `0x${string}` | undefined,
   });
 
   const handleClaimArtist = async () => {
@@ -73,19 +73,20 @@ export function Claim() {
 
     try {
       const hash = await claimWriteContract({
-        address: contractAddress,
+        address: contractAddress as `0x${string}`,
         abi: donateConfig.abi as Abi,
         functionName: 'claimArtist',
         args: [manualArtistId],
       });
-// todo minimize code
-      if (hash) {
+      // todo minimize code
+      if (hash !== undefined) {
         setTxHash(hash);
       } else {
         setIsClaiming(false);
       }
     } catch (error: any) {
-      const errorMessage = error?.details?.errors?.[0]?.message ||
+      const errorMessage =
+        error?.details?.errors?.[0]?.message ||
                          error?.shortMessage ||
                          error?.message ||
                          error?.cause?.message ||
