@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Polkadot project with contracts and frontend",
   "private": true,
+  "dependencies": {
+    "formidable": "^3.5.1",
+    "@vercel/node": "^3.0.11"
+  },
   "scripts": {
     "install": "cd contracts && bun install && cd ../frontend && bun install",
     "deploy-contract": "cd contracts && bun run deploy-contract && cd ../frontend && bun run generate",
