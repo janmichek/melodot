@@ -2,9 +2,15 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import formidable from 'formidable';
 import fs from 'fs';
 
+interface ShazamTrack {
+  subtitle?: string;
+  [key: string]: any;
+}
+
 interface DiscoveryResult {
-  track?: Record<string, unknown>;
+  track?: ShazamTrack;
   artistInfo?: Record<string, unknown>;
+  [key: string]: any;
 }
 
 /**
@@ -14,7 +20,7 @@ interface DiscoveryResult {
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
-): Promise<void> {
+): Promise<VercelResponse> {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -73,7 +79,7 @@ export default async function handler(
       });
     }
 
-    const result = await shazamResponse.json();
+    const result = await shazamResponse.json() as DiscoveryResult;
 
     // Try to fetch artist info if track found
     let artistInfo = null;
