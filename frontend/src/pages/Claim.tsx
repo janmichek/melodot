@@ -26,19 +26,11 @@ export function Claim() {
     handleCallback,
   } = useSpotifyAuth();
 
-  // Read artist balance from contract
-  const { data: balanceData } = useReadContract({
+  // Read artist info (balance and claimed status) from contract
+  const { data: artistInfoData } = useReadContract({
     address: contractAddress,
     abi: donateConfig.abi as Abi,
-    functionName: 'getArtistBalance',
-    args: manualArtistId ? [manualArtistId] : undefined,
-  });
-
-  // Read artist claimed status from contract
-  const { data: claimedData } = useReadContract({
-    address: contractAddress,
-    abi: donateConfig.abi as Abi,
-    functionName: 'getArtistStatus',
+    functionName: 'getArtistInfo',
     args: manualArtistId ? [manualArtistId] : undefined,
   });
 
@@ -122,13 +114,12 @@ export function Claim() {
 
   // Update artist balance and claimed status
   useEffect(() => {
-    if (balanceData !== undefined) {
-      setArtistBalance(balanceData as bigint);
+    if (artistInfoData !== undefined) {
+      const [balance, isClaimed] = artistInfoData as [bigint, boolean];
+      setArtistBalance(balance);
+      setArtistClaimed(isClaimed);
     }
-    if (claimedData !== undefined) {
-      setArtistClaimed(claimedData as boolean);
-    }
-  }, [balanceData, claimedData]);
+  }, [artistInfoData]);
 
   // Handle OAuth callback
   useEffect(() => {

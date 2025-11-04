@@ -71,15 +71,11 @@ export const donateAbi = [
   {
     type: 'function',
     inputs: [{ name: 'artistId', internalType: 'string', type: 'string' }],
-    name: 'getArtistBalance',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'artistId', internalType: 'string', type: 'string' }],
-    name: 'getArtistStatus',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    name: 'getArtistInfo',
+    outputs: [
+      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'isClaimed', internalType: 'bool', type: 'bool' },
+    ],
     stateMutability: 'view',
   },
   {

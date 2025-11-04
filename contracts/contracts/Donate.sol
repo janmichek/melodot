@@ -126,13 +126,9 @@ contract Donate is Ownable, PlatformFee {
         return artistIds.length;
     }
 
-    function getArtistStatus(string memory artistId) public view returns (bool) {
-        return artists[artistId].isClaimed;
-    }
-
-    function getArtistBalance(string memory artistId) public view returns (uint256) {
-        return artists[artistId].balance;
-//        todo can i merge with getArtistStatus
+    function getArtistInfo(string memory artistId) public view returns (uint256 balance, bool isClaimed) {
+        ArtistData memory artist = artists[artistId];
+        return (artist.balance, artist.isClaimed);
     }
 
     function getPlatformFeeBalance() public view returns (uint256) {
