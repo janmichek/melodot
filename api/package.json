@@ -1,3 +1,7 @@
 {
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "test": "bash test-api.sh",
+    "test:unit": "bash test-api.sh"
+  }
 }
