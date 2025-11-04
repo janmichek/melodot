@@ -1,4 +1,4 @@
-import { toast as sonnerToast } from 'sonner';
+import { toast as sonnerToast, Renderable } from 'sonner';
 
 export type ToastType = 'success' | 'error' | 'info' | 'loading';
 
@@ -6,20 +6,19 @@ export interface ToastOptions {
   message?: string;
   hash?: string;
   blockExplorerUrl?: string;
-  autoHide?: boolean;
   duration?: number;
   onDismiss?: () => void;
 }
 
 /**
  * Custom toast hook that wraps Sonner
- * Provides compatibility with the previous custom toast API
+ * Maintains API compatibility with the previous custom toast solution
  */
-export function useToast() {
+export function useSonnerToast() {
   const createToastContent = (
     title: string,
     options?: ToastOptions
-  ) => {
+  ): Renderable => {
     return (
       <div className="flex flex-col gap-2">
         <div className="font-semibold">{title}</div>
@@ -53,34 +52,26 @@ export function useToast() {
         duration: options?.duration ?? 3000,
         onDismiss: options?.onDismiss,
       });
-      return 'sonner-toast'; // Return a placeholder ID for compatibility
     },
     error: (title: string, options?: ToastOptions) => {
       sonnerToast.error(createToastContent(title, options), {
         duration: options?.duration ?? 4000,
         onDismiss: options?.onDismiss,
       });
-      return 'sonner-toast';
     },
     info: (title: string, options?: ToastOptions) => {
       sonnerToast.info(createToastContent(title, options), {
         duration: options?.duration ?? 3000,
         onDismiss: options?.onDismiss,
       });
-      return 'sonner-toast';
     },
-    pending: (title: string, options?: ToastOptions) => {
-      const toastId = sonnerToast.loading(createToastContent(title, options), {
+    loading: (title: string, options?: ToastOptions) => {
+      return sonnerToast.loading(createToastContent(title, options), {
         duration: options?.duration,
         onDismiss: options?.onDismiss,
       });
-      return toastId;
     },
-    removeToast: (id: string) => {
-      sonnerToast.dismiss(id);
-    },
-    clearToasts: () => {
-      sonnerToast.dismiss();
-    },
+    promise: sonnerToast.promise,
+    dismiss: sonnerToast.dismiss,
   };
 }
