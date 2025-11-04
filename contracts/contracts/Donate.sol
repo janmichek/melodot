@@ -116,20 +116,6 @@ contract Donate is Ownable, PlatformFee {
     // Keep track of all artist IDs for iteration
     string[] public artistIds;
 
-    // Events
-    event DonationReceived(
-        string indexed artistId,
-        address indexed donor,
-        uint256 donatedAmount,
-        uint256 platformFeeAmount,
-        uint256 artistFee
-    );
-
-    event ArtistClaimed(string indexed artistId, address indexed claimer, uint256 amount);
-
-    event ArtistWithdrawal(string indexed artistId, address indexed recipient, uint256 amount);
-
-    event PlatformFeeWithdrawn(address indexed recipient, uint256 amount);
 
     constructor() {
         _setupOwner(msg.sender);
@@ -178,8 +164,6 @@ contract Donate is Ownable, PlatformFee {
         // Add donation to artist's balance
         artists[artistId].balance += artistFee;
         balance += donatedAmount;
-
-        emit DonationReceived(artistId, msg.sender, donatedAmount, platformFee, artistFee);
     }
 
 //      todo  are evenets important if so then use them
@@ -196,8 +180,6 @@ contract Donate is Ownable, PlatformFee {
 
         // Mark artist as claimed
         artists[artistId].isClaimed = true;
-
-        emit ArtistClaimed(artistId, msg.sender, amount);
     }
 
 //    todo rename
@@ -225,8 +207,6 @@ contract Donate is Ownable, PlatformFee {
         if (!success) {
             revert WithdrawalFailed();
         }
-
-        emit ArtistWithdrawal(artistId, recipient, amount);
     }
 
 
@@ -247,8 +227,6 @@ contract Donate is Ownable, PlatformFee {
         if (!success) {
             revert WithdrawalFailed();
         }
-
-        emit PlatformFeeWithdrawn(recipient, amount);
     }
 
     /**
