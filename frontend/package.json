@@ -24,6 +24,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "formidable": "^3.5.4",
     "jdenticon": "^3.3.0",
     "lucide-react": "^0.552.0",
     "multer": "^2.0.2",
