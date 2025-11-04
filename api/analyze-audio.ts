@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-const formidable = require('formidable');
-const fs = require('fs');
+import formidable from 'formidable';
+import fs from 'fs';
 
 interface ShazamTrack {
   subtitle?: string;
