@@ -14,7 +14,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@fixtures/*": ["tests/fixtures/*"],
+      "@helpers/*": ["tests/helpers/*"],
+      "@page-objects/*": ["tests/page-objects/*"]
+    }
   },
   "include": [
     "src",
@@ -22,7 +28,9 @@
     "src/components/switchNetwork.tsx",
     "src/components/writeContract.tsx",
     "src/components/BalanceLabel.tsx",
-    "vite.config.ts"
+    "vite.config.ts",
+    "tests/**/*",
+    "playwright.config.js"
   ],
   "exclude": ["src/**/*.test.*", "src/**/*.spec.*", "src/test/**/*"]
 }

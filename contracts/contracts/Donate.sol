@@ -166,7 +166,7 @@ contract Donate is Ownable, PlatformFee {
         balance += donatedAmount;
     }
 
-//      todo  are evenets important if so then use them
+
     function claimArtist(string memory artistId) external {
         if (bytes(artistId).length == 0) {
             revert EmptyArtistId();
@@ -175,8 +175,6 @@ contract Donate is Ownable, PlatformFee {
         if (artists[artistId].isClaimed) {
             revert ArtistAlreadyClaimed();
         }
-
-        uint256 amount = artists[artistId].balance;
 
         // Mark artist as claimed
         artists[artistId].isClaimed = true;

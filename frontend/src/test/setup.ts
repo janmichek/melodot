@@ -18,6 +18,9 @@ vi.mock('@web3auth/modal/react', () => ({
   useWeb3AuthUser: vi.fn(() => ({
     userInfo: null,
   })),
+  useWeb3Auth: vi.fn(() => ({
+    web3Auth: null,
+  })),
 }));
 
 // Mock wagmi hooks and exports
@@ -43,6 +46,13 @@ vi.mock('wagmi', async (importOriginal) => {
       isSuccess: false,
     })),
     usePublicClient: vi.fn(() => null),
+    useReadContract: vi.fn(() => ({
+      data: null,
+      isError: false,
+      isLoading: false,
+      isSuccess: false,
+    })),
+    useConfig: vi.fn(() => null),
   };
 });
 
@@ -50,6 +60,18 @@ vi.mock('wagmi', async (importOriginal) => {
 vi.mock('../generated', () => ({
   myTokenModuleMyTokenAddress: {
     420420422: '0x1234567890123456789012345678901234567890',
+  },
+  donateConfig: {
+    address: {
+      420420422: '0x1234567890123456789012345678901234567890',
+      420420418: '0x0987654321098765432109876543210987654321',
+    },
+    abi: [],
+  },
+  donateAbi: [],
+  donateAddress: {
+    420420422: '0x1234567890123456789012345678901234567890',
+    420420418: '0x0987654321098765432109876543210987654321',
   },
 }));
 
@@ -72,4 +94,16 @@ vi.mock('../components/exportPrivateKey', () => ({
 
 vi.mock('../components/ContractData', () => ({
   ContractData: () => createElement('div', { 'data-testid': 'contract-data' }, 'Contract Data Component'),
+}));
+
+vi.mock('../components/Footer', () => ({
+  Footer: () => createElement('div', { 'data-testid': 'footer' }, 'Footer Component'),
+}));
+
+vi.mock('../components/UserMenu', () => ({
+  UserMenu: () => createElement('div', { 'data-testid': 'user-menu' }, 'User Menu Component'),
+}));
+
+vi.mock('../components/Header', () => ({
+  Header: () => createElement('div', { 'data-testid': 'header' }, 'Header Component'),
 }));

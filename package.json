@@ -12,7 +12,7 @@
     "deploy-contract": "cd contracts && bun run deploy-contract && cd ../frontend && bun run generate",
     "test-contract": "cd contracts && bun run test",
     "test:e2e": "cd frontend && bun run test:e2e",
-    "test:unit": "cd frontend && bun test src/__tests__",
+    "test:unit": "cd frontend && bun run test:unit",
     "start": "cd frontend && bun start",
     "vercel-build": "cd frontend && bun run build",
     "build": "cd frontend && bun run build"

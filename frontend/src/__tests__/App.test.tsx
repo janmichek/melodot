@@ -1,25 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { useWeb3AuthConnect, useWeb3AuthDisconnect, useWeb3AuthUser } from '@web3auth/modal/react';
-import { useAccount, useChainId } from 'wagmi';
+import { render, screen } from '@testing-library/react';
+import { useWeb3AuthConnect, useWeb3AuthDisconnect } from '@web3auth/modal/react';
+import { useAccount } from 'wagmi';
 import App from '../App';
-
-// Mock window.open
-Object.assign(window, { open: vi.fn() });
-
-// Mock setTimeout for provider initialization
-vi.stubGlobal('setTimeout', (callback: () => void, delay: number) => {
-  // Immediately call callback in tests
-  callback();
-  return 1;
-});
 
 describe('App Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('Not logged in state', () => {
+  describe('App Rendering', () => {
     beforeEach(() => {
       vi.mocked(useWeb3AuthConnect).mockReturnValue({
         connect: vi.fn(),
@@ -31,116 +21,47 @@ describe('App Component', () => {
       vi.mocked(useAccount).mockReturnValue({
         address: undefined,
       } as any);
-    });
-
-    it('displays educational messaging when not logged in', async () => {
-      render(<App />);
-
-      expect(screen.getByText(/Connect with your social accounts to explore Web3 without wallet extensions/)).toBeInTheDocument();
-      expect(screen.getByText(/no MetaMask or browser wallet required/)).toBeInTheDocument();
-
-      // Wait for provider to initialize and login button to appear
-      await waitFor(
-        () => {
-          expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
-        },
-        { timeout: 100 } // Short timeout for tests
-      );
-    });
-
-    it('shows "no wallet extension needed" messaging', () => {
-      render(<App />);
-
-      expect(screen.getByText(/no MetaMask or browser wallet required/)).toBeInTheDocument();
-    });
-
-    it('shows provider loading state before login button', () => {
-      // Mock setTimeout to not execute immediately
-      vi.stubGlobal('setTimeout', vi.fn());
-
-      render(<App />);
-
-      // Should show loading message initially
-      expect(screen.getByText(/Initializing Web3Auth provider/)).toBeInTheDocument();
-
-      // Login button should not be present during loading
-      expect(screen.queryByRole('button', { name: /login/i })).not.toBeInTheDocument();
-    });
-  });
-
-  describe('Logged in state', () => {
-    const mockAddress = '0x1234567890123456789012345678901234567890';
-
-    beforeEach(() => {
-      vi.mocked(useWeb3AuthConnect).mockReturnValue({
-        connect: vi.fn(),
-        isConnected: true,
-        connectorName: 'Web3Auth',
-        loading: false,
-        error: null,
-      });
-      vi.mocked(useAccount).mockReturnValue({
-        address: mockAddress,
-      } as any);
       vi.mocked(useWeb3AuthDisconnect).mockReturnValue({
         disconnect: vi.fn(),
         loading: false,
         error: null,
       });
-      vi.mocked(useWeb3AuthUser).mockReturnValue({
-        userInfo: { name: 'Test User' },
-      } as any);
-      vi.mocked(useChainId).mockReturnValue(420420422);
     });
 
-    it('displays showcase messages when logged in', () => {
+    it('renders app with layout structure', () => {
       render(<App />);
 
-      expect(screen.getByText(/Interact directly with Polkadot Asset Hub - no MetaMask required/)).toBeInTheDocument();
-      expect(screen.getByText(/Check Your BalanceLabel/)).toBeInTheDocument();
-      // Send Transactions section is commented out in the component
-      // expect(screen.getByText(/Send Transactions/)).toBeInTheDocument();
-      expect(screen.getByText(/Smart Contract Interactions/)).toBeInTheDocument();
-      expect(screen.getByText(/Network Switching/)).toBeInTheDocument();
-      expect(screen.getByText(/Private Key Access/)).toBeInTheDocument();
+      // App should render with Layout, Header, and Footer components
+      expect(screen.getByTestId('header')).toBeInTheDocument();
+      expect(screen.getByTestId('footer')).toBeInTheDocument();
     });
 
-    it('displays faucet button when logged in', () => {
+    it('renders Home page content on initial load', () => {
       render(<App />);
 
-      expect(screen.getByRole('button', { name: /get test tokens/i })).toBeInTheDocument();
+      // Home page renders AudioRecorder by default, which includes mock mode button
+      expect(screen.getByText(/Load Mock Track Data/)).toBeInTheDocument();
     });
 
-    it('opens faucet URL when faucet button is clicked', () => {
-      const mockOpen = vi.fn();
-      window.open = mockOpen;
-
+    it('renders toast provider for notifications', () => {
       render(<App />);
 
-      const faucetButton = screen.getByRole('button', { name: /get test tokens/i });
-      fireEvent.click(faucetButton);
-
-      expect(mockOpen).toHaveBeenCalledWith(
-        expect.stringContaining('faucet.polkadot.io/?parachain=1111'),
-        '_blank',
-        'noopener,noreferrer'
-      );
+      // Toast notifications container should be present
+      const toastRegion = screen.getByRole('region', { name: /toast notifications/i });
+      expect(toastRegion).toBeInTheDocument();
     });
 
-    it('renders all functionality sections with showcase messages', () => {
+    it('renders main content area', () => {
       render(<App />);
 
-      // Check that all sections are present
-      expect(screen.getByTestId('balance')).toBeInTheDocument();
-      // Send transaction is commented out in the component
-      // expect(screen.getByTestId('send-transaction')).toBeInTheDocument();
-      expect(screen.getByTestId('contract-data')).toBeInTheDocument();
-      expect(screen.getByTestId('switch-chain')).toBeInTheDocument();
-      expect(screen.getByTestId('export-private-key')).toBeInTheDocument();
+      // Main content should be present
+      const mainElement = screen.getByRole('main');
+      expect(mainElement).toBeInTheDocument();
+      expect(mainElement).toHaveClass('main-content');
     });
   });
 
-  describe('Mobile responsiveness', () => {
+  describe('Home Page Integration', () => {
     beforeEach(() => {
       vi.mocked(useWeb3AuthConnect).mockReturnValue({
         connect: vi.fn(),
@@ -149,35 +70,102 @@ describe('App Component', () => {
         loading: false,
         error: null,
       });
+      vi.mocked(useAccount).mockReturnValue({
+        address: undefined,
+      } as any);
+      vi.mocked(useWeb3AuthDisconnect).mockReturnValue({
+        disconnect: vi.fn(),
+        loading: false,
+        error: null,
+      });
     });
 
-    it('renders educational message with mobile-friendly styling', () => {
+    it('displays AudioRecorder component when no discovery data', () => {
       render(<App />);
 
-      const educationalMessage = screen.getByText(/Connect with your social accounts to explore Web3 without wallet extensions/);
-      expect(educationalMessage.closest('.educational-message')).toBeInTheDocument();
+      // AudioRecorder should be visible with mock data button
+      expect(screen.getByText(/Load Mock Track Data/)).toBeInTheDocument();
+      expect(screen.getByText(/To disable mock mode:/)).toBeInTheDocument();
     });
 
-    it('renders login button with touch-friendly size', async () => {
+    it('renders with mocked Layout components', () => {
       render(<App />);
 
-      // Wait for provider to initialize and login button to appear
-      await waitFor(
-        () => {
-          const loginButton = screen.getByRole('button', { name: /login/i });
-          expect(loginButton).toHaveClass('card');
-        },
-        { timeout: 100 } // Short timeout for tests
-      );
+      // All layout components should be mocked and present
+      expect(screen.getByTestId('header')).toBeInTheDocument();
+      expect(screen.getByTestId('footer')).toBeInTheDocument();
     });
   });
 
-  describe('Faucet functionality', () => {
-    const mockAddress = '0x1234567890123456789012345678901234567890';
+  describe('Router Structure', () => {
+    beforeEach(() => {
+      vi.mocked(useWeb3AuthConnect).mockReturnValue({
+        connect: vi.fn(),
+        isConnected: false,
+        connectorName: 'Web3Auth',
+        loading: false,
+        error: null,
+      });
+      vi.mocked(useAccount).mockReturnValue({
+        address: undefined,
+      } as any);
+      vi.mocked(useWeb3AuthDisconnect).mockReturnValue({
+        disconnect: vi.fn(),
+        loading: false,
+        error: null,
+      });
+    });
 
-    it('generates correct faucet URL for different chains', () => {
-      const mockOpen = vi.fn();
-      window.open = mockOpen;
+    it('renders App with BrowserRouter and Routes', () => {
+      render(<App />);
+
+      // Check that the app renders without errors
+      expect(screen.getByRole('main')).toBeInTheDocument();
+    });
+
+    it('renders ToastProvider wrapper', () => {
+      render(<App />);
+
+      // Toast provider should wrap the app
+      const toastContainer = screen.getByRole('region', { name: /toast notifications/i });
+      expect(toastContainer).toBeInTheDocument();
+    });
+
+    it('renders Toaster component for displaying toasts', () => {
+      render(<App />);
+
+      // Toaster should be present for displaying toast messages
+      const toastRegion = screen.getByRole('region', { name: /toast notifications/i });
+      expect(toastRegion).toBeInTheDocument();
+    });
+  });
+
+  describe('Web3Auth Integration', () => {
+    it('renders with Web3Auth context when not connected', () => {
+      vi.mocked(useWeb3AuthConnect).mockReturnValue({
+        connect: vi.fn(),
+        isConnected: false,
+        connectorName: 'Web3Auth',
+        loading: false,
+        error: null,
+      });
+      vi.mocked(useAccount).mockReturnValue({
+        address: undefined,
+      } as any);
+      vi.mocked(useWeb3AuthDisconnect).mockReturnValue({
+        disconnect: vi.fn(),
+        loading: false,
+        error: null,
+      });
+
+      render(<App />);
+
+      // App should render successfully with Web3Auth context
+      expect(screen.getByTestId('header')).toBeInTheDocument();
+    });
+
+    it('renders with Web3Auth context when connected', () => {
+      const mockAddress = '0x1234567890123456789012345678901234567890';
 
       vi.mocked(useWeb3AuthConnect).mockReturnValue({
         connect: vi.fn(),
@@ -187,20 +175,18 @@ describe('App Component', () => {
         error: null,
       });
       vi.mocked(useAccount).mockReturnValue({
-        address: mockAddress,
+        address: mockAddress as any,
       } as any);
-      vi.mocked(useChainId).mockReturnValue(420420418); // Kusama Asset Hub
+      vi.mocked(useWeb3AuthDisconnect).mockReturnValue({
+        disconnect: vi.fn(),
+        loading: false,
+        error: null,
+      });
 
       render(<App />);
 
-      const faucetButton = screen.getByRole('button', { name: /get test tokens/i });
-      fireEvent.click(faucetButton);
-
-      expect(mockOpen).toHaveBeenCalledWith(
-        expect.stringContaining('faucet.polkadot.io/?parachain=1000'),
-        '_blank',
-        'noopener,noreferrer'
-      );
+      // App should render successfully when connected
+      expect(screen.getByTestId('header')).toBeInTheDocument();
     });
   });
 });
