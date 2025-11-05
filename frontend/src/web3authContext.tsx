@@ -12,7 +12,7 @@ const web3AuthContextConfig = {
     web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
     chainConfig: {
       chainNamespace: CHAIN_NAMESPACES.EIP155,
-      chainId: "0x190F0016", // 420420422 in hex
+      chainId: "0x190f1b46", // 420420422 in hex
       rpcTarget: "https://testnet-passet-hub-eth-rpc.polkadot.io",
       displayName: "Passet Hub",
       blockExplorerUrl: "https://blockscout-passet-hub.parity-testnet.parity.io",
