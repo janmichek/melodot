@@ -8,7 +8,7 @@
     "@vercel/node": "^3.0.11"
   },
   "scripts": {
-    "install": "bun install && cd contracts && bun install && cd ../frontend && bun install",
+    "install": "cd contracts && bun install && cd ../frontend && bun install",
     "deploy-contract": "cd contracts && bun run deploy-contract && cd ../frontend && bun run generate",
     "test:contract": "cd contracts && bun run test",
     "test:e2e": "cd frontend && bun run test:e2e",
