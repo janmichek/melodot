@@ -60,7 +60,7 @@ export function ArtistWithdrawForm({
       withdrawWriteContract({
         address: contractAddress,
         abi: donateConfig.abi as Abi,
-        functionName: 'withdrawDonate',
+        functionName: 'withdrawDonates',
         args: [artistId, withdrawAddress as `0x${string}`],
       });
     } catch (error: any) {

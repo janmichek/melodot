@@ -176,8 +176,7 @@ contract Donate is Ownable, PlatformFee {
         artists[artistId].isClaimed = true;
     }
 
-//    todo rename
-    function withdrawDonate(string memory artistId, address recipient) external {
+    function withdrawDonates(string memory artistId, address recipient) external {
         if (bytes(artistId).length == 0) {
             revert EmptyArtistId();
         }
