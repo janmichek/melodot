@@ -1,5 +1,7 @@
  import { useEffect, useState } from 'react';
 
+const BLOCK_EXPLORER_BASE = 'https://blockscout-passet-hub.parity-testnet.parity.io';
+
 export interface TxNotificationProps {
   hash?: string;
   isLoading?: boolean;
@@ -87,11 +89,8 @@ export function TxNotification({
     onDismiss?.();
   };
 
-  const handleExplore = () => {
-    if (blockExplorerUrl) {
-      window.open(blockExplorerUrl, '_blank');
-    }
-  };
+  // Build explorer URL: use provided URL or construct from hash
+  const explorerUrl = blockExplorerUrl || (hash ? `${BLOCK_EXPLORER_BASE}/tx/${hash}` : null);
 
   return (
     <div
@@ -135,18 +134,33 @@ export function TxNotification({
           )}
 
           <div className="tx-notification-hash-container">
-            <code className="tx-notification-hash" title={hash}>
-              {formatHash(hash)}
-            </code>
-            {blockExplorerUrl && (
-              <button
-                type="button"
-                onClick={handleExplore}
+            {explorerUrl ? (
+              <a
+                href={explorerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tx-notification-hash-link"
+                title={`View transaction ${hash} on block explorer`}
+              >
+                <code className="tx-notification-hash">
+                  {formatHash(hash)}
+                </code>
+              </a>
+            ) : (
+              <code className="tx-notification-hash" title={hash}>
+                {formatHash(hash)}
+              </code>
+            )}
+            {explorerUrl && (
+              <a
+                href={explorerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="tx-notification-explore-btn"
                 aria-label="View on block explorer"
               >
-                🔗 View
-              </button>
+                🔗 View on Explorer
+              </a>
             )}
           </div>
         </div>

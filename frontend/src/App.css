@@ -2155,225 +2155,6 @@ button:disabled {
 	font-style: italic;
 }
 
-/* ===== Toast Component ===== */
-.toast-container {
-	position: fixed;
-	top: 16px;
-	right: 16px;
-	z-index: 9999;
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-	max-width: 480px;
-	pointer-events: none;
-}
-
-.toast {
-	padding: 16px;
-	border-radius: var(--radius);
-	border: 1px solid var(--border-color);
-	animation: toastSlideIn 0.3s ease;
-	pointer-events: auto;
-	box-shadow: var(--shadow-md);
-}
-
-@keyframes toastSlideIn {
-	from {
-		opacity: 0;
-		transform: translateX(400px);
-	}
-	to {
-		opacity: 1;
-		transform: translateX(0);
-	}
-}
-
-@keyframes toastSlideOut {
-	from {
-		opacity: 1;
-		transform: translateX(0);
-	}
-	to {
-		opacity: 0;
-		transform: translateX(400px);
-	}
-}
-
-.toast-pending {
-	background-color: var(--info-light);
-	border-color: var(--warning-color);
-}
-
-.toast-success {
-	background-color: var(--success-light);
-	border-color: var(--success-color);
-}
-
-.toast-error {
-	background-color: var(--error-light);
-	border-color: var(--error-color);
-}
-
-.toast-info {
-	background-color: var(--info-light);
-	border-color: var(--info-color);
-}
-
-.toast-content {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-}
-
-.toast-header {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	justify-content: space-between;
-}
-
-.toast-icon {
-	font-size: 20px;
-	flex-shrink: 0;
-}
-
-.toast-title-section {
-	flex: 1;
-	display: flex;
-	align-items: center;
-	gap: 8px;
-}
-
-.toast-title {
-	font-size: 14px;
-	font-weight: 600;
-	color: var(--text-color);
-	margin: 0;
-}
-
-.toast-spinner {
-	width: 12px;
-	height: 12px;
-	border: 2px solid var(--primary-color);
-	border-top-color: transparent;
-	border-radius: 50%;
-	animation: spin 0.6s linear infinite;
-}
-
-@keyframes spin {
-	to {
-		transform: rotate(360deg);
-	}
-}
-
-.toast-close {
-	background: none;
-	border: none;
-	color: var(--text-color);
-	cursor: pointer;
-	font-size: 16px;
-	padding: 4px;
-	opacity: 0.6;
-	transition: opacity 0.2s ease;
-	flex-shrink: 0;
-	line-height: 1;
-	min-height: auto;
-}
-
-.toast-close:hover {
-	opacity: 1;
-}
-
-.toast-body {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-}
-
-.toast-message {
-	font-size: 14px;
-	color: var(--text-color);
-	margin: 0;
-	font-weight: 500;
-}
-
-.toast-hash-container {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	flex-wrap: wrap;
-}
-
-.toast-hash {
-	padding: 6px 10px;
-	background-color: var(--bg-light);
-	border: 1px solid var(--border-color);
-	border-radius: 4px;
-	font-size: 12px;
-	color: var(--text-muted);
-	font-family: monospace;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	max-width: 200px;
-	flex: 0 1 auto;
-}
-
-.toast-explore-btn {
-	padding: 6px 10px;
-	background-color: var(--primary-color);
-	border: 1px solid var(--primary-color);
-	border-radius: 4px;
-	color: white;
-	font-size: 12px;
-	font-weight: 600;
-	cursor: pointer;
-	transition: all 0.2s ease;
-	white-space: nowrap;
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-	line-height: 1;
-	min-height: auto;
-}
-
-.toast-explore-btn:hover {
-	background-color: var(--primary-hover);
-	border-color: var(--primary-hover);
-}
-
-/* Responsive toast styling for mobile */
-@media (max-width: 640px) {
-	.toast-container {
-		top: 8px;
-		right: 8px;
-		left: 8px;
-		max-width: none;
-	}
-
-	.toast {
-		padding: 12px;
-	}
-
-	.toast-title {
-		font-size: 13px;
-	}
-
-	.toast-message {
-		font-size: 13px;
-	}
-
-	.toast-hash {
-		max-width: 150px;
-		font-size: 11px;
-	}
-
-	.toast-explore-btn {
-		font-size: 11px;
-		padding: 4px 8px;
-	}
-}
-
 /* ===== TxNotification Component ===== */
 .tx-notification {
 	padding: 16px;
@@ -2450,6 +2231,12 @@ button:disabled {
 	animation: spin 0.6s linear infinite;
 }
 
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 .tx-notification-close {
 	background: none;
 	border: none;
@@ -2507,6 +2294,22 @@ button:disabled {
 	white-space: nowrap;
 	max-width: 200px;
 	flex: 0 1 auto;
+}
+
+.tx-notification-hash-link {
+	text-decoration: none;
+	display: inline-block;
+	transition: opacity 0.2s ease;
+}
+
+.tx-notification-hash-link:hover {
+	opacity: 0.8;
+}
+
+.tx-notification-hash-link:hover .tx-notification-hash {
+	background-color: var(--primary-color);
+	color: white;
+	border-color: var(--primary-color);
 }
 
 .tx-notification-explore-btn {

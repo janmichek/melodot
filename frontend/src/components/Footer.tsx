@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useReadContract } from "wagmi";
 import type { Abi } from "viem";
 import { donateConfig } from "../generated";
-import { passetHub, formatPasBalance, CURRENCY_SYMBOL, formatAddress } from "../wagmi-config";
+import { passetHub, formatAddress } from "../wagmi-config";
 import { ArtistsList } from "./ArtistsList";
+import { BalanceDisplay } from "./ui/BalanceDisplay";
 
 interface ContractInfoFooterProps {
   contractAddress: `0x${string}`;
@@ -25,7 +26,6 @@ export function Footer({ contractAddress }: ContractInfoFooterProps) {
   });
 
   const artistCount = count ? Number(count) : 0;
-  const contractBalance = balance ? formatPasBalance(balance as bigint) : "0";
 
   return (
     <footer className="footer">
@@ -52,7 +52,7 @@ export function Footer({ contractAddress }: ContractInfoFooterProps) {
           <span>{artistCount} artists</span>
         )}
         <span>•</span>
-        <span>{contractBalance} {CURRENCY_SYMBOL}</span>
+        <BalanceDisplay balance={balance as bigint} showSymbol={true} size="small" />
       </div>
 
       {artistCount > 0 && isArtistsExpanded && (

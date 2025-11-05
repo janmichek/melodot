@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { donateConfig } from "../generated";
 import { formatAddressShort } from "../wagmi-config";
 import { BalanceDisplay } from "./ui/BalanceDisplay";
-import { useToast } from "../hooks/useToast";
+import { TxNotification } from "./ui/TxNotification";
 import type { Abi } from "viem";
 
 interface AdminWithdrawFormProps {
@@ -18,8 +18,6 @@ export function AdminWithdrawForm({
   platformFeeBalance,
 }: AdminWithdrawFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [toastId, setToastId] = useState<string>('');
-  const { pending: showPendingToast, success: showSuccessToast, error: showErrorToast } = useToast();
 
   const {
     data: hash,
@@ -32,41 +30,6 @@ export function AdminWithdrawForm({
     isLoading: isConfirming,
     isSuccess: isConfirmed,
   } = useWaitForTransactionReceipt({ hash });
-
-  // Show pending toast when transaction is being written
-  useEffect(() => {
-    if (isWithdrawing && hash) {
-      const id = showPendingToast('Withdrawal Status', {
-        message: '⏳ Processing withdrawal...',
-        hash,
-        autoHide: false,
-      });
-      setToastId(id);
-    }
-  }, [isWithdrawing, hash, showPendingToast]);
-
-  // Show success toast when transaction is confirmed
-  useEffect(() => {
-    if (isConfirmed && hash && toastId) {
-      showSuccessToast('Withdrawal Successful', {
-        message: '✅ Platform fees withdrawn!',
-        hash,
-        autoHide: true,
-        duration: 5000,
-      });
-    }
-  }, [isConfirmed, hash, toastId, showSuccessToast]);
-
-  // Show error toast if write fails
-  useEffect(() => {
-    if (writeError) {
-      showErrorToast('Withdrawal Failed', {
-        message: writeError.message || 'Failed to process withdrawal',
-        autoHide: true,
-        duration: 5000,
-      });
-    }
-  }, [writeError, showErrorToast]);
 
   const withdrawPlatformFees = async () => {
     if (isSubmitting || isWithdrawing || isConfirming) return;
@@ -113,6 +76,19 @@ export function AdminWithdrawForm({
       >
         {isWithdrawing || isConfirming ? "Processing..." : "Withdraw Platform Fees"}
       </button>
+
+      <TxNotification
+        hash={hash}
+        isLoading={isConfirming}
+        isSuccess={isConfirmed}
+        isError={!!writeError}
+        error={writeError?.message}
+        title="Withdrawal Status"
+        successMessage="✅ Platform fees withdrawn!"
+        pendingMessage="⏳ Processing withdrawal..."
+        errorMessage="❌ Withdrawal failed"
+        autoHideSuccess={false}
+      />
     </div>
   );
 }

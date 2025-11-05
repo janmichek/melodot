@@ -3,8 +3,8 @@ import { useSpotifyAuth } from "../hooks/useSpotifyAuth";
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { Layout, useWeb3AuthContext } from "../components/Layout";
 import { donateConfig } from "../generated";
-import { formatPasBalance, CURRENCY_SYMBOL } from "../wagmi-config";
 import { ArtistWithdrawForm } from "../components/ArtistWithdrawForm";
+import { BalanceDisplay } from "../components/ui/BalanceDisplay";
 import type { Abi } from "viem";
 
 export function Claim() {
@@ -184,7 +184,9 @@ export function Claim() {
                 <p>
                   <strong>Balance:</strong>{' '}
                   <span className="claim-artist-balance">
-                    {artistBalance !== null ? `${formatPasBalance(artistBalance)} ${CURRENCY_SYMBOL}` : 'Loading...'}
+                    {artistBalance !== null ? (
+                      <BalanceDisplay balance={artistBalance} showSymbol={true} size="small" />
+                    ) : 'Loading...'}
                   </span>
                 </p>
                 <p>

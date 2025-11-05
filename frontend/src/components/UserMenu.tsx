@@ -5,12 +5,8 @@ import { Link } from "react-router-dom";
 import { CURRENCY_SYMBOL, formatAddress, passetHub } from "../wagmi-config";
 import { donateConfig } from "../generated";
 import { useWeb3AuthContext } from "./Layout";
+import { BalanceDisplay } from "./ui/BalanceDisplay";
 import type { Abi } from "viem";
-
-interface UserMenuProps {
-  onCopyAddress: () => void;
-  copied: boolean;
-}
 
 // Generate deterministic number from address (similar to jsNumberForAddress)
 function addressToNumber(address: string): number {
@@ -18,7 +14,7 @@ function addressToNumber(address: string): number {
   return parseInt(hash, 16);
 }
 
-export function UserMenu({ onCopyAddress, copied }: UserMenuProps) {
+export function UserMenu() {
   const {
     address,
     disconnect,
@@ -27,8 +23,19 @@ export function UserMenu({ onCopyAddress, copied }: UserMenuProps) {
   } = useWeb3AuthContext();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const jazzRef = useRef<HTMLDivElement>(null);
+
+  const handleCopyAddress = () => {
+    if (address) {
+      navigator.clipboard.writeText(address).catch(err => {
+        console.error('Failed to copy address:', err);
+      });
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const chainId = useChainId();
   const { data: balance, isLoading: balanceLoading } = useBalance({
@@ -112,7 +119,7 @@ export function UserMenu({ onCopyAddress, copied }: UserMenuProps) {
             <div className="menu-label">Address</div>
             <div
               className={`menu-address ${copied ? 'menu-address-copied' : ''}`}
-              onClick={onCopyAddress}
+              onClick={handleCopyAddress}
               title={copied ? "Copied!" : "Click to copy"}
             >
               {copied ? "✓ Copied" : formatAddress(address || "0x0000000000000000000000000000000000000000" as `0x${string}`, 4, 3)}
@@ -123,7 +130,12 @@ export function UserMenu({ onCopyAddress, copied }: UserMenuProps) {
             <div className="menu-label">Balance</div>
             <div className="menu-value">
               {balanceLoading ? '...' : balance?.value !== undefined
-                ? `${formatUnits(balance.value, balance.decimals)} ${balance.symbol || CURRENCY_SYMBOL}`
+                ?     <BalanceDisplay
+                  balance={balance?.value}
+                  isLoading={balanceLoading}
+                  showSymbol={true}
+                  size="small"
+                />
                 : '---'}
             </div>
           </div>

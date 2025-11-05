@@ -32,7 +32,6 @@ export function Home() {
             <DonationForm
               contractAddress={contractAddress}
               artistId={artistId}
-              onSuccess={() => alert("Donation successful")}
               onRequireAuth={handleDonateClick}
             />
           )}
