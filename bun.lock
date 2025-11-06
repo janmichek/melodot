@@ -4,11 +4,9 @@
     "": {
       "name": "my-polkadot-cistej",
       "dependencies": {
+        "@types/node": "^24.10.0",
         "@vercel/node": "^5.5.4",
         "formidable": "^3.5.4",
-      },
-      "devDependencies": {
-        "@types/node": "^24.10.0",
       },
     },
   },
