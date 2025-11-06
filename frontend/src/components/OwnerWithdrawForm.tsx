@@ -5,18 +5,20 @@ import { formatAddressShort } from "../wagmi-config";
 import { BalanceDisplay } from "./ui/BalanceDisplay";
 import { TxNotification } from "./ui/TxNotification";
 import type { Abi } from "viem";
+import {Button} from "@/components/ui/button";
+import {Card} from "@/components/ui/card";
 
-interface AdminWithdrawFormProps {
+interface OwnerWithdrawFormProps {
   contractAddress: `0x${string}`;
   ownerAddress: `0x${string}`;
   platformFeeBalance: bigint | undefined;
 }
 
-export function AdminWithdrawForm({
+export function OwnerWithdrawForm({
   contractAddress,
   ownerAddress,
   platformFeeBalance,
-}: AdminWithdrawFormProps) {
+}: OwnerWithdrawFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -50,32 +52,32 @@ export function AdminWithdrawForm({
   };
 
   return (
-    <div className="admin-card">
-      <h3 className="admin-card-title">💰 Platform Fee Withdrawal</h3>
-      <p className="admin-card-subtitle">1% fee from all donations</p>
+    <Card className="owner-card">
+      <h3 className="owner-card-title">💰 Platform Fee Withdrawal</h3>
+      <p className="owner-card-subtitle">1% fee from all donations</p>
 
-      <div className="admin-info-box">
-        <div className="admin-info-row">
-          <span className="admin-label">Available Balance:</span>
+      <div className="owner-info-box">
+        <div className="owner-info-row">
+          <span className="owner-label">Available Balance:</span>
           <BalanceDisplay
             balance={platformFeeBalance}
             showSymbol={true}
             size="small"
           />
         </div>
-        <div className="admin-info-row">
-          <span className="admin-label">Recipient Address:</span>
-          <span className="admin-value">{formatAddressShort(ownerAddress, 16)}</span>
+        <div className="owner-info-row">
+          <span className="owner-label">Recipient Address:</span>
+          <span className="owner-value">{formatAddressShort(ownerAddress, 16)}</span>
         </div>
       </div>
-
-      <button
+{/*todo is needed isWithdrawing || isConfirming*/}
+      <Button
         onClick={withdrawPlatformFees}
         disabled={isSubmitting || isWithdrawing || isConfirming || platformFeeBalance === 0n}
-        className="admin-withdraw-btn"
+        className="owner-withdraw-btn"
       >
         {isWithdrawing || isConfirming ? "Processing..." : "Withdraw Platform Fees"}
-      </button>
+      </Button>
 
       <TxNotification
         hash={hash}
@@ -89,6 +91,6 @@ export function AdminWithdrawForm({
         errorMessage="❌ Withdrawal failed"
         autoHideSuccess={false}
       />
-    </div>
+    </Card>
   );
 }

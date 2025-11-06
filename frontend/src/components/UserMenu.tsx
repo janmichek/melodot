@@ -7,6 +7,8 @@ import { donateConfig } from "../generated";
 import { useWeb3AuthContext } from "./Layout";
 import { BalanceDisplay } from "./ui/BalanceDisplay";
 import type { Abi } from "viem";
+import {Separator} from "@/components/ui/separator";
+import {Button} from "@/components/ui/button";
 
 // Generate deterministic number from address (similar to jsNumberForAddress)
 function addressToNumber(address: string): number {
@@ -22,7 +24,6 @@ export function UserMenu() {
     contractAddress,
   } = useWeb3AuthContext();
 
-  const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const jazzRef = useRef<HTMLDivElement>(null);
@@ -84,114 +85,77 @@ export function UserMenu() {
     }
   }, [address]);
 
-  // Close menu when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [isOpen]);
-
   return (
     <div className="user-menu-container" ref={menuRef}>
-      <button
-        className="user-menu-button"
-        onClick={() => setIsOpen(!isOpen)}
-        title="Account menu"
-      >
+      <div className="flex flex-row">
+      <div
+        ref={jazzRef}
+        className="user-identicon"
+      />
         <div
-          ref={jazzRef}
-          className="user-identicon"
-        />
-        <span className="user-menu-caret">{isOpen ? "▲" : "▼"}</span>
-      </button>
-
-      {isOpen && (
-        <div className="user-menu-dropdown">
-          {/* Top Section: Address, Balance, Faucet */}
-          <div className="menu-item-section">
-            <div className="menu-label">Address</div>
-            <div
-              className={`menu-address ${copied ? 'menu-address-copied' : ''}`}
-              onClick={handleCopyAddress}
-              title={copied ? "Copied!" : "Click to copy"}
-            >
-              {copied ? "✓ Copied" : formatAddress(address || "0x0000000000000000000000000000000000000000" as `0x${string}`, 4, 3)}
-            </div>
-          </div>
-
-          <div className="menu-item-section">
-            <div className="menu-label">Balance</div>
-            <div className="menu-value">
-              {balanceLoading ? '...' : balance?.value !== undefined
-                ?     <BalanceDisplay
-                  balance={balance?.value}
-                  isLoading={balanceLoading}
-                  showSymbol={true}
-                  size="small"
-                />
-                : '---'}
-            </div>
-          </div>
-
-          <a
-            href="https://faucet.polkadot.io/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="menu-faucet-link menu-faucet-btn"
-          >
-            💧 Get Test Tokens
-          </a>
-
-          {/* Divider */}
-          <div className="menu-divider" />
-
-          {/* Middle Section: Navigation and Network */}
-          <div className="menu-item-section">
-            <div className="menu-label">Network</div>
-            <div className="menu-value">{getChainName()}</div>
-          </div>
-
-          <Link
-            to="/claim"
-            className="menu-claim-link"
-            onClick={() => setIsOpen(false)}
-            title="Claim artist balance"
-          >
-            📋 Claim
-          </Link>
-
-          {isOwner && (
-            <Link
-              to="/admin"
-              className="menu-admin-link"
-              onClick={() => setIsOpen(false)}
-              title="Admin panel"
-            >
-              ⚙️ Admin Panel
-            </Link>
-          )}
-
-          {/* Disconnect Button */}
-          <button
-            onClick={() => {
-              disconnect();
-              setIsOpen(false);
-            }}
-            className="menu-disconnect-btn"
-            disabled={disconnectLoading}
-            title="Disconnect wallet"
-          >
-            {disconnectLoading ? "•••" : "Disconnect Wallet"}
-          </button>
+          className={`menu-address ${copied ? 'menu-address-copied' : ''}`}
+          onClick={handleCopyAddress}
+          title={copied ? "Copied!" : "Click to copy"}
+        >
+          {copied ? "✓ Copied" : formatAddress(address || "0x0000000000000000000000000000000000000000" as `0x${string}`, 4, 3)}
         </div>
-      )}
+        <Separator/>
+      </div>
+      <div className="user-menu-dropdown">
+
+        <div className="menu-item-section">
+          <div className="menu-label">Balance</div>
+          <div className="menu-value">
+            {balanceLoading ? '...' : balance?.value !== undefined
+              ? <BalanceDisplay
+                balance={balance?.value}
+                isLoading={balanceLoading}
+                showSymbol={true}
+                size="small"
+              />
+              : '---'}
+          </div>
+        </div>
+
+        <a
+          href="https://faucet.polkadot.io/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="menu-faucet-link menu-faucet-btn"
+        >
+          💧 Get Test Tokens
+        </a>
+
+        {/* Divider */}
+        <div className="menu-divider" />
+
+        {/* Middle Section: Navigation and Network */}
+        <div className="menu-item-section">
+          <div className="menu-label">Network</div>
+          <div className="menu-value">{getChainName()}</div>
+        </div>
+
+        {isOwner && (
+          <Link
+            to="/owner"
+            className="menu-owner-link"
+            title="Owner panel"
+          >
+            ⚙️ Owner Panel
+          </Link>
+        )}
+
+        {/* Disconnect Button */}
+        <Button
+          onClick={() => {
+            disconnect();
+          }}
+          disabled={disconnectLoading}
+          title="Disconnect wallet"
+        >
+          {disconnectLoading ? "•••" : "Disconnect Wallet"}
+        </Button>
+      </div>
     </div>
   );
 }

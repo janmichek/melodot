@@ -3,6 +3,7 @@ import { useAudioRecorder } from "../hooks/audio";
 import AudioControls from "./AudioControls";
 import { DiscoveryResult } from "../types";
 import { USE_MOCK_DATA, MOCK_DISCOVERY_DATA } from "./mockDiscoveryData";
+import {Button} from "@/components/ui/button";
 
 const ATTEMPT_DURATIONS = [2, 5, 10, 15]; // seconds for each attempt
 
@@ -174,7 +175,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
           textAlign: 'center'
         }}>
 
-          <button
+          <Button
             onClick={handleMockMode}
             style={{
               padding: '10px 20px',
@@ -186,7 +187,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
             }}
           >
             Load Mock Track Data
-          </button>
+          </Button>
           <p>
             To disable mock mode: Set USE_MOCK_DATA = false in mockDiscoveryData.ts
           </p>
@@ -196,7 +197,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
       {allAttemptsFailed && (
         <div className="no-match-message">
           <p>No match found after {ATTEMPT_DURATIONS.length} attempts</p>
-          <button onClick={reset} className="btn-secondary">Try Again</button>
+          <Button onClick={reset} className="btn-secondary">Try Again</Button>
         </div>
       )}
 

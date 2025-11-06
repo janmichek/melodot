@@ -17,6 +17,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
+      "@/*": ["./src/*"],
       "@fixtures/*": ["tests/fixtures/*"],
       "@helpers/*": ["tests/helpers/*"],
       "@page-objects/*": ["tests/page-objects/*"]

@@ -3,19 +3,21 @@ import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagm
 import { donateConfig } from "../generated";
 import { CURRENCY_SYMBOL } from "../wagmi-config";
 import { TxNotification } from "./ui/TxNotification";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Abi } from "viem";
 import { parseEther } from "viem";
+import { useWeb3AuthContext } from "./Layout";
 
 interface DonationFormProps {
   contractAddress: `0x${string}`;
   artistId: string;
   onSuccess?: () => void;
-  onRequireAuth?: () => void;
 }
 
-export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAuth }: DonationFormProps) {
+export function DonationForm({ contractAddress, artistId, onSuccess }: DonationFormProps) {
   const [isDonating, setIsDonating] = useState(false);
-  const { isConnected } = useAccount();
+  const { isConnected, connect } = useWeb3AuthContext();
 
   const {
     data: hash,
@@ -39,7 +41,7 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
 
   const donate = async (amount: number) => {
      if (!isConnected) {
-      onRequireAuth?.();
+      void connect();
       return;
     }
 
@@ -63,39 +65,38 @@ export function DonationForm({ contractAddress, artistId, onSuccess, onRequireAu
   };
 
   return (
-    <div className="contract-form-section">
-      <h3 className="contract-form-title">🎵 Donate to Artist</h3>
-      <div className="form-group">
-        <p className="form-label">Artist ID: {artistId}</p>
-        <p className="form-label">Select amount to donate instantly:</p>
-        <div className="amount-selector-group">
-          {[1, 2, 10].map((amount) => (
-            <button
-              key={amount}
-              type="button"
-              onClick={() => donate(amount)}
-              disabled={isDonating || isWriting || isConfirming}
-              className="btn-amount-selector"
-              style={{ display: isWriting || isConfirming ? 'none' : 'inline-flex' }}
-            >
-              {`${amount} ${CURRENCY_SYMBOL}`}
-            </button>
-          ))}
+    <>
+        <div>
+          <p className="text-sm text-muted-foreground">Artist ID: {artistId}</p>
+          <div className="flex gap-2 mt-3">
+            {[1, 2, 10].map((amount) => (
+              <Button
+                key={amount}
+                type="button"
+                onClick={() => donate(amount)}
+                disabled={isDonating || isWriting || isConfirming}
+                variant="outline"
+                className={isWriting || isConfirming ? 'hidden' : ''}
+              >
+                {`${amount} ${CURRENCY_SYMBOL}`}
+              </Button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <TxNotification
-        hash={hash}
-        isLoading={isConfirming}
-        isSuccess={isConfirmed}
-        isError={!!writeError}
-        error={writeError?.message}
-        title="Donation Status"
-        successMessage="✅ Donation confirmed on-chain!"
-        pendingMessage="⏳ Processing donation..."
-        errorMessage="❌ Donation failed"
-        autoHideSuccess={false}
-      />
-    </div>
+        <TxNotification
+          hash={hash}
+          isLoading={isConfirming}
+          isSuccess={isConfirmed}
+          isError={!!writeError}
+          error={writeError?.message}
+          title="Donation Status"
+          successMessage="✅ Donation confirmed on-chain!"
+          pendingMessage="⏳ Processing donation..."
+          errorMessage="❌ Donation failed"
+          autoHideSuccess={false}
+        />
+
+    </>
   );
 }

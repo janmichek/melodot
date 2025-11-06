@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
 import { Home } from "./pages/Home";
 import { Claim } from "./pages/Claim";
-import { Admin } from "./pages/Admin";
+import { Owner } from "./pages/Owner";
 
 function AppContent() {
   return (
@@ -11,7 +11,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/claim" element={<Claim />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/owner" element={<Owner />} />
       </Routes>
     </>
   );
@@ -21,7 +21,6 @@ function App() {
   return (
     <BrowserRouter>
       <AppContent />
-      <Toaster position="top-right" richColors />
     </BrowserRouter>
   );
 }

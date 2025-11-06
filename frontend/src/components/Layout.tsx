@@ -7,20 +7,8 @@ import {
 import { useAccount } from "wagmi";
 import { donateConfig } from "../generated";
 import { passetHub } from "../wagmi-config";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
-
-
-export interface Web3AuthContextType {
-  isConnected: boolean;
-  address: `0x${string}` | undefined;
-  connect: () => void;
-  disconnect: () => void;
-  connectLoading: boolean;
-  disconnectLoading: boolean;
-  providerReady: boolean;
-  contractAddress: `0x${string}`;
-}
+import { AppSidebar } from "./AppSidebar";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 
 export function useWeb3AuthContext() {
   const {
@@ -97,15 +85,17 @@ export function useWeb3AuthContext() {
 }
 
 export function Layout({ children }: {children: ReactNode;}) {
-  const { contractAddress } = useWeb3AuthContext();
-
   return (
-    <div className="container">
-      <Header />
-
-      <main className="main-content">{children}</main>
-
-      <Footer contractAddress={contractAddress} />
-    </div>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header >
+          <SidebarTrigger className="ml-auto" />
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4">
+          <main className="main-content">{children}</main>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

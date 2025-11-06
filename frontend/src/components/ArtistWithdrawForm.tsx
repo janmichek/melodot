@@ -5,6 +5,7 @@ import { AddressInput } from "./ui/AddressInput";
 import { TxNotification } from "./ui/TxNotification";
 import type { Abi } from "viem";
 import { isAddress } from "viem";
+import {Button} from "@/components/ui/button";
 
 interface ArtistWithdrawFormProps {
   contractAddress: `0x${string}`;
@@ -23,7 +24,7 @@ export function ArtistWithdrawForm({
   const { isConnected } = useAccount();
 
   const {
-    writeContract: withdrawWriteContract,
+    writeContract,
     isPending: isWithdrawPending,
     data: withdrawHash,
     error: writeError,
@@ -55,7 +56,7 @@ export function ArtistWithdrawForm({
     setTxHash(undefined);
 
     try {
-      withdrawWriteContract({
+      writeContract({
         address: contractAddress,
         abi: donateConfig.abi as Abi,
         functionName: 'withdrawDonates',
@@ -120,13 +121,13 @@ export function ArtistWithdrawForm({
           showValidation={true}
           className="claim-withdraw-input"
         />
-        <button
+        <Button
           onClick={handleWithdraw}
           disabled={!isConnected || !isAddress(withdrawAddress as `0x${string}`) || isWithdrawPending || isConfirming}
           className="claim-withdraw-button"
         >
           {isWithdrawPending ? 'Sending transaction...' : isConfirming ? 'Confirming...' : 'Withdraw All'}
-        </button>
+        </Button>
 
         <TxNotification
           hash={txHash}

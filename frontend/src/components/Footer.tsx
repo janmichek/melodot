@@ -5,6 +5,7 @@ import { donateConfig } from "../generated";
 import { passetHub, formatAddress } from "../wagmi-config";
 import { ArtistsList } from "./ArtistsList";
 import { BalanceDisplay } from "./ui/BalanceDisplay";
+import {Button} from "@/components/ui/button";
 
 interface ContractInfoFooterProps {
   contractAddress: `0x${string}`;
@@ -42,12 +43,12 @@ export function Footer({ contractAddress }: ContractInfoFooterProps) {
         </a>
         <span>•</span>
         {artistCount > 0 ? (
-          <button
+          <Button
             onClick={() => setIsArtistsExpanded(!isArtistsExpanded)}
             className="footer-toggle"
           >
             {artistCount} artists {isArtistsExpanded ? '▼' : '▲'}
-          </button>
+          </Button>
         ) : (
           <span>{artistCount} artists</span>
         )}

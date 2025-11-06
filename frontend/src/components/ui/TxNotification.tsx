@@ -1,4 +1,8 @@
- import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Alert, AlertDescription, AlertTitle } from './alert';
+import { Button } from './button';
+import { Loader2, CheckCircle2, XCircle, Clock, ExternalLink, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const BLOCK_EXPLORER_BASE = 'https://blockscout-passet-hub.parity-testnet.parity.io';
 
@@ -22,9 +26,9 @@ export interface TxNotificationProps {
 /**
  * TxNotification Component
  *
- * A polkadot-ui inspired transaction notification component with:
+ * A transaction notification component built with shadcn Alert:
  * - Real-time transaction status updates
- * - Pending, success, and error states
+ * - Pending, success, and error states with variants
  * - Optional block explorer link
  * - Auto-hide functionality for success state
  * - Dismissible notification
@@ -37,9 +41,9 @@ export function TxNotification({
   isError = false,
   error,
   title = 'Transaction Status',
-  successMessage = '✅ Transaction successful!',
-  pendingMessage = '⏳ Waiting for confirmation...',
-  errorMessage = '❌ Transaction failed',
+  successMessage = 'Transaction successful!',
+  pendingMessage = 'Waiting for confirmation...',
+  errorMessage = 'Transaction failed',
   onDismiss,
   blockExplorerUrl,
   autoHideSuccess = true,
@@ -68,16 +72,24 @@ export function TxNotification({
     return null;
   }
 
-  const getStatusClass = () => {
-    if (isError) return 'tx-notification-error';
-    if (isSuccess) return 'tx-notification-success';
-    return 'tx-notification-pending';
+  const getVariant = () => {
+    if (isError) return 'destructive';
+    if (isSuccess) return 'success';
+    return 'info';
   };
 
-  const getStatusIcon = () => {
-    if (isError) return '❌';
-    if (isSuccess) return '✅';
-    return '⏳';
+  const getIcon = () => {
+    if (isError) return <XCircle className="h-4 w-4" />;
+    if (isSuccess) return <CheckCircle2 className="h-4 w-4" />;
+    if (isLoading) return <Loader2 className="h-4 w-4 animate-spin" />;
+    return <Clock className="h-4 w-4" />;
+  };
+
+  const getMessage = () => {
+    if (isLoading) return pendingMessage;
+    if (isSuccess) return successMessage;
+    if (isError) return error || errorMessage;
+    return null;
   };
 
   const formatHash = (txHash: string) => {
@@ -93,78 +105,52 @@ export function TxNotification({
   const explorerUrl = blockExplorerUrl || (hash ? `${BLOCK_EXPLORER_BASE}/tx/${hash}` : null);
 
   return (
-    <div
-      className={`tx-notification ${getStatusClass()} ${className}`}
-      role="alert"
-      aria-live="polite"
-      aria-atomic="true"
+    <Alert
+      variant={getVariant()}
+      className={cn("relative mt-4", className)}
     >
-      <div className="tx-notification-content">
-        <div className="tx-notification-header">
-          <span className="tx-notification-icon">{getStatusIcon()}</span>
-          <div className="tx-notification-title-section">
-            <h4 className="tx-notification-title">{title}</h4>
-            {isLoading && (
-              <div className="tx-notification-spinner"></div>
-            )}
-          </div>
-          <button
-            type="button"
+      {getIcon()}
+      <div className="flex-1">
+        <div className="flex items-center justify-between">
+          <AlertTitle className="mb-2">{title}</AlertTitle>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 top-2 h-6 w-6"
             onClick={handleDismiss}
-            className="tx-notification-close"
             aria-label="Dismiss notification"
           >
-            ✕
-          </button>
+            <X className="h-4 w-4" />
+          </Button>
         </div>
+        <AlertDescription className="space-y-2">
+          <p>{getMessage()}</p>
 
-        <div className="tx-notification-body">
-          {isLoading && (
-            <p className="tx-notification-message">{pendingMessage}</p>
-          )}
-          {isSuccess && (
-            <p className="tx-notification-message tx-notification-success-message">
-              {successMessage}
-            </p>
-          )}
-          {isError && (
-            <p className="tx-notification-message tx-notification-error-message">
-              {error || errorMessage}
-            </p>
-          )}
+          {hash && (
+            <div className="flex items-center gap-2 flex-wrap mt-2">
 
-          <div className="tx-notification-hash-container">
-            {explorerUrl ? (
-              <a
-                href={explorerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="tx-notification-hash-link"
-                title={`View transaction ${hash} on block explorer`}
-              >
-                <code className="tx-notification-hash">
-                  {formatHash(hash)}
-                </code>
-              </a>
-            ) : (
-              <code className="tx-notification-hash" title={hash}>
-                {formatHash(hash)}
-              </code>
-            )}
-            {explorerUrl && (
-              <a
-                href={explorerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="tx-notification-explore-btn"
-                aria-label="View on block explorer"
-              >
-                🔗 View on Explorer
-              </a>
-            )}
-          </div>
-        </div>
+              {explorerUrl && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs"
+                  asChild
+                >
+                  <a
+                    href={explorerUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="View on block explorer"
+                  >
+                    <ExternalLink className="h-3 w-3 mr-1" />
+                    View on Explorer
+                  </a>
+                </Button>
+              )}
+            </div>
+          )}
+        </AlertDescription>
       </div>
-    </div>
+    </Alert>
   );
 }

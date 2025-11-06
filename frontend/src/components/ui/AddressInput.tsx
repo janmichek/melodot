@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { isAddress } from 'viem';
+import { Input } from './input';
+import { Button } from './button';
+import { cn } from '@/lib/utils';
 
 export interface AddressInputProps {
   value: string;
@@ -62,63 +65,65 @@ export function AddressInput({
   };
 
   return (
-    <div className={`address-input-wrapper ${className}`}>
+    <div className={cn("space-y-2", className)}>
       {label && (
-        <label className="address-input-label">{label}</label>
+        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{label}</label>
       )}
 
-      <div className="address-input-container">
-        <input
+      <div className="relative">
+        <Input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
-          className={`address-input ${
-            showValidation && value ? (isValid ? 'address-input-valid' : 'address-input-invalid') : ''
-          }`}
+          className={cn(
+            showValidation && value ? (isValid ? 'border-green-500' : 'border-red-500') : ''
+          )}
           aria-invalid={showValidation && value ? !isValid : undefined}
           aria-describedby={error ? 'address-error' : undefined}
         />
 
         {value && (
-          <div className="address-input-actions">
-            <button
+          <div className="flex gap-2 mt-2">
+            <Button
               type="button"
               onClick={handleCopy}
-              className={`address-input-action ${isCopied ? 'address-action-copied' : ''}`}
+              variant="outline"
+              size="sm"
               title="Copy address"
               disabled={disabled}
             >
               {isCopied ? '✓ Copied' : '📋 Copy'}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={handlePaste}
-              className="address-input-action"
+              variant="outline"
+              size="sm"
               title="Paste from clipboard"
               disabled={disabled}
             >
               📌 Paste
-            </button>
+            </Button>
           </div>
         )}
       </div>
 
       {showValidation && value && !isValid && (
-        <p className="address-input-validation-error">
+        <p className="text-sm text-destructive">
           ❌ Invalid address format. Please enter a valid Ethereum address (0x...)
         </p>
       )}
 
       {showValidation && isValid && value && (
-        <p className="address-input-validation-success">
+        <p className="text-sm text-green-600">
           ✓ Valid address
         </p>
       )}
 
       {error && (
-        <p className="address-input-error" id="address-error">
+        <p className="text-sm text-destructive" id="address-error">
           ❌ {error}
         </p>
       )}
