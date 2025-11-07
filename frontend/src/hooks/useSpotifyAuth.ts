@@ -38,8 +38,40 @@ export const useSpotifyAuth = () => {
     }
   }, []);
 
+  // Start OAuth login
+  const login = useCallback(async () => {
+    setAuthState(prev => ({ ...prev, loading: true, error: null }));
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/spotify/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to start authentication');
+      }
+
+      const data = await response.json();
+      const { authUrl, state } = data;
+
+      localStorage.setItem('spotify_auth_state', state);
+      window.location.href = authUrl;
+    } catch (error) {
+
+      // todo separate erro messagging
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setAuthState(prev => ({
+        ...prev,
+        loading: false,
+        error: errorMessage,
+      }));
+      throw error;
+    }
+  }, []);
+
   // Handle OAuth callback
-  const handleCallback = useCallback(async (code: string) => {
+  async function callback(code: string) {
     setAuthState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
@@ -70,7 +102,7 @@ export const useSpotifyAuth = () => {
       }));
       throw error;
     }
-  }, []);
+  }
 
   // Fetch user profile
   const fetchProfile = async (accessToken: string) => {
@@ -111,35 +143,7 @@ export const useSpotifyAuth = () => {
     }
   };
 
-  // Start OAuth login
-  const login = useCallback(async () => {
-    setAuthState(prev => ({ ...prev, loading: true, error: null }));
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/spotify/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to start authentication');
-      }
-
-      const data = await response.json();
-      const { authUrl, state } = data;
-
-      localStorage.setItem('spotify_auth_state', state);
-      window.location.href = authUrl;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      setAuthState(prev => ({
-        ...prev,
-        loading: false,
-        error: errorMessage,
-      }));
-      throw error;
-    }
-  }, []);
 
   // Logout
   const logout = useCallback(() => {
@@ -160,6 +164,6 @@ export const useSpotifyAuth = () => {
     ...authState,
     login,
     logout,
-    handleCallback,
+    callback,
   };
 };

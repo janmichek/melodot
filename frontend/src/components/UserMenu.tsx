@@ -9,6 +9,7 @@ import { BalanceDisplay } from "./ui/BalanceDisplay";
 import type { Abi } from "viem";
 import {Separator} from "@/components/ui/separator";
 import {Button} from "@/components/ui/button";
+import {ModeToggle} from "@/components/ui/mode-toggle";
 
 // Generate deterministic number from address (similar to jsNumberForAddress)
 function addressToNumber(address: string): number {
@@ -155,6 +156,8 @@ export function UserMenu() {
         >
           {disconnectLoading ? "•••" : "Disconnect Wallet"}
         </Button>
+
+        <ModeToggle />
       </div>
     </div>
   );

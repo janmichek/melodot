@@ -9,7 +9,7 @@ import { donateConfig } from "../generated";
 import { passetHub } from "../wagmi-config";
 import { AppSidebar } from "./AppSidebar";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-
+``// todo mmoveto app.tsx
 export function useWeb3AuthContext() {
   const {
     connect,

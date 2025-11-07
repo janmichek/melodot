@@ -15,7 +15,6 @@ export function Header() {
   return (
     <header className="dapp-header-subtle">
       <div className="header-content-subtle">
-        <ModeToggle />
         {isConnected && address ? (
           <UserMenu />
         ) : (
