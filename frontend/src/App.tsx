@@ -1,20 +1,15 @@
 import "./App.css";
-import { useState, useEffect, ReactNode } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Toaster } from "sonner";
-import {
-  useWeb3AuthConnect,
-  useWeb3AuthDisconnect,
-  useWeb3Auth,
-} from "@web3auth/modal/react";
-import { useAccount } from "wagmi";
-import { donateConfig } from "./generated";
-import { passetHub } from "./wagmi-config";
-import { AppSidebar } from "./components/AppSidebar";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { Home } from "./pages/Home";
-import { Claim } from "./pages/Claim";
-import { Owner } from "./pages/Owner";
+import {useEffect, useState} from "react";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {useWeb3Auth, useWeb3AuthConnect, useWeb3AuthDisconnect,} from "@web3auth/modal/react";
+import {useAccount} from "wagmi";
+import {donateConfig} from "./generated";
+import {passetHub} from "./wagmi-config";
+import {AppSidebar} from "./components/AppSidebar";
+import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
+import {Home} from "./pages/Home";
+import {Claim} from "./pages/Claim";
+import {Owner} from "./pages/Owner";
 
 export function useWeb3AuthContext() {
   const {
@@ -90,40 +85,28 @@ export function useWeb3AuthContext() {
   };
 }
 
-function Layout({ children }: { children: ReactNode }) {
-  return (
-    <SidebarProvider>
-      <SidebarInset className="bg-background">
-        <header className="border-b border-border sticky top-0 bg-background">
-          <div className="flex items-center justify-end px-4 py-3">
-            <SidebarTrigger />
-          </div>
-        </header>
-        <div className="flex flex-1 flex-col p-4">
-          <main className="main-content">{children}</main>
-        </div>
-      </SidebarInset>
-      <AppSidebar />
-    </SidebarProvider>
-  );
-}
-
-function AppContent() {
-  return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/claim" element={<Claim />} />
-        <Route path="/owner" element={<Owner />} />
-      </Routes>
-    </Layout>
-  );
-}
-
 function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <SidebarProvider>
+        <SidebarInset className="bg-background">
+          <header className="border-b border-border sticky top-0 bg-background">
+            <div className="flex items-center justify-end px-4 py-3">
+              <SidebarTrigger />
+            </div>
+          </header>
+          <div className="flex flex-1 flex-col p-4">
+            <main className="main-content">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/claim" element={<Claim />} />
+                <Route path="/owner" element={<Owner />} />
+              </Routes>
+            </main>
+          </div>
+        </SidebarInset>
+        <AppSidebar />
+      </SidebarProvider>
     </BrowserRouter>
   );
 }

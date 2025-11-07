@@ -1,4 +1,4 @@
-import { formatPasBalance, CURRENCY_SYMBOL } from '../../wagmi-config';
+import {CURRENCY_SYMBOL, formatPasBalance} from '../../wagmi-config';
 
 export interface BalanceDisplayProps {
   balance?: bigint;
@@ -50,17 +50,6 @@ export function BalanceDisplay({
           </div>
         )}
       </div>
-
-      {balance === 0n && !isLoading && (
-        <a
-          href="https://faucet.polkadot.io/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="balance-display-faucet-link"
-          title="Get test tokens">
-          Request from Faucet
-        </a>
-      )}
     </div>
   );
 }
