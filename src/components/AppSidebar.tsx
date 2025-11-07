@@ -26,7 +26,7 @@ export function AppSidebar() {
     isConnected,
     address,
     connect,
-    connectLoading,
+    connecting,
     providerReady,
     contractAddress,
   } = useWeb3AuthContext();
@@ -68,7 +68,7 @@ export function AppSidebar() {
             >
               <a href="#">
                 {/*<IconInnerShadowTop className="!size-5" />*/}
-                <span className="text-base font-semibold"> Shaz</span>
+                <span className="text-base font-semibold">BeatChain</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -82,10 +82,10 @@ export function AppSidebar() {
           ) : (
             <Button
               onClick={() => connect()}
-              disabled={connectLoading || !providerReady}
+              disabled={connecting || !providerReady}
               variant="default"
               className="w-full">
-              {connectLoading || !providerReady ?
+              {connecting || !providerReady ?
                 <Spinner size="sm" className="inline"/>
                 : "Connect"}
             </Button>
@@ -97,7 +97,7 @@ export function AppSidebar() {
           <SidebarMenu>
 
             {/*todo fix*/}
-            {!balance?.value || balance?.value === 0n && (
+            {(!balance || balance === 0n) && (
               <SidebarMenuItem>
               <a
                 href="https://faucet.polkadot.io/"

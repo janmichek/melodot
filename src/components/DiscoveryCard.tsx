@@ -39,7 +39,6 @@ export default function DiscoveryCard({ discovery, onSearchAgain, children }: Di
 
       <CardContent className="p-6">
         <div className="flex flex-row">
-          {/* Album Cover */}
           {track.images?.coverart && (
             <div className="relative group">
               <div className="relative w-48 h-48 mx-auto md:mx-0">
@@ -53,7 +52,6 @@ export default function DiscoveryCard({ discovery, onSearchAgain, children }: Di
             </div>
           )}
 
-          {/* Track Info */}
           <div className="space-4 flex flex-col justify-center">
             <div className="space-y-2">
               <div className="flex items-start gap-2">
@@ -101,7 +99,6 @@ export default function DiscoveryCard({ discovery, onSearchAgain, children }: Di
               ← Search Again
             </Button>
 
-            {/* Spotify Link */}
             {spotifyUri && (
               <Button
                 asChild

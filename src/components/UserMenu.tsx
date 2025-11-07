@@ -18,7 +18,7 @@ export function UserMenu() {
   const {
     address,
     disconnect,
-    disconnectLoading,
+    disconnecting,
   } = useWeb3AuthContext();
 
   const jazzRef = useRef<HTMLDivElement>(null);

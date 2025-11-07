@@ -1,6 +1,6 @@
-# Shaz
+# BeatChain
 
-Decentralized music discovery and tipping platform on Polkadot. Identify songs through audio recognition and tip artists directly with crypto.
+Decentralized music discovery and tipping platform on blockchain. Identify songs through audio recognition and tip artists directly with crypto.
 
 ## Features
 
@@ -29,7 +29,7 @@ Decentralized music discovery and tipping platform on Polkadot. Identify songs t
 ```bash
 # Install dependencies
 git clone <repository-url>
-cd shaz
+cd beatchain
 bun install
 
 # Configure contracts
@@ -59,13 +59,12 @@ Visit `http://localhost:5173`
 ### Project Structure
 
 ```
-shaz/
+beatchain/
 ├── contracts/           # Solidity contracts
 │   ├── contracts/      # Donate.sol
 │   └── @README.md      # Contract docs
-├── frontend/           # React app
-│   ├── src/
-│   └── @README.md      # Frontend docs
+├── src/                # React app
+│   └── components/
 └── package.json
 ```
 

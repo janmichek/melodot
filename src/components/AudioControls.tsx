@@ -8,7 +8,6 @@ interface AudioControlsProps {
   onStop: () => void;
 }
 
-
 export default function AudioControls({isAnalyzing, onStart, onStop,}: AudioControlsProps) {
   const {
     permission,
@@ -16,7 +15,7 @@ export default function AudioControls({isAnalyzing, onStart, onStop,}: AudioCont
   } = useAudioRecorder();
 
   const isCurrentlyRecording = permission && !isAnalyzing;
-
+// todo simplify condition
   return (
     <div className="audio-player-container audio-player-recording-area">
       {!isCurrentlyRecording && !isAnalyzing ? (

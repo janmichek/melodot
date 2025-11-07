@@ -1,6 +1,6 @@
-# Shazam API - Vercel Serverless Functions
+# BeatChain API - Vercel Serverless Functions
 
-This directory contains serverless functions for the Shazam music discovery application, deployed on Vercel.
+This directory contains serverless functions for the BeatChain music discovery application, deployed on Vercel.
 
 ## Overview
 

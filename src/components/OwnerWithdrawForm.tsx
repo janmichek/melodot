@@ -1,4 +1,3 @@
-import {useState} from "react";
 import {useWaitForTransactionReceipt, useWriteContract} from "wagmi";
 import {donateConfig} from "../generated";
 import {formatAddressShort} from "../wagmi-config";
@@ -19,8 +18,6 @@ export function OwnerWithdrawForm({
   ownerAddress,
   platformFeeBalance,
 }: OwnerWithdrawFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const {
     data: hash,
     writeContract,
@@ -34,10 +31,9 @@ export function OwnerWithdrawForm({
   } = useWaitForTransactionReceipt({ hash });
 
   const withdrawPlatformFees = async () => {
-    if (isSubmitting || isWithdrawing || isConfirming) return;
+    if (isWithdrawing || isConfirming) return;
 
     try {
-      setIsSubmitting(true);
       writeContract({
         address: contractAddress,
         abi: donateConfig.abi as Abi,
@@ -46,8 +42,6 @@ export function OwnerWithdrawForm({
       });
     } catch (err) {
       console.error("Error withdrawing platform fees:", err);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -70,10 +64,9 @@ export function OwnerWithdrawForm({
           <span className="owner-value">{formatAddressShort(ownerAddress, 16)}</span>
         </div>
       </div>
-{/*todo is needed isWithdrawing || isConfirming*/}
       <Button
         onClick={withdrawPlatformFees}
-        disabled={isSubmitting || isWithdrawing || isConfirming || platformFeeBalance === 0n}
+        disabled={isWithdrawing || isConfirming || platformFeeBalance === 0n}
         className="owner-withdraw-btn"
       >
         {isWithdrawing || isConfirming ? "Processing..." : "Withdraw Platform Fees"}

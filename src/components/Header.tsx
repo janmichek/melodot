@@ -7,7 +7,7 @@ export function Header() {
     isConnected,
     address,
     connect,
-    connectLoading,
+    connecting,
     providerReady,
   } = useWeb3AuthContext();
   return (
@@ -18,13 +18,13 @@ export function Header() {
         ) : (
           <Button
             onClick={() => connect()}
-            disabled={connectLoading || !providerReady}
+            disabled={connecting || !providerReady}
             variant="default"
             size="default">
-            {connectLoading && (
+            {connecting && (
               <span className="mr-2 h-4 w-4 animate-spin">◌</span>
             )}
-            {connectLoading ? "Loading" : "Connect"}
+            {connecting ? "Loading" : "Connect"}
           </Button>
         )}
       </div>
