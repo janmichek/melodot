@@ -1,8 +1,8 @@
-import { useReadContract, useAccount } from "wagmi";
-import { useWeb3AuthContext } from "../App";
-import { OwnerWithdrawForm } from "../components/OwnerWithdrawForm";
-import { donateConfig } from "../generated";
-import type { Abi } from "viem";
+import {useAccount, useReadContract} from "wagmi";
+import {useWeb3AuthContext} from "../App";
+import {OwnerWithdrawForm} from "../components/OwnerWithdrawForm";
+import {donateConfig} from "../generated";
+import type {Abi} from "viem";
 
 export function Owner() {
   const { contractAddress, isConnected } = useWeb3AuthContext();
@@ -22,15 +22,15 @@ export function Owner() {
     functionName: "getPlatformFeeBalance",
   });
 
-  const isOwner = connectedAddress && ownerAddress && connectedAddress === ownerAddress;
+  const isOwner =  ownerAddress && connectedAddress === ownerAddress;
 
   return (
     <>
       {isOwner ? (
         <OwnerWithdrawForm
           contractAddress={contractAddress}
-          ownerAddress={connectedAddress as `0x${string}`}
-          platformFeeBalance={platformFeeBalance as bigint | undefined}
+          ownerAddress={ownerAddress as `0x${string}`}
+          platformFeeBalance={platformFeeBalance as bigint}
         />
       ) : null}
     </>

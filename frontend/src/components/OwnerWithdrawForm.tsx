@@ -1,17 +1,17 @@
-import { useState } from "react";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { donateConfig } from "../generated";
-import { formatAddressShort } from "../wagmi-config";
-import { BalanceDisplay } from "./ui/BalanceDisplay";
-import { TxNotification } from "./ui/TxNotification";
-import type { Abi } from "viem";
+import {useState} from "react";
+import {useWaitForTransactionReceipt, useWriteContract} from "wagmi";
+import {donateConfig} from "../generated";
+import {formatAddressShort} from "../wagmi-config";
+import {BalanceDisplay} from "./ui/BalanceDisplay";
+import {TxNotification} from "./ui/TxNotification";
+import type {Abi} from "viem";
 import {Button} from "@/components/ui/button";
 import {Card} from "@/components/ui/card";
 
 interface OwnerWithdrawFormProps {
   contractAddress: `0x${string}`;
   ownerAddress: `0x${string}`;
-  platformFeeBalance: bigint | undefined;
+  platformFeeBalance: bigint;
 }
 
 export function OwnerWithdrawForm({

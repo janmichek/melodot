@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
-import { useAudioRecorder } from "../hooks/audio";
+import {useEffect, useRef, useState} from "react";
+import {useAudioRecorder} from "../hooks/audio";
 import AudioControls from "./AudioControls";
-import { DiscoveryResult } from "../types";
-import { USE_MOCK_DATA, MOCK_DISCOVERY_DATA } from "./mockDiscoveryData";
+import {DiscoveryResult} from "../types";
+import {MOCK_DISCOVERY_DATA, USE_MOCK_DATA} from "./mockDiscoveryData";
 import {Button} from "@/components/ui/button";
 
 const ATTEMPT_DURATIONS = [2, 5, 10, 15]; // seconds for each attempt
@@ -22,7 +22,6 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
     stopRecording,
     resetRecording,
   } = useAudioRecorder();
-
 
   const [duration, setDuration] = useState(0);
   const [attemptIndex, setAttemptIndex] = useState(0);
@@ -165,7 +164,6 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
 
   return (
     <div className="shazam-container">
-      {/* Mock Mode Indicator */}
       {USE_MOCK_DATA && (
         <div style={{
           padding: '10px',
