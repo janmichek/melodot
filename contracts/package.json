@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npx hardhat test",
     "deploy-contract": "npx hardhat ignition deploy ignition/modules/Donate.js --network passetHub",
-    "clean": "npx hardhat clean && rm -rf artifacts-pvm && rm -rf cache && rm -rf cache-pvm && rm -rf ignition/deployments && npx hardhat ignition wipe"
+    "clean": "npx hardhat clean && rm -rf artifacts  && rm -rf artifacts-pvm && rm -rf cache && rm -rf cache-pvm && rm -rf typechain-types && rm -rf ignition/deployments && npx hardhat ignition wipe"
   },
   "keywords": [],
   "author": "",

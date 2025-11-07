@@ -126,7 +126,7 @@ contract Donate is Ownable, PlatformFee {
         return artistIds.length;
     }
 
-    function getArtistInfo(string memory artistId) public view returns (uint256 balance, bool isClaimed) {
+    function getArtistInfo(string memory artistId) public view returns (uint256 artistBalance, bool isClaimed) {
         ArtistData memory artist = artists[artistId];
         return (artist.balance, artist.isClaimed);
     }
