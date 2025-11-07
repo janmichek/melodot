@@ -1,5 +1,5 @@
-import { expect } from "chai";
-import { parseEther } from "viem";
+import {expect} from "chai";
+import {parseEther} from "viem";
 import hre from "hardhat";
 
 describe("Donate Contract", () => {
@@ -70,7 +70,7 @@ describe("Donate Contract", () => {
 
       await donate.write.donateToArtist([artistId], { value: donationAmount });
 
-      const artistBalance = await donate.read.getArtistBalance([artistId]);
+      const [artistBalance] = await donate.read.getArtistInfo([artistId]);
       expect(artistBalance).to.equal(expectedArtistBalance);
     });
 
@@ -120,7 +120,7 @@ describe("Donate Contract", () => {
       expect(count).to.equal(2n);
 
       // Artist1 should have accumulated balance from both donations (minus fees)
-      const artist1Balance = await donate.read.getArtistBalance(["artist1"]);
+      const [artist1Balance] = await donate.read.getArtistInfo(["artist1"]);
       expect(artist1Balance).to.equal(parseEther("0.99")); // 2 donations of 0.5 each = 1 ETH, minus 1% fee = 0.99 ETH
     });
 
@@ -147,7 +147,7 @@ describe("Donate Contract", () => {
 
       await donate.write.claimArtist([artistId]);
 
-      const isClaimed = await donate.read.getArtistStatus([artistId]);
+      const [, isClaimed] = await donate.read.getArtistInfo([artistId]);
       expect(isClaimed).to.equal(true);
     });
 
@@ -178,14 +178,14 @@ describe("Donate Contract", () => {
       const artistId = "artist1";
       await donate.write.claimArtist([artistId]);
 
-      const artistBalanceBefore = await donate.read.getArtistBalance([artistId]);
+      const [artistBalanceBefore] = await donate.read.getArtistInfo([artistId]);
       const recipientBalanceBefore = await publicClient.getBalance({ address: addr1.account.address });
 
-      const hash = await donate.write.withdrawDonate([artistId, addr1.account.address]);
+      const hash = await donate.write.withdrawDonates([artistId, addr1.account.address]);
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
       const gasUsed = receipt.gasUsed * receipt.effectiveGasPrice;
 
-      const artistBalanceAfter = await donate.read.getArtistBalance([artistId]);
+      const [artistBalanceAfter] = await donate.read.getArtistInfo([artistId]);
       const recipientBalanceAfter = await publicClient.getBalance({ address: addr1.account.address });
 
       expect(artistBalanceAfter).to.equal(0n);
@@ -194,7 +194,7 @@ describe("Donate Contract", () => {
 
     it("should revert if artist not claimed", async () => {
       await expect(
-        donate.write.withdrawDonate(["artist1", addr1.account.address])
+        donate.write.withdrawDonates(["artist1", addr1.account.address])
       ).to.be.rejectedWith(/NotArtistClaimed/);
     });
 
@@ -203,13 +203,13 @@ describe("Donate Contract", () => {
       await donate.write.claimArtist([artistId]);
 
       await expect(
-        donate.write.withdrawDonate([artistId, "0x0000000000000000000000000000000000000000"])
+        donate.write.withdrawDonates([artistId, "0x0000000000000000000000000000000000000000"])
       ).to.be.rejectedWith(/InvalidRecipientAddress/);
     });
 
     it("should revert on empty artist ID", async () => {
       await expect(
-        donate.write.withdrawDonate(["", addr1.account.address])
+        donate.write.withdrawDonates(["", addr1.account.address])
       ).to.be.rejectedWith(/EmptyArtistId/);
     });
   });
@@ -268,7 +268,7 @@ describe("Donate Contract", () => {
 
       await donate.write.donateToArtist([artistId], { value: donationAmount });
 
-      const balance = await donate.read.getArtistBalance([artistId]);
+      const [balance] = await donate.read.getArtistInfo([artistId]);
       // Should be donation minus 1% fee
       expect(balance).to.equal(parseEther("0.99"));
     });
@@ -277,11 +277,11 @@ describe("Donate Contract", () => {
       const artistId = "artist1";
 
       await donate.write.donateToArtist([artistId], { value: parseEther("1") });
-      let status = await donate.read.getArtistStatus([artistId]);
+      let [, status] = await donate.read.getArtistInfo([artistId]);
       expect(status).to.equal(false);
 
       await donate.write.claimArtist([artistId]);
-      status = await donate.read.getArtistStatus([artistId]);
+      [, status] = await donate.read.getArtistInfo([artistId]);
       expect(status).to.equal(true);
     });
 
