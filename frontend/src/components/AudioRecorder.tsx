@@ -2,7 +2,6 @@ import {useEffect, useRef, useState} from "react";
 import {useAudioRecorder} from "../hooks/audio";
 import AudioControls from "./AudioControls";
 import {DiscoveryResult} from "../types";
-import {MOCK_DISCOVERY_DATA, USE_MOCK_DATA} from "./mockDiscoveryData";
 import {Button} from "@/components/ui/button";
 
 const ATTEMPT_DURATIONS = [2, 5, 10, 15]; // seconds for each attempt
@@ -13,11 +12,9 @@ interface AudioRecorderProps {
 
 export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps) {
   const {
-    permission,
     audioBlob,
     errorMessage,
     isRecording,
-    requestPermission,
     startRecording,
     stopRecording,
     resetRecording,
@@ -57,19 +54,6 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
     if (isProcessingAttempt.current) return;
     isProcessingAttempt.current = true;
 
-    // ===== MOCK MODE: Return mock data immediately =====
-    if (USE_MOCK_DATA) {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      onAnalysisComplete(MOCK_DISCOVERY_DATA);
-      reset();
-      isProcessingAttempt.current = false;
-      return;
-    }
-    // ===== END MOCK MODE =====
-
-    // ===== REAL AUDIO ANALYSIS (currently disabled when USE_MOCK_DATA = true) =====
-    // Uncomment this section and set USE_MOCK_DATA = false to restore real audio analysis
     try {
       const formData = new FormData();
       if (!audioBlob) {
@@ -94,7 +78,6 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
     } catch (error) {
       startNextAttempt();
     }
-    // ===== END REAL AUDIO ANALYSIS =====
   }
 
   function startNextAttempt() {
@@ -157,41 +140,8 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
     };
   }
 
-  // Mock mode: Skip recording and use mock data immediately
-  function handleMockMode() {
-    onAnalysisComplete(MOCK_DISCOVERY_DATA);
-  }
-
   return (
     <div className="shazam-container">
-      {USE_MOCK_DATA && (
-        <div style={{
-          padding: '10px',
-          backgroundColor: '#fff3cd',
-          border: '1px solid #ffc107',
-          borderRadius: '4px',
-          textAlign: 'center'
-        }}>
-
-          <Button
-            onClick={handleMockMode}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#ffc107',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
-          >
-            Load Mock Track Data
-          </Button>
-          <p>
-            To disable mock mode: Set USE_MOCK_DATA = false in mockDiscoveryData.ts
-          </p>
-        </div>
-      )}
-
       {allAttemptsFailed && (
         <div className="no-match-message">
           <p>No match found after {ATTEMPT_DURATIONS.length} attempts</p>
@@ -199,14 +149,11 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
         </div>
       )}
 
-      {!allAttemptsFailed && !USE_MOCK_DATA && (
+      {!allAttemptsFailed && (
         <AudioControls
-          hasPermission={permission}
-          isRecording={isRecording || isAnalyzing}
           isAnalyzing={isAnalyzing}
           onStart={record}
           onStop={stop}
-          onRequestPermission={requestPermission}
         />
       )}
 

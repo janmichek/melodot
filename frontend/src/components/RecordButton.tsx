@@ -3,7 +3,6 @@ import {Button} from "@/components/ui/button";
 
 interface RecordButtonProps {
   hasPermission: boolean;
-  isRecording: boolean;
   onStart: () => void;
   onRequestPermission: () => void;
 }

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "@/lib/utils"
+import {cn} from "@/lib/utils"
 import {Button} from "@/components/ui/button";
 
 const SIDEBAR_WIDTH = "16rem"
@@ -342,8 +342,16 @@ const SidebarMenuButton = React.forwardRef<
 >(({ asChild = false, isActive = false, className, ...props }, ref) => {
   const Comp = asChild ? React.Fragment : "button"
 
+  if (asChild) {
+    return (
+      <Comp
+        {...props}
+      />
+    )
+  }
+
   return (
-    <Comp
+    <button
       ref={ref}
       data-sidebar="menu-button"
       data-active={isActive}

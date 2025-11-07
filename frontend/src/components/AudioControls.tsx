@@ -1,33 +1,29 @@
 import StopButton from "./StopButton";
 import RecordButton from "./RecordButton";
+import {useAudioRecorder} from "@/hooks/audio";
 
 interface AudioControlsProps {
-  hasPermission: boolean;
-  isRecording: boolean;
   isAnalyzing: boolean;
   onStart: () => void;
   onStop: () => void;
-  onRequestPermission: () => void;
 }
 
-export default function AudioControls({
-  hasPermission,
-  isRecording,
-  isAnalyzing,
-  onStart,
-  onStop,
-  onRequestPermission,
-}: AudioControlsProps) {
-  const isCurrentlyRecording = hasPermission && isRecording;
+
+export default function AudioControls({isAnalyzing, onStart, onStop,}: AudioControlsProps) {
+  const {
+    permission,
+    enablePermission,
+  } = useAudioRecorder();
+
+  const isCurrentlyRecording = permission && !isAnalyzing;
 
   return (
     <div className="audio-player-container audio-player-recording-area">
       {!isCurrentlyRecording && !isAnalyzing ? (
         <RecordButton
-          hasPermission={hasPermission}
-          isRecording={isRecording}
+          hasPermission={permission}
           onStart={onStart}
-          onRequestPermission={onRequestPermission}
+          onRequestPermission={enablePermission}
         />
       ) : null}
       {isCurrentlyRecording && <StopButton onClick={onStop} />}

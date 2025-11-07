@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import {useCallback, useRef, useState} from "react";
 
 interface AudioRecorderState {
   mediaRecorder: MediaRecorder | null;
@@ -17,8 +17,9 @@ export const useAudioRecorder = () => {
     isRecording: false,
   });
   const audioChunksRef = useRef<Blob[]>([]);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
-  const requestPermission = useCallback(async () => {
+  const enablePermission = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -51,6 +52,7 @@ export const useAudioRecorder = () => {
         }));
       };
 
+      mediaRecorderRef.current = mediaRecorder;
       setState((prev) => ({
         ...prev,
         mediaRecorder,
@@ -69,24 +71,27 @@ export const useAudioRecorder = () => {
   }, []);
 
   const startRecording = useCallback(() => {
-    if (state.mediaRecorder && !state.isRecording) {
+    const recorder = mediaRecorderRef.current || state.mediaRecorder;
+    if (recorder && !state.isRecording) {
       audioChunksRef.current = []; // Clear audio chunks on start
-      state.mediaRecorder.start();
+      recorder.start();
       setState((prev) => ({ ...prev, isRecording: true}));
     }
   }, [state.mediaRecorder, state.isRecording]);
 
   const stopRecording = useCallback(() => {
-    if (state.mediaRecorder && state.isRecording) {
-      state.mediaRecorder.stop();
+    const recorder = mediaRecorderRef.current || state.mediaRecorder;
+    if (recorder && state.isRecording) {
+      recorder.stop();
       setState((prev) => ({ ...prev, isRecording: false}));
     }
   }, [state.mediaRecorder, state.isRecording]);
 
   const resetRecording = useCallback(() => {
-    if (state.mediaRecorder) {
+    const recorder = mediaRecorderRef.current || state.mediaRecorder;
+    if (recorder) {
       audioChunksRef.current = []; // Clear audio chunks
-      state.mediaRecorder.stop();
+      recorder.stop();
       setState((prev) => ({
         ...prev,
         audioBlob: null,
@@ -97,7 +102,7 @@ export const useAudioRecorder = () => {
 
   return {
     ...state,
-    requestPermission,
+    enablePermission,
     startRecording,
     stopRecording,
     resetRecording,
