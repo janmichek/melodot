@@ -3,6 +3,7 @@ import {useBalance, useChainId} from "wagmi";
 import {formatAddress, passetHub} from "../wagmi-config";
 import {useWeb3AuthContext} from "../App";
 import {BalanceDisplay} from "./ui/BalanceDisplay";
+import {Spinner} from "./ui/spinner";
 import Jazzicon from "@metamask/jazzicon";
 import {
   DropdownMenu,
@@ -58,31 +59,32 @@ export function UserMenu() {
                 <span
                   className="truncate font-medium">{formatAddress(address as `0x${string}`, 8, 5)}</span>
                 <span className="text-muted-foreground truncate text-xs">
-                {/*todo imporove */}
-                  {balanceLoading ? '...' : balance?.value !== undefined ? (
-                    <>
-                      <BalanceDisplay
-                        balance={balance?.value}
-                        isLoading={balanceLoading}
-                        showSymbol={true}
-                        size="small"
-                      />
-
-                    </>
-                  ) : '---'}
+                  {balanceLoading ? (
+                    <Spinner size="sm" className="inline" />
+                  ) : balance?.value !== undefined ? (
+                    <BalanceDisplay
+                      balance={balance?.value}
+                      isLoading={balanceLoading}
+                      showSymbol={true}
+                      size="small"
+                    />
+                  ) : (
+                    '---'
+                  )}
                 </span>
               </div>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <DropdownMenuContent
-            side="right"
-          >
+          <DropdownMenuContent side="right">
             <div className="px-2 py-1.5 text-sm">
               <div className="text-xs text-muted-foreground">Network</div>
               <div className="font-medium">{getChainName()}</div>
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => disconnect()} disabled={disconnectLoading}>
+              {disconnectLoading ? (
+                <Spinner size="sm" className="inline mr-2" />
+              ) : null}
               Disconnect
             </DropdownMenuItem>
           </DropdownMenuContent>

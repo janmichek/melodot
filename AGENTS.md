@@ -370,13 +370,6 @@ When deployment fails:
 
 ## Project Ideas for Hackathons
 
-**Proven Simple Ideas:**
-
-- **Custom Token:** ERC-20 implementation
-- **NFT Collection:** Minimal ERC-721
-- **Simple DeFi:** Basic AMM or lending
-- **Cross-chain:** XCM message passing
-
 **Success Strategy:**
 
 1. Start with kitdot template
