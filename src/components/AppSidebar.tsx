@@ -20,7 +20,7 @@ import type {Abi} from "viem";
 import {donateConfig} from "../generated";
 import {Footer} from "@/components/Footer";
 import {Spinner} from "@/components/ui/spinner";
-import {BeatChainLogo} from "./BeatChainLogo";
+import LogoSvg from "@/assets/icons/beatchain-logo.svg";
 
 export function AppSidebar() {
   const {
@@ -68,7 +68,7 @@ export function AppSidebar() {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="#" className="flex items-center gap-2">
-                <BeatChainLogo className="w-6 h-6" />
+                <img src={LogoSvg} alt="BeatChain Logo" className="w-6 h-6" />
                 <span className="text-base font-semibold">BeatChain</span>
               </a>
             </SidebarMenuButton>
