@@ -32,12 +32,6 @@ export function AppSidebar() {
 
   const location = useLocation();
 
-  const {data: count} = useReadContract({
-    address: contractAddress,
-    abi: donateConfig.abi as Abi,
-    functionName: "getArtistsCount",
-  });
-
   const {data: balance} = useReadContract({
     address: contractAddress,
     abi: donateConfig.abi as Abi,
@@ -99,6 +93,19 @@ export function AppSidebar() {
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>Documents</SidebarGroupLabel>
           <SidebarMenu>
+
+            {!balance?.value || balance?.value === 0n && (
+              <SidebarMenuItem>
+              <a
+                href="https://faucet.polkadot.io/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="menu-faucet-link menu-faucet-btn"
+              >
+                💧 Get Test Tokens
+              </a>
+              </SidebarMenuItem>
+            )}
 
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.title}>

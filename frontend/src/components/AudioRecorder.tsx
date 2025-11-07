@@ -142,6 +142,14 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
 
   return (
     <div className="shazam-container">
+      {!allAttemptsFailed && (
+      <AudioControls
+        isAnalyzing={isAnalyzing}
+        onStart={record}
+        onStop={stop}
+      />
+    )}
+
       {allAttemptsFailed && (
         <div className="no-match-message">
           <p>No match found after {ATTEMPT_DURATIONS.length} attempts</p>
@@ -149,13 +157,6 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
         </div>
       )}
 
-      {!allAttemptsFailed && (
-        <AudioControls
-          isAnalyzing={isAnalyzing}
-          onStart={record}
-          onStop={stop}
-        />
-      )}
 
       {errorMessage &&
         <p className="shazam-error">{errorMessage}</p>

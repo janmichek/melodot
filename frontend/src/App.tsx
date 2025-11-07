@@ -15,11 +15,11 @@ export function useWeb3AuthContext() {
   const {
     connect,
     isConnected,
-    loading: connectLoading,
+    loading: connecting,
   } = useWeb3AuthConnect();
   const {
     disconnect,
-    loading: disconnectLoading,
+    loading: disconnecting,
   } = useWeb3AuthDisconnect();
 
   const { web3Auth } = useWeb3Auth();
@@ -31,8 +31,7 @@ export function useWeb3AuthContext() {
       if (web3Auth) {
         try {
           const isInitialized = web3Auth.status === "ready";
-          const isNotConnecting = !connectLoading;
-          const isReadyToLogin = isInitialized && isNotConnecting;
+          const isReadyToLogin = isInitialized && !connecting;
 
           setProviderReady(isReadyToLogin);
 
@@ -69,7 +68,7 @@ export function useWeb3AuthContext() {
       clearInterval(interval);
       clearTimeout(timeout);
     };
-  }, [web3Auth, connectLoading]);
+  }, [web3Auth, connecting]);
 
   const contractAddress = donateConfig.address[passetHub.id];
 
@@ -78,8 +77,8 @@ export function useWeb3AuthContext() {
     address,
     connect,
     disconnect,
-    connectLoading,
-    disconnectLoading,
+    connecting,
+    disconnecting,
     providerReady,
     contractAddress,
   };
