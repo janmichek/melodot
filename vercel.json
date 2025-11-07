@@ -1,8 +1,8 @@
 {
   "framework": null,
-  "buildCommand": "cd frontend && bun install && bun run build",
-  "outputDirectory": "frontend/dist",
-  "installCommand": "bun install && cd frontend && bun install",
+  "buildCommand": "bun install && bun run build",
+  "outputDirectory": "dist",
+  "installCommand": "bun install",
   "functions": {
     "api/**/*.ts": {
       "runtime": "@vercel/node@3.2.29"
