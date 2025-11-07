@@ -19,6 +19,7 @@ import {useReadContract} from "wagmi";
 import type {Abi} from "viem";
 import {donateConfig} from "../generated";
 import {Footer} from "@/components/Footer";
+import {Spinner} from "@/components/ui/spinner";
 
 export function AppSidebar() {
   const {
@@ -83,9 +84,10 @@ export function AppSidebar() {
               onClick={() => connect()}
               disabled={connectLoading || !providerReady}
               variant="default"
-              size="sm"
               className="w-full">
-              {connectLoading ? "•••" : "Connect"}
+              {connectLoading || !providerReady ?
+                <Spinner size="sm" className="inline"/>
+                : "Connect"}
             </Button>
           )}
         </div>
@@ -94,6 +96,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Documents</SidebarGroupLabel>
           <SidebarMenu>
 
+            {/*todo fix*/}
             {!balance?.value || balance?.value === 0n && (
               <SidebarMenuItem>
               <a

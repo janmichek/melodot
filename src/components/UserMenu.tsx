@@ -25,7 +25,7 @@ export function UserMenu() {
 
   const chainId = useChainId();
 
-  const { data: balance, isLoading: balanceLoading } = useBalance({
+  const {data: balance, isLoading: balanceLoading} = useBalance({
     address: address,
     chainId: passetHub.id,
   });
@@ -60,17 +60,15 @@ export function UserMenu() {
                   className="truncate font-medium">{formatAddress(address as `0x${string}`, 8, 5)}</span>
                 <span className="text-muted-foreground truncate text-xs">
                   {balanceLoading ? (
-                    <Spinner size="sm" className="inline" />
-                  ) : balance?.value !== undefined ? (
+                    <Spinner size="sm" className="inline"/>
+                  ) :
                     <BalanceDisplay
-                      balance={balance?.value}
-                      isLoading={balanceLoading}
-                      showSymbol={true}
-                      size="small"
-                    />
-                  ) : (
-                    '---'
-                  )}
+                    balance={balance?.value}
+                    isLoading={balanceLoading}
+                    showSymbol={true}
+                    size="small"
+                  />
+                  }
                 </span>
               </div>
             </SidebarMenuButton>
@@ -80,11 +78,8 @@ export function UserMenu() {
               <div className="text-xs text-muted-foreground">Network</div>
               <div className="font-medium">{getChainName()}</div>
             </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => disconnect()} disabled={disconnectLoading}>
-              {disconnectLoading ? (
-                <Spinner size="sm" className="inline mr-2" />
-              ) : null}
+            <DropdownMenuSeparator/>
+            <DropdownMenuItem onClick={() => disconnect()}>
               Disconnect
             </DropdownMenuItem>
           </DropdownMenuContent>
