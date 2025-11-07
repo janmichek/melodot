@@ -1,21 +1,15 @@
-import { useState, useRef, useEffect } from "react";
-import { formatUnits } from "viem";
-import { useReadContract, useChainId, useBalance } from "wagmi";
-import { Link } from "react-router-dom";
-import { CURRENCY_SYMBOL, formatAddress, passetHub } from "../wagmi-config";
-import { donateConfig } from "../generated";
-import { useWeb3AuthContext } from "../App";
-import { BalanceDisplay } from "./ui/BalanceDisplay";
-import type { Abi } from "viem";
+import {useEffect, useRef, useState} from "react";
+import type {Abi} from "viem";
+import {useBalance, useChainId, useReadContract} from "wagmi";
+import {Link} from "react-router-dom";
+import {formatAddress, passetHub} from "../wagmi-config";
+import {donateConfig} from "../generated";
+import {useWeb3AuthContext} from "../App";
+import {BalanceDisplay} from "./ui/BalanceDisplay";
 import {Separator} from "@/components/ui/separator";
 import {Button} from "@/components/ui/button";
 import {ModeToggle} from "@/components/ui/mode-toggle";
-
-// Generate deterministic number from address (similar to jsNumberForAddress)
-function addressToNumber(address: string): number {
-  const hash = address.slice(2).substring(0, 8);
-  return parseInt(hash, 16);
-}
+import Jazzicon from "@metamask/jazzicon";
 
 export function UserMenu() {
   const {
@@ -64,24 +58,10 @@ export function UserMenu() {
   useEffect(() => {
     if (jazzRef.current && address) {
       jazzRef.current.innerHTML = "";
-      const num = addressToNumber(address);
-      const hue1 = num % 360;
-      const hue2 = (num + 120) % 360;
-
-      const jazziconSvg = `
-        <svg height="32" width="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="g-${num}" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:hsl(${hue1},100%,50%);stop-opacity:1" />
-              <stop offset="100%" style="stop-color:hsl(${hue2},100%,50%);stop-opacity:1" />
-            </linearGradient>
-          </defs>
-          <rect width="32" height="32" fill="url(#g-${num})" rx="50%" />
-          <circle cx="16" cy="16" r="10" fill="white" opacity="0.2" />
-          <circle cx="10" cy="10" r="2" fill="white" opacity="0.4" />
-        </svg>
-      `;
-      jazzRef.current.innerHTML = jazziconSvg;
+      // Convert address to a number for Jazzicon
+      const num = parseInt(address.slice(2, 10), 16);
+      const icon = Jazzicon(32, num);
+      jazzRef.current.appendChild(icon);
     }
   }, [address]);
 

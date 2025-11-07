@@ -4,9 +4,10 @@
   "description": "Polkadot project with contracts and frontend",
   "private": true,
   "dependencies": {
-    "formidable": "^3.5.4",
+    "@metamask/jazzicon": "^2.0.0",
+    "@types/node": "^24.10.0",
     "@vercel/node": "^5.5.4",
-    "@types/node": "^24.10.0"
+    "formidable": "^3.5.4"
   },
   "scripts": {
     "install": "cd contracts && bun install && cd ../frontend && bun install",
@@ -15,7 +16,8 @@
     "test:e2e": "cd frontend && bun run test:e2e",
     "test:unit": "cd frontend && bun run test:unit",
     "test:api": "cd api && bun run test:unit",
-    "start": "cd frontend && vercel dev",
+    "dev": "cd frontend && bun run dev",
+    "start": "cd frontend && bun run dev",
     "vercel-build": "cd frontend && bun run build",
     "build": "cd frontend && bun run build"
   },
