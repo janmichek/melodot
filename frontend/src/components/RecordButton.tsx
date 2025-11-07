@@ -1,5 +1,5 @@
-import { Mic } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {Mic} from "lucide-react";
+import {Button} from "@/components/ui/button";
 
 interface RecordButtonProps {
   hasPermission: boolean;
@@ -10,7 +10,6 @@ interface RecordButtonProps {
 
 export default function RecordButton({
   hasPermission,
-  isRecording,
   onStart,
   onRequestPermission,
 }: RecordButtonProps) {

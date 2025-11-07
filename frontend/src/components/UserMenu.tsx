@@ -1,15 +1,19 @@
 import {useEffect, useRef, useState} from "react";
 import type {Abi} from "viem";
 import {useBalance, useChainId, useReadContract} from "wagmi";
-import {Link} from "react-router-dom";
 import {formatAddress, passetHub} from "../wagmi-config";
 import {donateConfig} from "../generated";
 import {useWeb3AuthContext} from "../App";
 import {BalanceDisplay} from "./ui/BalanceDisplay";
-import {Separator} from "@/components/ui/separator";
-import {Button} from "@/components/ui/button";
-import {ModeToggle} from "@/components/ui/mode-toggle";
 import Jazzicon from "@metamask/jazzicon";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {SidebarMenu, SidebarMenuButton, SidebarMenuItem,} from "@/components/ui/sidebar";
 
 export function UserMenu() {
   const {
@@ -66,75 +70,64 @@ export function UserMenu() {
   }, [address]);
 
   return (
-    <div className="user-menu-container" ref={menuRef}>
-      <div className="flex flex-row">
-      <div
-        ref={jazzRef}
-        className="user-identicon"
-      />
-        <div
-          className={`menu-address ${copied ? 'menu-address-copied' : ''}`}
-          onClick={handleCopyAddress}
-          title={copied ? "Copied!" : "Click to copy"}
-        >
-          {copied ? "✓ Copied" : formatAddress(address || "0x0000000000000000000000000000000000000000" as `0x${string}`, 4, 3)}
-        </div>
-        <Separator/>
-      </div>
-      <div className="user-menu-dropdown">
-
-        <div className="menu-item-section">
-          <div className="menu-label">Balance</div>
-          <div className="menu-value">
-            {balanceLoading ? '...' : balance?.value !== undefined
-              ? <BalanceDisplay
-                balance={balance?.value}
-                isLoading={balanceLoading}
-                showSymbol={true}
-                size="small"
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
+              <div
+                ref={jazzRef}
+                className="h-8 w-8 rounded-lg"
               />
-              : '---'}
-          </div>
-        </div>
-
-        <a
-          href="https://faucet.polkadot.io/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="menu-faucet-link menu-faucet-btn"
-        >
-          💧 Get Test Tokens
-        </a>
-
-        <div className="menu-divider" />
-
-        <div className="menu-item-section">
-          <div className="menu-label">Network</div>
-          <div className="menu-value">{getChainName()}</div>
-        </div>
-
-        {isOwner && (
-          <Link
-            to="/owner"
-            className="menu-owner-link"
-            title="Owner panel"
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span
+                  className="truncate font-medium">{formatAddress(address || "0x0000000000000000000000000000000000000000" as `0x${string}`, 4, 3)}</span>
+                <span className="text-muted-foreground truncate text-xs">
+                {/*todo imporove */}
+                  {balanceLoading ? '...' : balance?.value !== undefined ? (
+                    <>
+                      <BalanceDisplay
+                        balance={balance?.value}
+                        isLoading={balanceLoading}
+                        showSymbol={true}
+                        size="small"
+                      />
+                      {balance?.value === 0n && (
+                        <a
+                          href="https://faucet.polkadot.io/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="menu-faucet-link menu-faucet-btn"
+                        >
+                          💧 Get Test Tokens
+                        </a>
+                      )}
+                    </>
+                  ) : '---'}
+                </span>
+              </div>
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            side="right"
+            align="end"
+            sideOffset={4}
           >
-            ⚙️ Owner Panel
-          </Link>
-        )}
-
-        <Button
-          onClick={() => {
-            disconnect();
-          }}
-          disabled={disconnectLoading}
-          title="Disconnect wallet"
-        >
-          {disconnectLoading ? "•••" : "Disconnect Wallet"}
-        </Button>
-
-        <ModeToggle />
-      </div>
-    </div>
+            <div className="px-2 py-1.5 text-sm">
+              <div className="text-xs text-muted-foreground">Network</div>
+              <div className="font-medium">{getChainName()}</div>
+            </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => disconnect()} disabled={disconnectLoading}>
+              Disconnect
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
 }
