@@ -7,7 +7,7 @@ import type { Abi } from "viem";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { useWeb3AuthContext } from "./Layout";
+import { useWeb3AuthContext } from "../App";
 
 interface ClaimCardProps {
   contractAddress: `0x${string}` | undefined;

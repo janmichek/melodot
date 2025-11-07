@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useWeb3AuthContext } from "./Layout";
+import { useWeb3AuthContext } from "../App";
 import { UserMenu } from "./UserMenu";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "./ui/mode-toggle";
@@ -20,7 +20,6 @@ import { useReadContract } from "wagmi";
 import type { Abi } from "viem";
 import { donateConfig } from "../generated";
 import { passetHub, formatAddress } from "../wagmi-config";
-import { ArtistsList } from "./ArtistsList";
 import { BalanceDisplay } from "./ui/BalanceDisplay";
 import {Footer} from "@/components/Footer";
 
@@ -62,31 +61,31 @@ export function AppSidebar() {
   ];
 
   return (
-    <Sidebar side="right" collapsible="icon">
-      <SidebarHeader className="border-b border-sidebar-border p-4">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
+    <Sidebar side="right" collapsible="icon" className="border-l border-border">
+      <SidebarHeader className="border-b border-border">
+        <div className="flex items-center gap-2 px-2 py-4">
+          <div className="flex flex-1 flex-col gap-3">
             <h2 className="text-lg font-semibold group-data-[collapsible=icon]:hidden">
-              Menu
+              Shaz
             </h2>
-            <ModeToggle />
-          </div>
 
-          {/* Connect button at top of sidebar */}
-          <div className="group-data-[collapsible=icon]:hidden">
-            {isConnected && address ? (
-              <UserMenu />
-            ) : (
-              <Button
-                onClick={() => connect()}
-                disabled={connectLoading || !providerReady}
-                variant="default"
-                size="default"
-                className="w-full">
-                {connectLoading ? "•••" : "Connect"}
-              </Button>
-            )}
+            {/* Connect button at top of sidebar */}
+            <div className="group-data-[collapsible=icon]:hidden">
+              {isConnected && address ? (
+                <UserMenu />
+              ) : (
+                <Button
+                  onClick={() => connect()}
+                  disabled={connectLoading || !providerReady}
+                  variant="default"
+                  size="sm"
+                  className="w-full">
+                  {connectLoading ? "•••" : "Connect"}
+                </Button>
+              )}
+            </div>
           </div>
+          <ModeToggle />
         </div>
       </SidebarHeader>
 
@@ -102,7 +101,7 @@ export function AppSidebar() {
                   >
                     <Link to={item.url}>
                       <item.icon />
-                      <span>{item.title}</span>
+                      <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -112,8 +111,10 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-4">
-        <Footer contractAddress={contractAddress}></Footer>
+      <SidebarFooter className="border-t border-border">
+        <div className="group-data-[collapsible=icon]:hidden">
+          <Footer contractAddress={contractAddress}></Footer>
+        </div>
       </SidebarFooter>
     </Sidebar>
   );

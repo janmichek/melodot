@@ -7,17 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Abi } from "viem";
 import { parseEther } from "viem";
-import { useWeb3AuthContext } from "./Layout";
+import { useWeb3AuthContext } from "../App";
 
 interface DonationFormProps {
-  contractAddress: `0x${string}`;
   artistId: string;
   onSuccess?: () => void;
 }
 
-export function DonationForm({ contractAddress, artistId, onSuccess }: DonationFormProps) {
+export function DonationForm({ artistId, onSuccess }: DonationFormProps) {
   const [isDonating, setIsDonating] = useState(false);
-  const { isConnected, connect } = useWeb3AuthContext();
+  const { isConnected, connect, contractAddress } = useWeb3AuthContext();
 
   const {
     data: hash,

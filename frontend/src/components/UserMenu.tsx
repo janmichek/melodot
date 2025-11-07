@@ -4,7 +4,7 @@ import { useReadContract, useChainId, useBalance } from "wagmi";
 import { Link } from "react-router-dom";
 import { CURRENCY_SYMBOL, formatAddress, passetHub } from "../wagmi-config";
 import { donateConfig } from "../generated";
-import { useWeb3AuthContext } from "./Layout";
+import { useWeb3AuthContext } from "../App";
 import { BalanceDisplay } from "./ui/BalanceDisplay";
 import type { Abi } from "viem";
 import {Separator} from "@/components/ui/separator";
@@ -56,7 +56,6 @@ export function UserMenu() {
     address: contractAddress as `0x${string}` | undefined,
     abi: donateConfig.abi as Abi,
     functionName: "owner",
-    query: { enabled: !!contractAddress }
   });
 
   const isOwner = !!(address && owner && address.toLowerCase() === String(owner).toLowerCase());
@@ -127,10 +126,8 @@ export function UserMenu() {
           💧 Get Test Tokens
         </a>
 
-        {/* Divider */}
         <div className="menu-divider" />
 
-        {/* Middle Section: Navigation and Network */}
         <div className="menu-item-section">
           <div className="menu-label">Network</div>
           <div className="menu-value">{getChainName()}</div>
@@ -146,7 +143,6 @@ export function UserMenu() {
           </Link>
         )}
 
-        {/* Disconnect Button */}
         <Button
           onClick={() => {
             disconnect();

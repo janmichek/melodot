@@ -1,4 +1,4 @@
-import { useWeb3AuthContext } from "./Layout";
+import { useWeb3AuthContext } from "../App";
 import { UserMenu } from "./UserMenu";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "./ui/mode-toggle";

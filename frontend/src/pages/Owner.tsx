@@ -1,19 +1,18 @@
 import { useReadContract, useAccount } from "wagmi";
-import { Layout, useWeb3AuthContext } from "../components/Layout";
+import { useWeb3AuthContext } from "../App";
 import { OwnerWithdrawForm } from "../components/OwnerWithdrawForm";
 import { donateConfig } from "../generated";
 import type { Abi } from "viem";
 
 export function Owner() {
   const { contractAddress, isConnected } = useWeb3AuthContext();
-  const { address } = useAccount();
+  const { address : connectedAddress } = useAccount();
 
   // Read contract owner
-  const { data: owner } = useReadContract({
+  const { data: ownerAddress } = useReadContract({
     address: contractAddress as `0x${string}` ,
     abi: donateConfig.abi as Abi,
     functionName: "owner",
-    query: { enabled: !!contractAddress }
   });
 
   // Read total platform fee accumulated (1% of all donations)
@@ -21,20 +20,19 @@ export function Owner() {
     address: contractAddress as `0x${string}`,
     abi: donateConfig.abi as Abi,
     functionName: "getPlatformFeeBalance",
-    query: { enabled: !!contractAddress }
   });
 
-  const isOwner = address && owner && address.toLowerCase() === (owner as string).toLowerCase();
+  const isOwner = connectedAddress && ownerAddress && connectedAddress === ownerAddress;
 
   return (
-    <Layout>
-      {isConnected && isOwner && contractAddress && address ? (
+    <>
+      {isOwner ? (
         <OwnerWithdrawForm
           contractAddress={contractAddress}
-          ownerAddress={address as `0x${string}`}
+          ownerAddress={connectedAddress as `0x${string}`}
           platformFeeBalance={platformFeeBalance as bigint | undefined}
         />
       ) : null}
-    </Layout>
+    </>
   );
 }
