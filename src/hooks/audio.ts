@@ -71,34 +71,34 @@ export const useAudioRecorder = () => {
   }, []);
 
   const startRecording = useCallback(() => {
-    const recorder = mediaRecorderRef.current || state.mediaRecorder;
-    if (recorder && !state.isRecording) {
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state === 'inactive') {
       audioChunksRef.current = []; // Clear audio chunks on start
       recorder.start();
-      setState((prev) => ({ ...prev, isRecording: true}));
     }
-  }, [state.mediaRecorder, state.isRecording]);
+  }, []);
 
   const stopRecording = useCallback(() => {
-    const recorder = mediaRecorderRef.current || state.mediaRecorder;
-    if (recorder && state.isRecording) {
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state === 'recording') {
       recorder.stop();
-      setState((prev) => ({ ...prev, isRecording: false}));
     }
-  }, [state.mediaRecorder, state.isRecording]);
+  }, []);
 
   const resetRecording = useCallback(() => {
-    const recorder = mediaRecorderRef.current || state.mediaRecorder;
+    const recorder = mediaRecorderRef.current;
     if (recorder) {
       audioChunksRef.current = []; // Clear audio chunks
-      recorder.stop();
+      if (recorder.state === 'recording') {
+        recorder.stop();
+      }
       setState((prev) => ({
         ...prev,
         audioBlob: null,
         isRecording: false,
       }));
     }
-  }, [state.mediaRecorder]);
+  }, []);
 
   return {
     ...state,

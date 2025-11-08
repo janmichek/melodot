@@ -10,7 +10,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Default API URL
-API_URL="${1:-http://localhost:3000/api/analyze-audio}"
+API_URL="${1:-http://localhost:5173/api/analyze-audio}"
 
 echo -e "${YELLOW}Testing Audio Analysis API${NC}"
 echo "API URL: $API_URL"

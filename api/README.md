@@ -87,13 +87,13 @@ npm install -g vercel
 vercel dev
 ```
 
-The API will be available at `http://localhost:3000/api/analyze-audio`
+The API will be available at `http://localhost:5173/api/analyze-audio`
 
 ### 3. Test the API
 
 Using curl:
 ```bash
-curl -X POST http://localhost:3000/api/analyze-audio \
+curl -X POST http://localhost:5173/api/analyze-audio \
   -F "file=@path/to/audio.mp3"
 ```
 
@@ -102,7 +102,7 @@ Using Node.js:
 const form = new FormData();
 form.append('file', audioBlob, 'recording.webm');
 
-const response = await fetch('http://localhost:3000/api/analyze-audio', {
+const response = await fetch('http://localhost:5173/api/analyze-audio', {
   method: 'POST',
   body: form
 });

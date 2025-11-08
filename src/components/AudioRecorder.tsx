@@ -12,9 +12,11 @@ interface AudioRecorderProps {
 
 export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps) {
   const {
+    permission,
     audioBlob,
     errorMessage,
     isRecording,
+    enablePermission,
     startRecording,
     stopRecording,
     resetRecording,
@@ -144,9 +146,12 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
     <div className="shazam-container">
       {!allAttemptsFailed && (
       <AudioControls
+        hasPermission={permission}
+        isRecording={isRecording}
         isAnalyzing={isAnalyzing}
         onStart={record}
         onStop={stop}
+        onRequestPermission={enablePermission}
       />
     )}
 

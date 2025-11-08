@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type {VercelRequest, VercelResponse} from '@vercel/node';
 import formidable from 'formidable';
 import fs from 'fs';
 
@@ -106,7 +106,7 @@ export default async function handler(
     if (result?.track?.subtitle) {
       try {
         const artistInfoResponse = await fetch(
-          `${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:3000'}/api/artist-info?artist=${encodeURIComponent(result.track.subtitle)}`
+          `${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:5173'}/api/artist-info?artist=${encodeURIComponent(result.track.subtitle)}`
         );
 
         if (artistInfoResponse.ok) {
