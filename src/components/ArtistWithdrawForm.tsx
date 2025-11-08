@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
 import {useAccount, useWaitForTransactionReceipt, useWriteContract} from "wagmi";
 import {donateConfig} from "../generated";
-import {AddressInput} from "./ui/AddressInput";
-import {TxNotification} from "./ui/TxNotification";
+import {AddressInput} from "./ui/address-input";
+import {TxNotification} from "./ui/tx-notification";
 import type {Abi} from "viem";
 import {isAddress} from "viem";
 import {Button} from "@/components/ui/button";

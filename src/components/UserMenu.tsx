@@ -2,7 +2,7 @@ import {useEffect, useRef} from "react";
 import {useBalance, useChainId} from "wagmi";
 import {formatAddress, passetHub} from "../wagmi-config";
 import {useWeb3AuthContext} from "../App";
-import {BalanceDisplay} from "./ui/BalanceDisplay";
+import {BalanceDisplay} from "./ui/balance-display";
 import {Spinner} from "./ui/spinner";
 import Jazzicon from "@metamask/jazzicon";
 import {

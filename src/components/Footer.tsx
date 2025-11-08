@@ -3,7 +3,7 @@ import {usePublicClient, useReadContract} from "wagmi";
 import type {Abi} from "viem";
 import {donateConfig} from "../generated";
 import {formatAddress, passetHub} from "../wagmi-config";
-import {BalanceDisplay} from "./ui/BalanceDisplay";
+import {BalanceDisplay} from "./ui/balance-display";
 import {Button} from "@/components/ui/button";
 
 interface ContractInfoFooterProps {

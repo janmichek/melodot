@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {useReadContract, useWaitForTransactionReceipt, useWriteContract} from "wagmi";
 import {donateConfig} from "../generated";
 import {ArtistWithdrawForm} from "./ArtistWithdrawForm";
-import {BalanceDisplay} from "./ui/BalanceDisplay";
+import {BalanceDisplay} from "./ui/balance-display";
 import type {Abi} from "viem";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";

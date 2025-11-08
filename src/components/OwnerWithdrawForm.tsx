@@ -1,8 +1,8 @@
 import {useWaitForTransactionReceipt, useWriteContract} from "wagmi";
 import {donateConfig} from "../generated";
 import {formatAddressShort} from "../wagmi-config";
-import {BalanceDisplay} from "./ui/BalanceDisplay";
-import {TxNotification} from "./ui/TxNotification";
+import {BalanceDisplay} from "./ui/balance-display";
+import {TxNotification} from "./ui/tx-notification";
 import type {Abi} from "viem";
 import {Button} from "@/components/ui/button";
 import {Card} from "@/components/ui/card";

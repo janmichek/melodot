@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {useWaitForTransactionReceipt, useWriteContract} from "wagmi";
 import {donateConfig} from "../generated";
 import {CURRENCY_SYMBOL} from "../wagmi-config";
-import {TxNotification} from "./ui/TxNotification";
+import {TxNotification} from "./ui/tx-notification";
 import {Button} from "@/components/ui/button";
 import type {Abi} from "viem";
 import {parseEther} from "viem";
