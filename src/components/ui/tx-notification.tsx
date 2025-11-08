@@ -1,8 +1,8 @@
 import {useEffect, useState} from 'react';
+import {clsx} from 'clsx';
 import {Alert, AlertDescription, AlertTitle} from './alert';
 import {Button} from './button';
 import {CheckCircle2, Clock, ExternalLink, Loader2, X, XCircle} from 'lucide-react';
-import {cn} from '@/lib/utils';
 
 const BLOCK_EXPLORER_BASE = 'https://blockscout-passet-hub.parity-testnet.parity.io';
 
@@ -107,7 +107,7 @@ export function TxNotification({
   return (
     <Alert
       variant={getVariant()}
-      className={cn("relative mt-4", className)}
+      className={clsx("relative mt-4", className)}
     >
       {getIcon()}
       <div className="flex-1">

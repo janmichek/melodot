@@ -1,8 +1,8 @@
 import {useEffect, useState} from 'react';
 import {isAddress} from 'viem';
+import {clsx} from 'clsx';
 import {Input} from './input';
 import {Button} from './button';
-import {cn} from '@/lib/utils';
 
 export interface AddressInputProps {
   value: string;
@@ -65,7 +65,7 @@ export function AddressInput({
   };
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={clsx("space-y-2", className)}>
       {label && (
         <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{label}</label>
       )}
@@ -77,7 +77,7 @@ export function AddressInput({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
-          className={cn(
+          className={clsx(
             showValidation && value ? (isValid ? 'border-green-500' : 'border-red-500') : ''
           )}
           aria-invalid={showValidation && value ? !isValid : undefined}

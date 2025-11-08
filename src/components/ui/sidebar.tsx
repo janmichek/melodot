@@ -1,5 +1,5 @@
 import * as React from "react"
-import {cn} from "@/lib/utils"
+import {clsx} from "clsx"
 import {Button} from "@/components/ui/button";
 
 const SIDEBAR_WIDTH = "16rem"
@@ -67,7 +67,7 @@ const SidebarProvider = React.forwardRef<
       >
         <div
           ref={ref}
-          className={cn("flex min-h-screen", className)}
+          className={clsx("flex min-h-screen", className)}
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH,
@@ -98,7 +98,7 @@ const Sidebar = React.forwardRef<
     return (
       <div
         ref={ref}
-        className={cn("flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground", className)}
+        className={clsx("flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground", className)}
         {...props}
       >
         {children}
@@ -120,7 +120,7 @@ const Sidebar = React.forwardRef<
       <div
         ref={ref}
         data-mobile="true"
-        className={cn(
+        className={clsx(
           "fixed inset-y-0 z-50 flex w-[--sidebar-width-mobile] flex-col bg-sidebar text-sidebar-foreground transition-transform duration-200 lg:hidden",
           side === "left" ? "left-0" : "right-0",
           openMobile
@@ -139,7 +139,7 @@ const Sidebar = React.forwardRef<
       <div
         ref={ref}
         data-desktop="true"
-        className={cn(
+        className={clsx(
           "hidden lg:flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
           className
         )}
@@ -162,7 +162,7 @@ const SidebarTrigger = React.forwardRef<
     <Button
       ref={ref}
       data-sidebar="trigger"
-      className={cn(
+      className={clsx(
         "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-9 w-9",
         className
       )}
@@ -200,7 +200,7 @@ const SidebarInset = React.forwardRef<
   return (
     <main
       ref={ref}
-      className={cn(
+      className={clsx(
         "flex-1 flex flex-col min-w-0",
         className
       )}
@@ -218,7 +218,7 @@ const SidebarHeader = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={clsx("flex flex-col gap-2 p-2", className)}
       {...props}
     />
   )
@@ -233,7 +233,7 @@ const SidebarFooter = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="footer"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={clsx("flex flex-col gap-2 p-2", className)}
       {...props}
     />
   )
@@ -248,7 +248,7 @@ const SidebarContent = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="content"
-      className={cn("flex-1 overflow-auto", className)}
+      className={clsx("flex-1 overflow-auto", className)}
       {...props}
     />
   )
@@ -263,7 +263,7 @@ const SidebarGroup = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="group"
-      className={cn("flex flex-col gap-1 p-2", className)}
+      className={clsx("flex flex-col gap-1 p-2", className)}
       {...props}
     />
   )
@@ -278,7 +278,7 @@ const SidebarGroupLabel = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="group-label"
-      className={cn(
+      className={clsx(
         "flex items-center px-2 py-1.5 text-xs font-medium text-sidebar-foreground/70",
         className
       )}
@@ -296,7 +296,7 @@ const SidebarGroupContent = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="group-content"
-      className={cn("flex flex-col gap-1", className)}
+      className={clsx("flex flex-col gap-1", className)}
       {...props}
     />
   )
@@ -311,7 +311,7 @@ const SidebarMenu = React.forwardRef<
     <ul
       ref={ref}
       data-sidebar="menu"
-      className={cn("flex flex-col gap-1", className)}
+      className={clsx("flex flex-col gap-1", className)}
       {...props}
     />
   )
@@ -326,7 +326,7 @@ const SidebarMenuItem = React.forwardRef<
     <li
       ref={ref}
       data-sidebar="menu-item"
-      className={cn("group/menu-item relative", className)}
+      className={clsx("group/menu-item relative", className)}
       {...props}
     />
   )
@@ -355,7 +355,7 @@ const SidebarMenuButton = React.forwardRef<
       ref={ref}
       data-sidebar="menu-button"
       data-active={isActive}
-      className={cn(
+      className={clsx(
         "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium transition-colors",
         "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
