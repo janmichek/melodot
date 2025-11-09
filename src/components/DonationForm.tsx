@@ -22,7 +22,6 @@ export function DonationForm({ artistId, onSuccess }: DonationFormProps) {
     writeContract,
     isPending: isWriting,
     error: writeError,
-    reset: resetWrite,
   } = useWriteContract();
 
   const {

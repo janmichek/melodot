@@ -18,7 +18,7 @@ export default function AudioControls({
   onStop,
   onRequestPermission,
 }: AudioControlsProps) {
-  const isCurrentlyRecording = hasPermission && isRecording && !isAnalyzing;
+  const isProcessing = hasPermission && (isRecording || isAnalyzing);
   const isReadyToRecord = hasPermission && !isRecording && !isAnalyzing;
 
   return (
@@ -37,7 +37,7 @@ export default function AudioControls({
           onRequestPermission={onRequestPermission}
         />
       )}
-      {isCurrentlyRecording && <StopButton onClick={onStop} />}
+      {isProcessing && <StopButton onClick={onStop} />}
     </div>
   );
 }

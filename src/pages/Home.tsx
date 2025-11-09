@@ -11,18 +11,22 @@ const USE_MOCK_DATA = false;
 export function Home() {
   const [discoveryData, setDiscoveryData] = useState<DiscoveryResult | null>(USE_MOCK_DATA ? mockDiscoveryData : null);
 
-  const artistId = discoveryData?.track?.artists?.[0]?.adamid;
+  const artistId = discoveryData?.spotifyInfo?.artists?.[0]?.id;
 
   return (
     <>
       {!discoveryData ? (
         <AudioRecorder onAnalysisComplete={setDiscoveryData} />
       ) : (
+        <>
+          {discoveryData}
         <DiscoveryCard
           discovery={discoveryData}
           onSearchAgain={() => setDiscoveryData(null)}>
           {artistId && (<DonationForm artistId={artistId}/>)}
         </DiscoveryCard>
+        </>
+
       )}
     </>
   );
