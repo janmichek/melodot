@@ -93,14 +93,6 @@ abstract contract PlatformFee {
  * ============================================================================
  */
 contract Donate is Ownable, PlatformFee {
-    uint256 public balance;
-
-    struct ArtistData {
-        uint256 balance;
-        bool isClaimed;
-    }
-
-    // Custom errors (more gas efficient than require)
     error InvalidDonationAmount();
     error EmptyArtistId();
     error NoBalanceToClaim();
@@ -110,10 +102,15 @@ contract Donate is Ownable, PlatformFee {
     error WithdrawalFailed();
     error NotArtistClaimed();
 
-    // Store artist data by ID
+    uint256 public balance;
+
+    struct ArtistData {
+        uint256 balance;
+        bool isClaimed;
+    }
+
     mapping(string => ArtistData) public artists;
 
-    // Keep track of all artist IDs for iteration
     string[] public artistIds;
 
 
@@ -132,7 +129,7 @@ contract Donate is Ownable, PlatformFee {
     }
 
     function getPlatformFeeBalance() public view returns (uint256) {
-        // Calculate total fees collected so far (balance - all artist balances)
+        // Calculate total fees collected (balance - all artist balances)
         uint256 totalArtistBalances = 0;
         for (uint i = 0; i < artistIds.length; i++) {
             totalArtistBalances += artists[artistIds[i]].balance;
@@ -146,7 +143,6 @@ contract Donate is Ownable, PlatformFee {
             revert InvalidDonationAmount();
         }
 
-        // Get platform fee info
         (, uint16 feeBps) = getPlatformFeeInfo();
 
         uint256 platformFee = (donatedAmount * feeBps) / 10_000;
@@ -157,7 +153,6 @@ contract Donate is Ownable, PlatformFee {
             artistIds.push(artistId);
         }
 
-        // Add donation to artist's balance
         artists[artistId].balance += artistFee;
         balance += donatedAmount;
     }
@@ -172,7 +167,6 @@ contract Donate is Ownable, PlatformFee {
             revert ArtistAlreadyClaimed();
         }
 
-        // Mark artist as claimed
         artists[artistId].isClaimed = true;
     }
 
@@ -213,7 +207,6 @@ contract Donate is Ownable, PlatformFee {
             revert NoBalanceToWithdraw();
         }
 
-        // Reset balance (all fees withdrawn)
         balance -= amount;
 
         (bool success, ) = payable(recipient).call{ value: amount }("");
