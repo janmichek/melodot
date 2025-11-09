@@ -100,21 +100,46 @@ export default async function handler(
     }
 
     const result = await shazamResponse.json() as DiscoveryResult;
+    //
+    // // Try to fetch artist info if track found
+    // let artistInfo = null;
+    // if (result?.track?.subtitle) {
+    //   try {
+    //     const artistInfoResponse = await fetch(
+    //       `${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:5173'}/api/artist-info?artist=${encodeURIComponent(result.track.subtitle)}`
+    //     );
+    //
+    //     if (artistInfoResponse.ok) {
+    //       artistInfo = await artistInfoResponse.json();
+    //     }
+    //   } catch (error) {
+    //     console.error('Failed to fetch artist info:', error);
+    //     // Continue without artist info
+    //   }
+    // }
 
-    // Try to fetch artist info if track found
-    let artistInfo = null;
-    if (result?.track?.subtitle) {
+    // Try to fetch Spotify track info if Spotify URI found
+    let spotifyInfo = null;
+    console.log('result?.track?', result?.track)
+    const spotifyProvider = result?.track?.hub?.providers?.find((provider: any) => provider.type === 'SPOTIFY');
+    const spotifyUri = spotifyProvider?.actions?.[0]?.uri;
+    console.log('spotifyUri', spotifyUri)
+    if (spotifyUri) {
       try {
-        const artistInfoResponse = await fetch(
-          `${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:5173'}/api/artist-info?artist=${encodeURIComponent(result.track.subtitle)}`
+        const baseUrl = process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : 'http://localhost:3000';
+        const spotifyResponse = await fetch(
+          `${baseUrl}/api/spotify/track-info?uri=${encodeURIComponent(spotifyUri)}`
         );
 
-        if (artistInfoResponse.ok) {
-          artistInfo = await artistInfoResponse.json();
+        if (spotifyResponse.ok) {
+          spotifyInfo = await spotifyResponse.json();
         }
+        console.log('spotifyInfo', spotifyInfo)
       } catch (error) {
-        console.error('Failed to fetch artist info:', error);
-        // Continue without artist info
+        console.error('Failed to fetch Spotify info:', error);
+        // Continue without Spotify info
       }
     }
 
@@ -125,7 +150,7 @@ export default async function handler(
       console.error('Failed to clean up temp file:', err);
     }
 
-    return res.status(200).json({ ...result, artistInfo });
+    return res.status(200).json({ ...result, spotifyInfo });
   } catch (error) {
     console.error('Error analyzing audio:', error);
     return res.status(500).json({
