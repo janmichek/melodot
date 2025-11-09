@@ -109,10 +109,9 @@ contract Donate is Ownable, PlatformFee {
         bool isClaimed;
     }
 
-    mapping(string => ArtistData) public artists;
+    mapping(string => ArtistData) public donations;
 
     string[] public artistIds;
-
 
     constructor() {
         _setupOwner(msg.sender);
@@ -124,7 +123,7 @@ contract Donate is Ownable, PlatformFee {
     }
 
     function getArtistInfo(string memory artistId) public view returns (uint256 artistBalance, bool isClaimed) {
-        ArtistData memory artist = artists[artistId];
+        ArtistData memory artist = donations[artistId];
         return (artist.balance, artist.isClaimed);
     }
 
@@ -132,7 +131,7 @@ contract Donate is Ownable, PlatformFee {
         // Calculate total fees collected (balance - all artist balances)
         uint256 totalArtistBalances = 0;
         for (uint i = 0; i < artistIds.length; i++) {
-            totalArtistBalances += artists[artistIds[i]].balance;
+            totalArtistBalances += donations[artistIds[i]].balance;
         }
         return balance - totalArtistBalances;
     }
@@ -149,11 +148,11 @@ contract Donate is Ownable, PlatformFee {
         uint256 artistFee = donatedAmount - platformFee;
 
         // If artist doesn't exist yet, add them to the list
-        if (artists[artistId].balance == 0) {
+        if (donations[artistId].balance == 0) {
             artistIds.push(artistId);
         }
 
-        artists[artistId].balance += artistFee;
+        donations[artistId].balance += artistFee;
         balance += donatedAmount;
     }
 
@@ -163,11 +162,11 @@ contract Donate is Ownable, PlatformFee {
             revert EmptyArtistId();
         }
 
-        if (artists[artistId].isClaimed) {
+        if (donations[artistId].isClaimed) {
             revert ArtistAlreadyClaimed();
         }
 
-        artists[artistId].isClaimed = true;
+        donations[artistId].isClaimed = true;
     }
 
     function withdrawDonates(string memory artistId, address recipient) external {
@@ -177,17 +176,17 @@ contract Donate is Ownable, PlatformFee {
         if (recipient == address(0)) {
             revert InvalidRecipientAddress();
         }
-        if (!artists[artistId].isClaimed) {
+        if (!donations[artistId].isClaimed) {
             revert NotArtistClaimed();
         }
 
-        uint256 amount = artists[artistId].balance;
+        uint256 amount = donations[artistId].balance;
         if (amount == 0) {
             revert NoBalanceToWithdraw();
         }
 
         // Reset artist balance after withdrawal
-        artists[artistId].balance = 0;
+        donations[artistId].balance = 0;
         balance -= amount;
 
         (bool success, ) = payable(recipient).call{ value: amount }("");
