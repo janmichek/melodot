@@ -1,4 +1,4 @@
-import { HardhatUserConfig, vars } from "hardhat/config";
+import {HardhatUserConfig} from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomicfoundation/hardhat-viem";
 import "@parity/hardhat-polkadot";
@@ -14,7 +14,7 @@ if (!privateKey) {
 }
 
 const config: HardhatUserConfig = {
-  // todo update to 0.8.28
+  // todo update to highest solitity version and refactor in whol eproject
   solidity: "0.8.19",
   resolc: {
     compilerSource: "npm",

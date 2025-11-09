@@ -4,7 +4,7 @@ import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 
 export function ClaimSpotifyCard() {
-  const { isAuthenticated, profile, loading, error, login, logout, callback } = useSpotifyAuth();
+  const { isAuthenticated, profile, loading, error, login, logout, authorize } = useSpotifyAuth();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -18,15 +18,15 @@ export function ClaimSpotifyCard() {
         return;
       }
 
-      callback(code)
+      authorize(code)
         .then(() => {
           window.history.replaceState({}, document.title, window.location.pathname);
         })
         .catch(() => {
-          console.error('OAuth callback error:');
+          console.error('OAuth authorization error:');
         });
     }
-  }, [callback]);
+  }, [authorize]);
 
   const handleLogin = async () => {
     try {

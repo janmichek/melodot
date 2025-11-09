@@ -30,7 +30,6 @@ export const useSpotifyAuth = () => {
     error: null,
   });
 
-  // Load tokens from localStorage on mount
   useEffect(() => {
     const savedAccessToken = localStorage.getItem('spotify_access_token');
     if (savedAccessToken) {
@@ -38,7 +37,6 @@ export const useSpotifyAuth = () => {
     }
   }, []);
 
-  // Start OAuth login
   const login = useCallback(async () => {
     setAuthState(prev => ({ ...prev, loading: true, error: null }));
 
@@ -71,7 +69,7 @@ export const useSpotifyAuth = () => {
   }, []);
 
   // Handle OAuth callback
-  async function callback(code: string) {
+  async function authorize(code: string) {
     setAuthState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
@@ -104,7 +102,6 @@ export const useSpotifyAuth = () => {
     }
   }
 
-  // Fetch user profile
   const fetchProfile = async (accessToken: string) => {
     setAuthState(prev => ({ ...prev, loading: true, error: null }));
 
@@ -143,9 +140,6 @@ export const useSpotifyAuth = () => {
     }
   };
 
-
-
-  // Logout
   const logout = useCallback(() => {
     localStorage.removeItem('spotify_access_token');
     localStorage.removeItem('spotify_refresh_token');
@@ -164,6 +158,6 @@ export const useSpotifyAuth = () => {
     ...authState,
     login,
     logout,
-    callback,
+    authorize,
   };
 };
