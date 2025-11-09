@@ -70,6 +70,36 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
       const data = await response.json();
 
       if (data && data.track) {
+        // Try to fetch Spotify info if available
+        console.log('Track hub providers:', data.track?.hub?.providers);
+// todo cleanup component
+        const spotifyProvider = data.track?.hub?.providers?.find((provider: any) =>
+          provider.type === 'SPOTIFY'
+        );
+
+        const spotifyDeeplink = spotifyProvider?.actions?.find((action: any) =>
+          action.type === 'uri'
+        )?.uri;
+
+        console.log('Spotify deeplink found:', spotifyDeeplink);
+
+        if (spotifyDeeplink) {
+          try {
+            const spotifyResponse = await fetch(`/api/spotify/track/info?uri=${encodeURIComponent(spotifyDeeplink)}`);
+            if (spotifyResponse.ok) {
+              const spotifyInfo = await spotifyResponse.json();
+              console.log('Spotify info:', spotifyInfo);
+              data.spotifyInfo = spotifyInfo;
+            } else {
+              const error = await spotifyResponse.text();
+              console.error('Spotify API error:', error);
+            }
+          } catch (error) {
+            console.error('Failed to fetch Spotify info:', error);
+            // Continue without Spotify info
+          }
+        }
+
         onAnalysisComplete(data);
         reset();
         isProcessingAttempt.current = false;

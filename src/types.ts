@@ -10,6 +10,13 @@ export interface DiscoveryResult {
         type: string;
         uri?: string;
       }>;
+      providers?: Array<{
+        type: string;
+        actions?: Array<{
+          type: string;
+          uri?: string;
+        }>;
+      }>;
     };
     sections?: Array<{
       type?: string;
@@ -36,4 +43,27 @@ export interface DiscoveryResult {
       website?: string;
     };
   } | null;
+  spotifyInfo?: {
+    id: string;
+    name: string;
+    artists: Array<{
+      id: string;
+      name: string;
+      url: string;
+    }>;
+    album: {
+      id: string;
+      name: string;
+      releaseDate: string;
+      coverUrl?: string;
+      url: string;
+    };
+    durationMs: number;
+    popularity: number;
+    previewUrl: string | null;
+    url: string;
+  } | null;
 }
+
+
+// todo to complicated reduce
