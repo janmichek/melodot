@@ -33,16 +33,6 @@ export default async function handler(
   }
 
   try {
-    // Check for API key
-    const apiKey = process.env.VITE_RAPIDAPI_KEY;
-    if (!apiKey) {
-      return res.status(500).json({
-        error: 'Shazam API not configured',
-        details: 'Set VITE_RAPIDAPI_KEY environment variable',
-      });
-    }
-
-    // Parse multipart form data
     const form = formidable({
       multiples: false,
       maxFileSize: 50 * 1024 * 1024,
@@ -54,9 +44,8 @@ export default async function handler(
     try {
       const result = await form.parse(req as any);
       files = result[1];
-      console.log('Form parsed successfully, files:', Object.keys(files));
+
     } catch (parseError) {
-      console.error('Formidable parse error:', parseError);
       return res.status(500).json({
         error: 'Failed to parse form data',
         details: parseError instanceof Error ? parseError.message : 'Unknown parse error',
@@ -70,10 +59,8 @@ export default async function handler(
       return res.status(400).json({ error: 'No audio file provided' });
     }
 
-    // Read audio file
     const fileBuffer = await fs.promises.readFile(uploadedFile.filepath);
 
-    // Call Shazam API
     const formData = new FormData();
     const blob = new Blob([fileBuffer], { type: uploadedFile.mimetype || 'audio/webm' });
     formData.append('file', blob, 'audio.webm');
@@ -83,7 +70,7 @@ export default async function handler(
       {
         method: 'POST',
         headers: {
-          'X-RapidAPI-Key': apiKey,
+          'X-RapidAPI-Key': process.env.VITE_RAPIDAPI_KEY,
           'X-RapidAPI-Host': 'shazam-core.p.rapidapi.com',
         },
         body: formData,
@@ -100,35 +87,14 @@ export default async function handler(
     }
 
     const result = await shazamResponse.json() as DiscoveryResult;
-    //
-    // // Try to fetch artist info if track found
-    // let artistInfo = null;
-    // if (result?.track?.subtitle) {
-    //   try {
-    //     const artistInfoResponse = await fetch(
-    //       `${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:5173'}/api/artist-info?artist=${encodeURIComponent(result.track.subtitle)}`
-    //     );
-    //
-    //     if (artistInfoResponse.ok) {
-    //       artistInfo = await artistInfoResponse.json();
-    //     }
-    //   } catch (error) {
-    //     console.error('Failed to fetch artist info:', error);
-    //     // Continue without artist info
-    //   }
-    // }
 
-    // Try to fetch Spotify track info if Spotify URI found
     let spotifyInfo = null;
-    console.log('result?.track?', result?.track)
     const spotifyProvider = result?.track?.hub?.providers?.find((provider: any) => provider.type === 'SPOTIFY');
     const spotifyUri = spotifyProvider?.actions?.[0]?.uri;
-    console.log('spotifyUri', spotifyUri)
+
     if (spotifyUri) {
       try {
-        const baseUrl = process.env.VERCEL_URL
-          ? `https://${process.env.VERCEL_URL}`
-          : 'http://localhost:3000';
+        const baseUrl= 'http://localhost:3000';
         const spotifyResponse = await fetch(
           `${baseUrl}/api/spotify/track-info?uri=${encodeURIComponent(spotifyUri)}`
         );
@@ -136,14 +102,11 @@ export default async function handler(
         if (spotifyResponse.ok) {
           spotifyInfo = await spotifyResponse.json();
         }
-        console.log('spotifyInfo', spotifyInfo)
       } catch (error) {
         console.error('Failed to fetch Spotify info:', error);
-        // Continue without Spotify info
       }
     }
 
-    // Clean up
     try {
       await fs.promises.unlink(uploadedFile.filepath);
     } catch (err) {
@@ -151,6 +114,7 @@ export default async function handler(
     }
 
     return res.status(200).json({ ...result, spotifyInfo });
+
   } catch (error) {
     console.error('Error analyzing audio:', error);
     return res.status(500).json({
