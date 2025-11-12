@@ -28,6 +28,17 @@
  * @property {boolean} isRecording
  */
 
+/**
+ * Props accepted by the audio controls component.
+ * @typedef {Object} AudioControlsProps
+ * @property {boolean} hasPermission
+ * @property {boolean} isRecording
+ * @property {boolean} isAnalyzing
+ * @property {() => void} onStart
+ * @property {() => void} onStop
+ * @property {() => void} onRequestPermission
+ */
+
 export {};
 
 

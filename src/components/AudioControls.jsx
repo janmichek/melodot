@@ -1,10 +1,12 @@
-// @ts-check
-
 import StopButton from "./StopButton";
 import RecordButton from "./RecordButton";
 
 /**
- * @param {{hasPermission: boolean, isRecording: boolean, isAnalyzing: boolean, onStart: () => void, onStop: () => void, onRequestPermission: () => void}} props
+ * @typedef {import("../types").AudioControlsProps} AudioControlsProps
+ */
+
+/**
+ * @param {AudioControlsProps} props
  */
 export default function AudioControls({
   hasPermission,
