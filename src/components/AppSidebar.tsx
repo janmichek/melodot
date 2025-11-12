@@ -94,20 +94,18 @@ export function AppSidebar() {
         </div>
 
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-          <SidebarGroupLabel>Documents</SidebarGroupLabel>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarMenu>
-
-            {/*todo fix*/}
             {(!balance || balance === 0n) && (
               <SidebarMenuItem>
-              <a
-                href="https://faucet.polkadot.io/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="menu-faucet-link menu-faucet-btn"
-              >
-                💧 Get Test Tokens
-              </a>
+                <a
+                  href="https://faucet.polkadot.io/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm font-medium text-primary transition hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  💧 Get Test Tokens
+                </a>
               </SidebarMenuItem>
             )}
 

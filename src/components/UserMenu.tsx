@@ -1,8 +1,7 @@
 import {useEffect, useRef} from "react";
 import {useBalance, useChainId} from "wagmi";
-import {formatAddress, passetHub} from "../wagmi-config";
+import {CURRENCY_SYMBOL, formatAddress, formatPasBalance, passetHub} from "../wagmi-config";
 import {useWeb3AuthContext} from "../App";
-import {BalanceDisplay} from "./ui/balance-display";
 import {Spinner} from "./ui/spinner";
 import Jazzicon from "@metamask/jazzicon";
 import {
@@ -29,6 +28,11 @@ export function UserMenu() {
     address: address,
     chainId: passetHub.id,
   });
+
+  const formattedBalance =
+    balance && balance.value
+      ? `${formatPasBalance(balance.value)} ${CURRENCY_SYMBOL}`
+      : `0 ${CURRENCY_SYMBOL}`;
 
   const getChainName = () => {
     if (chainId === passetHub.id) return "Passet Hub";
@@ -57,19 +61,17 @@ export function UserMenu() {
               />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span
-                  className="truncate font-medium">{formatAddress(address as `0x${string}`, 8, 5)}</span>
-                <span className="text-muted-foreground truncate text-xs">
-                  {balanceLoading ? (
-                    <Spinner size="sm" className="inline"/>
-                  ) :
-                    <BalanceDisplay
-                    balance={balance?.value}
-                    isLoading={balanceLoading}
-                    showSymbol={true}
-                    size="small"
-                  />
-                  }
+                  className="truncate font-medium"
+                >
+                  {formatAddress(address as `0x${string}`, 8, 5)}
                 </span>
+                <div className="truncate text-xs text-muted-foreground">
+                  {balanceLoading ? (
+                    <Spinner size="sm" className="inline" />
+                  ) : (
+                    formattedBalance
+                  )}
+                </div>
               </div>
             </SidebarMenuButton>
           </DropdownMenuTrigger>

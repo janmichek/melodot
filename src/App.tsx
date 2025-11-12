@@ -6,10 +6,11 @@ import {useAccount} from "wagmi";
 import {donateConfig} from "./generated";
 import {passetHub} from "./wagmi-config";
 import {AppSidebar} from "./components/AppSidebar";
-import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
+import {SidebarInset, SidebarProvider} from "@/components/ui/sidebar";
 import {Home} from "./pages/Home";
 import {Claim} from "./pages/Claim";
 import {Owner} from "./pages/Owner";
+import {Header} from "./components/Header";
 
 export function useWeb3AuthContext() {
   const {
@@ -89,13 +90,9 @@ function App() {
     <BrowserRouter>
       <SidebarProvider>
         <SidebarInset className="bg-background">
-          <header className="border-b border-border sticky top-0 bg-background">
-            <div className="flex items-center justify-end px-4 py-3">
-              <SidebarTrigger />
-            </div>
-          </header>
-          <div className="flex flex-1 flex-col p-4">
-            <main className="main-content">
+          <Header />
+          <div className="flex flex-1 flex-col gap-4 p-4">
+            <main className="main-content flex-1">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/claim" element={<Claim />} />

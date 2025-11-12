@@ -21,7 +21,7 @@ _Comprehensive instructions for AI agents helping develop BeatChain_
 - **Audio**: Web Audio API
 - **API**: Vercel serverless functions
 - **Package Manager**: Bun
-- **Testing**: Vitest (unit), Playwright (e2e)
+- **Testing**: Playwright (e2e)
 
 ### Key Dependencies
 ```json
@@ -109,9 +109,7 @@ bun run test                # Run contract tests
 bun run deploy-contract     # Deploy to Paseo + generate types
 
 # Testing
-bun run test                # Run unit tests (Vitest)
 bun run test:e2e           # Run e2e tests (Playwright)
-bun run test:ui            # Open Vitest UI
 bun run test:api           # Test API functions
 
 # Code Generation
@@ -342,12 +340,6 @@ vercel deploy --prod
 - Environment variables: Set in Vercel dashboard
 
 ## Testing
-
-### Unit Tests (Vitest)
-```bash
-bun run test              # Run all tests
-bun run test:ui           # Open Vitest UI
-```
 
 ### E2E Tests (Playwright)
 ```bash

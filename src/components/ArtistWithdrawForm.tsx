@@ -76,7 +76,6 @@ export function ArtistWithdrawForm({
   useEffect(() => {
     if (withdrawHash) {
       setTxHash(withdrawHash);
-      console.log('Withdrawal transaction submitted:', withdrawHash);
     }
   }, [withdrawHash]);
 
@@ -105,12 +104,14 @@ export function ArtistWithdrawForm({
   }, [confirmError]);
 
   return (
-    <div className="claim-withdraw-section">
-      <h4>Withdraw Claimed Balance</h4>
-      <p className="claim-withdraw-description">
-        Send your claimed balance to a wallet address
-      </p>
-      <div className="claim-withdraw-input-group">
+    <div className="mt-6 space-y-4 rounded-lg border border-border bg-muted/5 p-4">
+      <div className="space-y-1">
+        <h4 className="text-base font-semibold">Withdraw Claimed Balance</h4>
+        <p className="text-sm text-muted-foreground">
+          Send your claimed balance to a wallet address.
+        </p>
+      </div>
+      <div className="space-y-4">
         <AddressInput
           value={withdrawAddress}
           onChange={setWithdrawAddress}
@@ -119,14 +120,17 @@ export function ArtistWithdrawForm({
           error={withdrawError}
           disabled={!isConnected || isWithdrawPending || isConfirming}
           showValidation={true}
-          className="claim-withdraw-input"
         />
         <Button
           onClick={handleWithdraw}
           disabled={!isConnected || !isAddress(withdrawAddress as `0x${string}`) || isWithdrawPending || isConfirming}
-          className="claim-withdraw-button"
+          className="w-full sm:w-auto"
         >
-          {isWithdrawPending ? 'Sending transaction...' : isConfirming ? 'Confirming...' : 'Withdraw All'}
+          {isWithdrawPending
+            ? "Sending transaction..."
+            : isConfirming
+            ? "Confirming..."
+            : "Withdraw All"}
         </Button>
 
         <TxNotification

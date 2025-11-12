@@ -1,1 +1,12 @@
 .vercel
+node_modules
+.idea
+dist
+playwright-report
+test-results
+contracts/artifacts
+contracts/artifacts-pvm
+contracts/cache
+contracts/cache-pvm
+contracts/ignition/deployments
+contracts/typechain-types

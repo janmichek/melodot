@@ -94,9 +94,9 @@ export default async function handler(
 
     if (spotifyUri) {
       try {
-        const baseUrl= 'http://localhost:3000';
+        const baseUrl = 'http://localhost:3000';
         const spotifyResponse = await fetch(
-          `${baseUrl}/api/spotify/track-info?uri=${encodeURIComponent(spotifyUri)}`
+          `${baseUrl}/api/track-info?uri=${encodeURIComponent(spotifyUri)}`
         );
 
         if (spotifyResponse.ok) {

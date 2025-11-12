@@ -95,6 +95,10 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
     }
   }, [artistInfoData]);
 
+  const statusBadgeClasses = artistClaimed
+    ? "rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-500"
+    : "rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-600";
+
   return (
     <Card>
       <CardHeader>
@@ -103,68 +107,77 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
           Enter your Spotify Artist ID to check your balance and claim status
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="claim-artist-input-group">
-          <Input
-            type="text"
-            placeholder="Enter Spotify Artist ID (e.g., 1234567890)"
-            value={manualArtistId}
-            onChange={(e) => setManualArtistId(e.target.value)}
-            className="claim-artist-input"
-          />
-        </div>
+      <CardContent className="space-y-6">
+        <Input
+          type="text"
+          placeholder="Enter Spotify Artist ID (e.g., 1234567890)"
+          value={manualArtistId}
+          onChange={(e) => setManualArtistId(e.target.value)}
+        />
 
         {manualArtistId && (
-          <div className="claim-artist-info-box mt-4">
-            <h3 className="font-bold">Artist Information</h3>
-            <p><strong>Artist ID:</strong> {manualArtistId}</p>
-            <p>
-              <strong>Spotify Profile:</strong>{' '}
-              <a
-                href={`https://open.spotify.com/artist/${manualArtistId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline inline-flex items-center gap-1"
-              >
-                View on Spotify
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="inline"
+          <div className="space-y-4 rounded-lg border border-border/40 bg-muted/10 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-sm font-semibold text-foreground">
+                Artist Information
+              </h3>
+              <span className={statusBadgeClasses}>
+                {artistClaimed ? "✓ Already Claimed" : "○ Available to Claim"}
+              </span>
+            </div>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-2 text-foreground">
+                <strong className="font-semibold">Artist ID:</strong>
+                <span className="font-mono">{manualArtistId}</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 text-foreground">
+                <strong className="font-semibold">Spotify Profile:</strong>
+                <a
+                  href={`https://open.spotify.com/artist/${manualArtistId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-primary hover:underline"
                 >
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                  <polyline points="15 3 21 3 21 9" />
-                  <line x1="10" x2="21" y1="14" y2="3" />
-                </svg>
-              </a>
-            </p>
-            <p>
-              <strong>Balance:</strong>{' '}
-              <span className="claim-artist-balance">
+                  View on Spotify
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" x2="21" y1="14" y2="3" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="space-y-1">
+                <strong className="text-sm font-semibold text-foreground">
+                  Balance:
+                </strong>
                 {artistBalance !== null ? (
-                  <BalanceDisplay balance={artistBalance} showSymbol={true} size="small" />
-                ) : 'Loading...'}
-              </span>
-            </p>
-            <p>
-              <strong>Status:</strong>{' '}
-              <span className={`claim-artist-status ${artistClaimed ? 'claimed' : 'available'}`}>
-                {artistClaimed ? '✓ Already Claimed' : '○ Available to Claim'}
-              </span>
-            </p>
-
-            {artistBalance === 0n && (
-              <p className="claim-no-balance-message text-sm text-muted-foreground">
-                ℹ️ No donations found for this artist ID
-              </p>
-            )}
+                  <BalanceDisplay
+                    balance={artistBalance}
+                    showSymbol={true}
+                    size="small"
+                  />
+                ) : (
+                  <span className="text-sm text-muted-foreground">Loading...</span>
+                )}
+              </div>
+              {artistBalance === 0n && (
+                <p className="text-sm text-muted-foreground">
+                  ℹ️ No donations found for this artist ID
+                </p>
+              )}
+            </div>
 
             {artistClaimed && contractAddress && manualArtistId && (
               <ArtistWithdrawForm
@@ -176,27 +189,33 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
         )}
       </CardContent>
       {manualArtistId && !artistClaimed && artistBalance !== null && artistBalance > 0n && (
-        <CardFooter className="flex-col items-start">
+        <CardFooter className="flex flex-col gap-4">
           {!isConnected ? (
-            <div className="claim-wallet-warning text-yellow-500">
+            <div className="w-full rounded-md border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-sm text-amber-600">
               ⚠️ Connect your wallet to claim this artist balance
             </div>
           ) : (
-            <div className="claim-action-section">
+            <div className="flex w-full flex-col gap-3">
               <Button
                 onClick={handleClaimArtist}
                 disabled={isClaiming || isClaimPending || isConfirming}
-                className="claim-button"
+                className="w-full sm:w-auto"
               >
-                {isClaimPending ? 'Sending transaction...' : isConfirming ? 'Confirming...' : isClaiming ? 'Processing...' : 'Claim Artist Balance'}
+                {isClaimPending
+                  ? "Sending transaction..."
+                  : isConfirming
+                  ? "Confirming..."
+                  : isClaiming
+                  ? "Processing..."
+                  : "Claim Artist Balance"}
               </Button>
               {claimError && (
-                <div className="text-red-500 mt-2">
+                <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
                   {claimError}
                 </div>
               )}
               {txHash && !claimError && (
-                <div className="text-green-500 mt-2">
+                <div className="rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-primary">
                   Transaction submitted: {txHash.slice(0, 10)}...
                 </div>
               )}

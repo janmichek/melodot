@@ -79,37 +79,42 @@ function ArtistsList({ count, contractAddress }: { count: bigint; contractAddres
   }, [count, publicClient, contractAddress]);
 
   return (
-    <div className="artists-list-section">
-      <h3 className="artists-list-title">
-        All Artists in Contract ({count.toString()})
-      </h3>
-      {isLoading && <p className="p-text">Loading artists...</p>}
-      {!isLoading && artistItems.length === 0 && (
-        <p className="p-text">No artists found</p>
+    <div className="space-y-4 rounded-lg border border-border/40 bg-muted/10 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-sm font-semibold text-foreground">
+          All Artists in Contract ({count.toString()})
+        </h3>
+        <span className="text-xs text-muted-foreground">
+          Updated in real-time
+        </span>
+      </div>
+      {isLoading && (
+        <p className="text-sm text-muted-foreground">Loading artists...</p>
       )}
-      <div className="artists-list-container">
+      {!isLoading && artistItems.length === 0 && (
+        <p className="text-sm text-muted-foreground">No artists found</p>
+      )}
+      <div className="grid gap-3">
         {artistItems.map((artist) => (
-          <div key={artist.id} className="artist-card">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "0.5rem",
-              }}
-            >
-              <p style={{ margin: 0 }}>Artist: {artist.id}</p>
+          <div
+            key={artist.id}
+            className="space-y-3 rounded-md border border-border/30 bg-background/80 p-3"
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-foreground">
+                Artist:{" "}
+                <span className="font-mono text-xs text-muted-foreground">
+                  {artist.id}
+                </span>
+              </p>
               <span
-                style={{
-                  fontSize: "0.75rem",
-                  fontWeight: "bold",
-                  padding: "0.25rem 0.5rem",
-                  borderRadius: "3px",
-                  backgroundColor: artist.isClaimed ? "#4CAF50" : "#FF9800",
-                  color: "white",
-                }}
+                className={
+                  artist.isClaimed
+                    ? "rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-500"
+                    : "rounded-full bg-amber-500/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-600"
+                }
               >
-                {artist.isClaimed ? "✓ CLAIMED" : "○ AVAILABLE"}
+                {artist.isClaimed ? "✓ Claimed" : "○ Available"}
               </span>
             </div>
             <BalanceDisplay
@@ -141,39 +146,43 @@ export function Footer({ contractAddress }: ContractInfoFooterProps) {
   });
 
   const artistCount = count ? Number(count) : 0;
+  const platformBalance = typeof balance === "bigint" ? balance : undefined;
 
   return (
-    <footer className="footer">
-      <div className="footer-info">
-        <span>{passetHub.name}</span>
+    <footer
+      className="flex flex-col gap-4 rounded-xl border border-border bg-muted/5 p-4 text-sm text-muted-foreground"
+      data-testid="footer"
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="font-medium text-foreground">{passetHub.name}</span>
         <span>•</span>
         <a
           href={`${passetHub.blockExplorers.default.url}/address/${contractAddress}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="footer-link"
+          className="font-medium text-primary hover:underline"
         >
           {formatAddress(contractAddress, 6, 4)}
         </a>
         <span>•</span>
         {artistCount > 0 ? (
           <Button
-            onClick={() => setIsArtistsExpanded(!isArtistsExpanded)}
-            className="footer-toggle"
+            onClick={() => setIsArtistsExpanded((prev) => !prev)}
+            variant="ghost"
+            size="sm"
+            className="h-8 px-3"
           >
-            {artistCount} artists {isArtistsExpanded ? '▼' : '▲'}
+            {artistCount} artists {isArtistsExpanded ? "▼" : "▲"}
           </Button>
         ) : (
           <span>{artistCount} artists</span>
         )}
         <span>•</span>
-        <BalanceDisplay balance={balance as bigint} showSymbol={true} size="small" />
+        <BalanceDisplay balance={platformBalance} showSymbol={true} size="small" />
       </div>
 
       {artistCount > 0 && isArtistsExpanded && (
-        <div className="footer-artists">
-          <ArtistsList count={BigInt(artistCount)} contractAddress={contractAddress} />
-        </div>
+        <ArtistsList count={BigInt(artistCount)} contractAddress={contractAddress} />
       )}
     </footer>
   );

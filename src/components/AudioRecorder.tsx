@@ -64,38 +64,36 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
       }
       formData.append("file", audioBlob, "recording.webm");
 
-      const response = await fetch('/api/analyze-audio', { method: 'POST', body: formData, });
-      if (!response.ok) {throw new Error(`HTTP error! status: ${response.status}`);}
+      const response = await fetch("/api/analyze-audio", { method: "POST", body: formData });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
 
       if (data && data.track) {
-        // Try to fetch Spotify info if available
-        console.log('Track hub providers:', data.track?.hub?.providers);
-// todo cleanup component
-        const spotifyProvider = data.track?.hub?.providers?.find((provider: any) =>
-          provider.type === 'SPOTIFY'
+        const spotifyProvider = data.track?.hub?.providers?.find(
+          (provider: { type: string }) => provider.type === "SPOTIFY"
         );
 
-        const spotifyDeeplink = spotifyProvider?.actions?.find((action: any) =>
-          action.type === 'uri'
+        const spotifyDeeplink = spotifyProvider?.actions?.find(
+          (action: { type: string }) => action.type === "uri"
         )?.uri;
-
-        console.log('Spotify deeplink found:', spotifyDeeplink);
 
         if (spotifyDeeplink) {
           try {
-            const spotifyResponse = await fetch(`/api/spotify/track/info?uri=${encodeURIComponent(spotifyDeeplink)}`);
+            const spotifyResponse = await fetch(
+              `/api/spotify/track/info?uri=${encodeURIComponent(spotifyDeeplink)}`
+            );
             if (spotifyResponse.ok) {
               const spotifyInfo = await spotifyResponse.json();
-              console.log('Spotify info:', spotifyInfo);
               data.spotifyInfo = spotifyInfo;
             } else {
               const error = await spotifyResponse.text();
-              console.error('Spotify API error:', error);
+              console.error("Spotify API error:", error);
             }
           } catch (error) {
-            console.error('Failed to fetch Spotify info:', error);
+            console.error("Failed to fetch Spotify info:", error);
             // Continue without Spotify info
           }
         }
@@ -173,29 +171,34 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
   }
 
   return (
-    <div className="shazam-container">
+    <div className="shazam-container flex w-full flex-col items-center gap-6">
       {!allAttemptsFailed && (
-      <AudioControls
-        hasPermission={permission}
-        isRecording={isRecording}
-        isAnalyzing={isAnalyzing}
-        onStart={record}
-        onStop={stop}
-        onRequestPermission={enablePermission}
-      />
-    )}
+        <AudioControls
+          hasPermission={permission}
+          isRecording={isRecording}
+          isAnalyzing={isAnalyzing}
+          onStart={record}
+          onStop={stop}
+          onRequestPermission={enablePermission}
+        />
+      )}
 
       {allAttemptsFailed && (
-        <div className="no-match-message">
-          <p>No match found after {ATTEMPT_DURATIONS.length} attempts</p>
-          <Button onClick={reset} className="btn-secondary">Try Again</Button>
+        <div className="w-full max-w-md rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
+          <p className="mb-4 text-sm text-muted-foreground">
+            No match found after {ATTEMPT_DURATIONS.length} attempts
+          </p>
+          <Button onClick={reset} variant="secondary">
+            Try Again
+          </Button>
         </div>
       )}
 
-
-      {errorMessage &&
-        <p className="shazam-error">{errorMessage}</p>
-      }
+      {errorMessage && (
+        <p className="shazam-error rounded-md border border-destructive/20 bg-destructive/10 px-4 py-2 text-sm text-destructive">
+          {errorMessage}
+        </p>
+      )}
     </div>
   );
 }

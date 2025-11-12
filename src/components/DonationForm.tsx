@@ -62,38 +62,36 @@ export function DonationForm({ artistId, onSuccess }: DonationFormProps) {
   };
 
   return (
-    <>
-        <div>
-          <p className="text-sm text-muted-foreground">Artist ID: {artistId}</p>
-          <div className="flex gap-2 mt-3">
-            {[1, 2, 10].map((amount) => (
-              <Button
-                key={amount}
-                type="button"
-                onClick={() => donate(amount)}
-                disabled={isDonating || isWriting || isConfirming}
-                variant="outline"
-                className={isWriting || isConfirming ? 'hidden' : ''}
-              >
-                {`${amount} ${CURRENCY_SYMBOL}`}
-              </Button>
-            ))}
-          </div>
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <p className="text-sm text-muted-foreground">Artist ID: {artistId}</p>
+        <div className="flex flex-wrap gap-2">
+          {[1, 2, 10].map((amount) => (
+            <Button
+              key={amount}
+              type="button"
+              onClick={() => donate(amount)}
+              disabled={isDonating || isWriting || isConfirming}
+              variant="outline"
+            >
+              {`${amount} ${CURRENCY_SYMBOL}`}
+            </Button>
+          ))}
         </div>
+      </div>
 
-        <TxNotification
-          hash={hash}
-          isLoading={isConfirming}
-          isSuccess={isConfirmed}
-          isError={!!writeError}
-          error={writeError?.message}
-          title="Donation Status"
-          successMessage="✅ Donation confirmed on-chain!"
-          pendingMessage="⏳ Processing donation..."
-          errorMessage="❌ Donation failed"
-          autoHideSuccess={false}
-        />
-
-    </>
+      <TxNotification
+        hash={hash}
+        isLoading={isConfirming}
+        isSuccess={isConfirmed}
+        isError={!!writeError}
+        error={writeError?.message}
+        title="Donation Status"
+        successMessage="✅ Donation confirmed on-chain!"
+        pendingMessage="⏳ Processing donation..."
+        errorMessage="❌ Donation failed"
+        autoHideSuccess={false}
+      />
+    </div>
   );
 }

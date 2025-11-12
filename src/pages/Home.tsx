@@ -18,15 +18,12 @@ export function Home() {
       {!discoveryData ? (
         <AudioRecorder onAnalysisComplete={setDiscoveryData} />
       ) : (
-        <>
-          {discoveryData}
         <DiscoveryCard
-          discovery={discoveryData}
-          onSearchAgain={() => setDiscoveryData(null)}>
-          {artistId && (<DonationForm artistId={artistId}/>)}
+          discovery={discoveryData!}
+          onSearchAgain={() => setDiscoveryData(null)}
+        >
+          {artistId && <DonationForm artistId={artistId} />}
         </DiscoveryCard>
-        </>
-
       )}
     </>
   );
