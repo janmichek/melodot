@@ -127,7 +127,10 @@ function ArtistsList({ count, contractAddress }) {
   );
 }
 
-export function Footer({ contractAddress }: ContractInfoFooterProps) {
+/**
+ * @param {{contractAddress: string}} props
+ */
+export function Footer({ contractAddress }) {
   const [isArtistsExpanded, setIsArtistsExpanded] = useState(false);
 
   const { data: count } = useReadContract({

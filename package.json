@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:3000": "vite --port 3000",
     "build": "tsc && vite build",
     "generate": "wagmi generate",
     "test:api": "bun test ./tests/api/analyze-audio.test.ts",
