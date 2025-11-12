@@ -15,7 +15,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {Coins, Home} from "lucide-react";
+import {Coins, Home, List} from "lucide-react";
 import {Link, useLocation} from "react-router-dom";
 import {useReadContract} from "wagmi";
 import {donateConfig} from "../generated";
@@ -46,6 +46,11 @@ export function AppSidebar() {
       title: "Home",
       url: "/",
       icon: Home,
+    },
+    {
+      title: "Donations",
+      url: "/donations",
+      icon: List,
     },
     {
       title: "Claim",

@@ -6,14 +6,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:3000": "vite --port 3000",
+    "start": "vercel dev",
     "build": "tsc && vite build",
     "generate": "wagmi generate",
-    "test:api": "bun test ./tests/api/analyze-audio.test.ts",
-    "test:api:manual": "bash ./api/test-api.sh",
+    "test:api": "bash ./api/test-api.sh",
     "test:e2e": "playwright test",
     "test:contract": "cd contracts && bun install && bun run test",
     "deploy-contract": "cd contracts && bun install && bun run deploy-contract && cd .. && bun run generate",
+    "clean-contract": "cd contracts && npx hardhat clean && rm -rf artifacts  && rm -rf artifacts-pvm && rm -rf cache && rm -rf cache-pvm && rm -rf typechain-types && rm -rf ignition/deployments && npx hardhat ignition wipe",
     "reinstall": "rm -rf node_modules/ && bun pm cache rm && bun install",
     "test:all": "bun run test:contract && bun run test:api && bun run test:e2e"
   },
