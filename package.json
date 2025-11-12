@@ -8,10 +8,13 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "generate": "wagmi generate",
+    "test:api": "bun test ./tests/api/analyze-audio.test.ts",
+    "test:api:manual": "bash ./api/test-api.sh",
     "test:e2e": "playwright test",
     "test:contract": "cd contracts && bun install && bun run test",
     "deploy-contract": "cd contracts && bun install && bun run deploy-contract && cd .. && bun run generate",
-    "reinstall": "rm -rf node_modules/ && bun pm cache rm && bun install"
+    "reinstall": "rm -rf node_modules/ && bun pm cache rm && bun install",
+    "test:all": "bun run test:contract && bun run test:api && bun run test:e2e"
   },
   "dependencies": {
     "@metamask/jazzicon": "^2.0.0",

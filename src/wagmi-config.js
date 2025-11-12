@@ -1,0 +1,94 @@
+// @ts-check
+
+import {createConfig, http} from "wagmi";
+import {mainnet} from "wagmi/chains";
+
+export const passetHub = {
+  id: 420420422,
+  name: "Passet Hub",
+  nativeCurrency: {
+    name: "PAS",
+    symbol: "PAS",
+    decimals: 18,
+  },
+  rpcUrls: {
+    default: {
+      http: ["https://testnet-passet-hub-eth-rpc.polkadot.io"],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Blockscout",
+      url: "https://blockscout-passet-hub.parity-testnet.parity.io",
+    },
+  },
+};
+
+export const wagmiConfig = createConfig({
+  chains: [passetHub, mainnet],
+  transports: {
+    [passetHub.id]: http(passetHub.rpcUrls.default.http[0]),
+    [mainnet.id]: http(),
+  },
+});
+
+/**
+ * Format PAS balance from Wei to human-readable format
+ * @param balance - Balance in Wei (bigint, number, or string)
+ * @returns Formatted balance as string (e.g., "1.23")
+ */
+/** @param {bigint | number | string} balance */
+export const formatPasBalance = (balance) => {
+  const decimals = passetHub.nativeCurrency.decimals;
+  const numBalance =
+    typeof balance === "bigint"
+      ? Number(balance)
+      : typeof balance === "string"
+      ? Number(balance)
+      : balance;
+  return (numBalance / 10 ** decimals).toFixed(2);
+};
+
+/**
+ * Format an Ethereum address for display (short format)
+ * @param address - Full Ethereum address
+ * @param startChars - Number of characters to show at start (default: 4)
+ * @param endChars - Number of characters to show at end (default: 3)
+ * @returns Formatted address (e.g., "0x1234...5678")
+ */
+/** @param {string} address @param {number} [startChars=4] @param {number} [endChars=3] */
+export const formatAddress = (address, startChars = 4, endChars = 3) => {
+  if (!address || address.length < startChars + endChars) {
+    return address;
+  }
+  return `${address.slice(0, startChars)}...${address.slice(-endChars)}`;
+};
+
+/**
+ * Format an Ethereum address for display with custom length
+ * @param address - Full Ethereum address
+ * @param length - Total characters to show before ellipsis (default: 10)
+ * @returns Formatted address (e.g., "0x123456...")
+ */
+/** @param {string} address @param {number} [length=10] */
+export const formatAddressShort = (address, length = 10) => {
+  if (!address || address.length < length) {
+    return address;
+  }
+  return `${address.slice(0, length)}...`;
+};
+
+/**
+ * Format amount with currency symbol
+ * @param amount - Numeric amount
+ * @param symbol - Currency symbol (default: PAS)
+ * @param decimals - Number of decimal places (default: 2)
+ * @returns Formatted amount with symbol (e.g., "1.23 PAS")
+ */
+/** @param {string | number} amount @param {string} [symbol=CURRENCY_SYMBOL] @param {number} [decimals=2] */
+export const formatAmountWithSymbol = (amount, symbol = CURRENCY_SYMBOL, decimals = 2) => {
+  const num = typeof amount === "string" ? parseFloat(amount) : amount;
+  return `${num.toFixed(decimals)} ${symbol}`;
+};
+
+export const CURRENCY_SYMBOL = passetHub.nativeCurrency.symbol;
