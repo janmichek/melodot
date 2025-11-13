@@ -67,7 +67,7 @@ const SidebarProvider = React.forwardRef<
       >
         <div
           ref={ref}
-          className={clsx("flex min-h-screen", className)}
+          className={clsx("flex h-screen", className)}
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH,
@@ -145,7 +145,7 @@ const Sidebar = React.forwardRef<
         ref={ref}
         data-desktop="true"
         className={clsx(
-          "hidden lg:flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
+          "hidden lg:flex h-screen w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
           className
         )}
         {...props}
