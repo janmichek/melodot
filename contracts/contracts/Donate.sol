@@ -136,6 +136,14 @@ contract Donate is Ownable, PlatformFee {
         return balance - totalArtistBalances;
     }
 
+    event DonationMade(
+        address indexed donor,
+        string indexed artistId,
+        uint256 donatedAmount,
+        uint256 artistFee,
+        uint256 platformFee
+    );
+
     function donateToArtist(string memory artistId) external payable {
         uint256 donatedAmount = msg.value;
         if (donatedAmount == 0) {
@@ -154,6 +162,8 @@ contract Donate is Ownable, PlatformFee {
 
         donations[artistId].balance += artistFee;
         balance += donatedAmount;
+
+        emit DonationMade(msg.sender, artistId, donatedAmount, artistFee, platformFee);
     }
 
 

@@ -31,6 +31,18 @@ export const donateAbi = [
   { type: 'error', inputs: [], name: 'PlatformFeeUnauthorized' },
   { type: 'error', inputs: [], name: 'WithdrawalFailed' },
   {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'donor', internalType: 'address', type: 'address', indexed: true },
+      { name: 'artistId', internalType: 'string', type: 'string', indexed: true },
+      { name: 'donatedAmount', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'artistFee', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'platformFee', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'DonationMade',
+  },
+  {
     type: 'function',
     inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     name: 'artistIds',
@@ -153,7 +165,7 @@ export const donateAbi = [
  *
  */
 export const donateAddress = {
-  420420422: '0xbe4FDba44048aDb6D464ebB4424029f18DBC26Cb',
+  420420422: '0x12eb031B80c09d16FCaBD1D59c7C4C2300EEaA47',
 } as const
 
 /**

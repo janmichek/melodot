@@ -4,6 +4,7 @@ import type {Abi} from "viem";
 import {donateConfig} from "../generated";
 import {BalanceDisplay} from "./ui/balance-display";
 import {DonationsTable} from "./DonationsTable";
+import {DonationTransactions} from "./DonationTransactions";
 
 interface ArtistItem {
   id: string;
@@ -135,6 +136,9 @@ export function DonationsList({ contractAddress }: DonationsListProps) {
       className="flex flex-col gap-4 rounded-xl border border-border bg-muted/5 p-4 text-sm text-muted-foreground"
       data-testid="donations-list"
     >
+      {/* Donation Transactions - Shows all transactions with donor addresses */}
+      <DonationTransactions contractAddress={contractAddress} />
+      
       {artistCount > 0 && (
         <>
           <DonationsTable contractAddress={contractAddress} />
