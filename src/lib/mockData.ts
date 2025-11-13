@@ -1,9 +1,8 @@
-// @ts-check
+import {DiscoveryResult} from "../types";
 
-/** @typedef {import("../types/index.js").DiscoveryResult} DiscoveryResult */
-
-/** @type {DiscoveryResult} */
-export const mockDiscoveryData = {
+// Mock response data for development
+// Using 'as any' because this mock data contains extended fields not in the simplified type definition
+export const mockDiscoveryData: DiscoveryResult = {
   "track": {
     "layout": "5",
     "type": "MUSIC",

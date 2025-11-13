@@ -28,4 +28,3 @@ ReactDOM.createRoot(rootElement).render(
     </Web3AuthProvider>
   </ThemeProvider>
 );
-

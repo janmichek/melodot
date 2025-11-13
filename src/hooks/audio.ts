@@ -1,20 +1,23 @@
-// @ts-check
-
 import {useCallback, useRef, useState} from "react";
 
-/** @typedef {import("../types/index.js").AudioRecorderState} AudioRecorderState */
+interface AudioRecorderState {
+  mediaRecorder: MediaRecorder | null;
+  audioBlob: Blob | null;
+  permission: boolean;
+  errorMessage: string | null;
+  isRecording: boolean;
+}
 
 export const useAudioRecorder = () => {
-  /** @type {[AudioRecorderState, (updater: (prev: AudioRecorderState) => AudioRecorderState) => void]} */
-  const [state, setState] = useState({
+  const [state, setState] = useState<AudioRecorderState>({
     mediaRecorder: null,
     audioBlob: null,
     permission: false,
     errorMessage: null,
     isRecording: false,
   });
-  const audioChunksRef = useRef(/** @type {Blob[]} */([]));
-  const mediaRecorderRef = useRef(/** @type {MediaRecorder|null} */(null));
+  const audioChunksRef = useRef<Blob[]>([]);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const enablePermission = useCallback(async () => {
     try {
