@@ -111,7 +111,12 @@ const Sidebar = React.forwardRef<
       {/* Mobile overlay */}
       {openMobile && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-40 lg:hidden backdrop-blur-sm"
+          style={{
+            backgroundColor: "var(--sidebar-overlay)",
+            WebkitBackdropFilter: "blur(2px)",
+            backdropFilter: "blur(2px)",
+          }}
           onClick={() => setOpenMobile(false)}
         />
       )}
@@ -339,15 +344,21 @@ const SidebarMenuButton = React.forwardRef<
     asChild?: boolean
     isActive?: boolean
   }
->(({ asChild = false, isActive = false, className, ...props }, ref) => {
-  const Comp = asChild ? React.Fragment : "button"
+>(({ asChild = false, isActive = false, className, children, ...props }, ref) => {
+  const baseClasses = clsx(
+    "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium transition-colors",
+    "text-sidebar-foreground/90 hover:text-primary data-[active=true]:text-primary",
+    "hover:bg-sidebar-accent/30 data-[active=true]:bg-sidebar-accent/40",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+  )
 
-  if (asChild) {
-    return (
-      <Comp
-        {...props}
-      />
-    )
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children, {
+      ...props,
+      "data-sidebar": "menu-button",
+      "data-active": isActive,
+      className: clsx(baseClasses, className, children.props.className),
+    })
   }
 
   return (
@@ -355,14 +366,11 @@ const SidebarMenuButton = React.forwardRef<
       ref={ref}
       data-sidebar="menu-button"
       data-active={isActive}
-      className={clsx(
-        "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium transition-colors",
-        "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-        "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
-        className
-      )}
+      className={clsx(baseClasses, className)}
       {...props}
-    />
+    >
+      {children}
+    </button>
   )
 })
 SidebarMenuButton.displayName = "SidebarMenuButton"

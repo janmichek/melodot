@@ -10,7 +10,11 @@ export function ModeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button
+          variant="outline"
+          size="icon"
+          className="!border-none !bg-[color:var(--primary-color)] !text-white shadow-xs hover:!bg-[color:var(--primary-hover)] focus-visible:!ring-[rgba(var(--primary-color-rgb),0.45)] focus-visible:!ring-offset-0 dark:hover:!bg-[color:var(--primary-hover)]"
+        >
           <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="sr-only">Toggle theme</span>

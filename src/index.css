@@ -47,6 +47,12 @@
   --font-space-grotesk: "Space Grotesk", -apple-system, BlinkMacSystemFont,
     "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
     "Droid Sans", "Helvetica Neue", sans-serif;
+  --primary-color: #529dff;
+  --primary-hover: #5ca8ff;
+  --primary-gradient-end: #4080ff;
+  --primary-hover-gradient-end: #5090ff;
+  --primary-color-rgb: 82 157 255;
+  --primary-accent-rgb: 117 181 255;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -78,6 +84,7 @@
   --sidebar-accent-foreground: hsl(240 5.9% 10%);
   --sidebar-border: hsl(220 13% 91%);
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --sidebar-overlay: rgba(15, 17, 20, 0.2);
 }
 
 .dark {
@@ -85,6 +92,12 @@
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
+  --primary-color: #74adff;
+  --primary-hover: #8cc0ff;
+  --primary-gradient-end: #3f74ff;
+  --primary-hover-gradient-end: #4c86ff;
+  --primary-color-rgb: 116 173 255;
+  --primary-accent-rgb: 155 197 255;
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
@@ -112,6 +125,7 @@
   --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
   --sidebar-border: hsl(240 3.7% 15.9%);
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --sidebar-overlay: rgba(0, 0, 0, 0.35);
 }
 
 @layer base {

@@ -1,3 +1,4 @@
+import {useEffect} from "react";
 import {useWeb3AuthContext} from "../App";
 import {UserMenu} from "./UserMenu";
 import {Button} from "@/components/ui/button";
@@ -7,13 +8,13 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
-import {Coins, Home, List} from "lucide-react";
+import {Coins, List, Mic} from "lucide-react";
 import {Link, useLocation} from "react-router-dom";
 import {useReadContract} from "wagmi";
 import type {Abi} from "viem";
@@ -32,6 +33,11 @@ export function AppSidebar() {
   } = useWeb3AuthContext();
 
   const location = useLocation();
+  const {setOpenMobile} = useSidebar();
+
+  useEffect(() => {
+    setOpenMobile(false);
+  }, [location.pathname, setOpenMobile]);
 
   const {data: balance} = useReadContract({
     address: contractAddress,
@@ -41,9 +47,9 @@ export function AppSidebar() {
 
   const menuItems = [
     {
-      title: "Home",
+      title: "Analyze",
       url: "/",
-      icon: Home,
+      icon: Mic,
     },
     {
       title: "Donations",
@@ -121,9 +127,6 @@ export function AppSidebar() {
             </SidebarMenu>
           )}
 
-          <SidebarGroupLabel className="group-data-[state=collapsed]/sidebar-wrapper:hidden">
-            Navigation
-          </SidebarGroupLabel>
           <SidebarMenu>
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.title}>

@@ -8,7 +8,7 @@ import {mockDiscoveryData} from "@/lib/mockData";
 // Toggle mock data: set to true for mock data, false for real audio analysis
 const USE_MOCK_DATA = false;
 
-export function Home() {
+export function Analyze() {
   const [discoveryData, setDiscoveryData] = useState<DiscoveryResult | null>(USE_MOCK_DATA ? mockDiscoveryData : null);
 
   const artistId = discoveryData?.spotifyInfo?.artists?.[0]?.id;
