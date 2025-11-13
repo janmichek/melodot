@@ -78,7 +78,7 @@ export function AddressInput({
           placeholder={placeholder}
           disabled={disabled}
           className={clsx(
-            showValidation && value ? (isValid ? 'border-green-500' : 'border-red-500') : ''
+            showValidation && value ? (isValid ? 'border-green-500' : 'border-blue-500') : ''
           )}
           aria-invalid={showValidation && value ? !isValid : undefined}
           aria-describedby={error ? 'address-error' : undefined}

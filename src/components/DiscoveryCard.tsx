@@ -201,7 +201,7 @@ export default function DiscoveryCard({ discovery, onSearchAgain, children }: Di
                     variant="outline"
                     size="sm"
                     asChild
-                    className="hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/50 transition-colors"
+                    className="hover:bg-blue-500/10 hover:text-blue-500 hover:border-blue-500/50 transition-colors"
                   >
                     <a
                       href={discovery.artistInfo.socialLinks.youtube}
