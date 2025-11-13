@@ -3,28 +3,21 @@ import {clsx} from "clsx";
 import {Button} from "@/components/ui/button";
 
 interface RecordButtonProps {
-  hasPermission: boolean;
   onStart: () => void;
-  onRequestPermission: () => void;
   className?: string;
   tabIndex?: number;
   ariaHidden?: boolean;
 }
 
 export default function RecordButton({
-  hasPermission,
   onStart,
-  onRequestPermission,
   className,
   tabIndex,
   ariaHidden,
 }: RecordButtonProps) {
   const handleClick = () => {
-    if (!hasPermission) {
-      onRequestPermission();
-    } else {
-      onStart();
-    }
+    // onStart will handle permission request and recording start
+    onStart();
   };
 
   return (

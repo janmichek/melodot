@@ -28,8 +28,8 @@ code {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	min-height: 100vh;
 	width: 100%;
+	position: relative;
 }
 
 .audio-player-toggle-wrapper {

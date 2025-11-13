@@ -98,10 +98,10 @@ function App() {
           } as CSSProperties
         }
       >
-        <SidebarInset className="bg-background">
+        <SidebarInset className="bg-background flex flex-col overflow-hidden">
           <Header />
-          <div className="@container/main flex flex-1 flex-col gap-4 px-4 py-4 sm:px-6 sm:py-6">
-            <main className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-4 px-4 py-4 sm:px-6 sm:py-6 overflow-y-auto overflow-x-hidden scrollbar-hide">
+            <main className="flex flex-1 flex-col min-h-0">
               <Routes>
                 <Route path="/" element={<Analyze />} />
                 <Route path="/donations" element={<Donations />} />

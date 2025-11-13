@@ -14,7 +14,7 @@ export function Analyze() {
   const artistId = discoveryData?.spotifyInfo?.artists?.[0]?.id;
 
   return (
-    <>
+    <div className="flex min-h-full w-full items-center justify-center py-6">
       {!discoveryData ? (
         <AudioRecorder onAnalysisComplete={setDiscoveryData} />
       ) : (
@@ -25,6 +25,6 @@ export function Analyze() {
           {artistId && <DonationForm artistId={artistId} />}
         </DiscoveryCard>
       )}
-    </>
+    </div>
   );
 }

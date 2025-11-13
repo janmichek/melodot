@@ -15,7 +15,7 @@ export function Donations() {
   }, [contractAddress]);
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 pb-6">
       <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">Donations</h1>

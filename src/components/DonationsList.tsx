@@ -2,8 +2,8 @@ import {useEffect, useState} from "react";
 import {usePublicClient, useReadContract} from "wagmi";
 import type {Abi} from "viem";
 import {donateConfig} from "../generated";
-import {formatAddress, passetHub} from "../wagmi-config";
 import {BalanceDisplay} from "./ui/balance-display";
+import {DonationsTable} from "./DonationsTable";
 
 interface ArtistItem {
   id: string;
@@ -76,7 +76,6 @@ function ArtistsList({ count, contractAddress }: { count: bigint; contractAddres
         <h3 className="text-sm font-semibold text-foreground">
           Artists in Contract ({count.toString()})
         </h3>
-        <span className="text-xs text-muted-foreground">Updated in real-time</span>
       </div>
       {isLoading && <p className="text-sm text-muted-foreground">Loading artists...</p>}
       {!isLoading && artistItems.length === 0 && (
@@ -129,39 +128,18 @@ export function DonationsList({ contractAddress }: DonationsListProps) {
     functionName: "getArtistsCount",
   });
 
-  const { data: balance } = useReadContract({
-    address: contractAddress,
-    abi: donateConfig.abi as Abi,
-    functionName: "balance",
-  });
-
   const artistCount = count ? Number(count) : 0;
-  const platformBalance = typeof balance === "bigint" ? balance : undefined;
 
   return (
     <section
       className="flex flex-col gap-4 rounded-xl border border-border bg-muted/5 p-4 text-sm text-muted-foreground"
       data-testid="donations-list"
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="font-medium text-foreground">{passetHub.name}</span>
-        <span>•</span>
-        <a
-          href={`${passetHub.blockExplorers.default.url}/address/${contractAddress}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-medium text-primary hover:underline"
-        >
-          {formatAddress(contractAddress, 6, 4)}
-        </a>
-        <span>•</span>
-        <span>{artistCount} artists</span>
-        <span>•</span>
-        <BalanceDisplay balance={platformBalance} showSymbol={true} size="small" />
-      </div>
-
       {artistCount > 0 && (
-        <ArtistsList count={BigInt(artistCount)} contractAddress={contractAddress} />
+        <>
+          <DonationsTable contractAddress={contractAddress} />
+          <ArtistsList count={BigInt(artistCount)} contractAddress={contractAddress} />
+        </>
       )}
     </section>
   );

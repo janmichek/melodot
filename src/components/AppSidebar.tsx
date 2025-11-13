@@ -85,17 +85,17 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar side="right" collapsible="icon" className="border-l border-border/60">
+    <Sidebar side="right" collapsible="offcanvas" className="border-l border-border/60">
       <SidebarHeader className="border-b border-border/60">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="h-11 px-2 data-[state=collapsed]/sidebar-wrapper:justify-center"
+              className="h-11 px-2"
             >
               <Link to="/" className="flex items-center gap-2">
                 <Logo className="h-6 w-6 text-sidebar-foreground" />
-                <span className="text-base font-semibold group-data-[state=collapsed]/sidebar-wrapper:hidden">
+                <span className="text-base font-semibold">
                   BeatChain
                 </span>
               </Link>
@@ -105,13 +105,13 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="gap-6">
-        <SidebarGroup className="group-data-[state=collapsed]/sidebar-wrapper:hidden">
+        <SidebarGroup>
           {renderConnectArea()}
         </SidebarGroup>
 
         <SidebarGroup className="gap-3">
           {(!balance || balance === 0n) && (
-            <SidebarMenu className="group-data-[state=collapsed]/sidebar-wrapper:hidden">
+            <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <a
@@ -137,7 +137,7 @@ export function AppSidebar() {
                 >
                   <Link to={item.url} className="flex w-full items-center gap-2">
                     <item.icon className="h-4 w-4" />
-                    <span className="truncate group-data-[state=collapsed]/sidebar-wrapper:hidden">
+                    <span className="truncate">
                       {item.title}
                     </span>
                   </Link>

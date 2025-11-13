@@ -5,7 +5,7 @@ export function Claim() {
   const { contractAddress } = useWeb3AuthContext();
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 pb-6">
       <header className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Artist Claiming</h1>
         <p className="text-sm text-muted-foreground">

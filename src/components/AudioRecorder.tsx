@@ -27,6 +27,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
   const [allAttemptsFailed, setAllAttemptsFailed] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const isProcessingAttempt = useRef(false);
+  const pendingRecordingStart = useRef(false);
 
   // Analyze audio when ready
   useEffect(() => {
@@ -39,6 +40,18 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
   useEffect(() => {
     return startDurationTimer(isRecording, setDuration);
   }, [isRecording]);
+
+  // Auto-start recording when permission is granted after user clicked record
+  useEffect(() => {
+    if (permission && pendingRecordingStart.current && !isRecording && !isAnalyzing) {
+      pendingRecordingStart.current = false;
+      setAttemptIndex(0);
+      setAllAttemptsFailed(false);
+      setDuration(0);
+      isProcessingAttempt.current = false;
+      startRecording();
+    }
+  }, [permission, isRecording, isAnalyzing, startRecording]);
 
   // Auto-stop recording when duration threshold is reached for current attempt
   useEffect(() => {
@@ -126,8 +139,17 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
     }
   }
 
-  function record() {
+  async function record() {
     if (!isRecording && !isAnalyzing) {
+      // If no permission, request it first
+      if (!permission) {
+        pendingRecordingStart.current = true;
+        await enablePermission();
+        // Recording will start automatically via useEffect when permission is granted
+        return;
+      }
+      
+      // Start recording if we already have permission
       setAttemptIndex(0);
       setAllAttemptsFailed(false);
       setDuration(0);
@@ -150,6 +172,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
     setAttemptIndex(0);
     setAllAttemptsFailed(false);
     isProcessingAttempt.current = false;
+    pendingRecordingStart.current = false;
     resetRecording();
   }
 
@@ -171,7 +194,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
   }
 
   return (
-    <div className="shazam-container flex w-full flex-col items-center gap-6">
+    <div className="shazam-container flex w-full flex-col items-center justify-center gap-6">
       {!allAttemptsFailed && (
         <AudioControls
           hasPermission={permission}
@@ -179,7 +202,6 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
           isAnalyzing={isAnalyzing}
           onStart={record}
           onStop={stop}
-          onRequestPermission={enablePermission}
         />
       )}
 

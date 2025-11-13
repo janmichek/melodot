@@ -34,6 +34,13 @@ export function Owner() {
       functionName: "getPlatformFeeBalance",
     });
 
+  const { data: totalBalance, isLoading: isLoadingTotalBalance } =
+    useReadContract({
+      address: contractAddress as `0x${string}`,
+      abi: donateConfig.abi as Abi,
+      functionName: "balance",
+    });
+
   const ownerWalletAddress = ownerAddress as `0x${string}` | undefined;
 
   const isOwner =
@@ -73,7 +80,7 @@ export function Owner() {
   };
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 pb-6">
       <header className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Owner Dashboard
@@ -101,6 +108,18 @@ export function Owner() {
                 ? "—"
                 : formatAddressShort(ownerWalletAddress, 16)}
             </div>
+          </div>
+          <div className="space-y-1">
+            <span className="font-medium text-foreground">
+              Total Donated
+            </span>
+            <BalanceDisplay
+              balance={(totalBalance as bigint) ?? 0n}
+              showSymbol
+              isLoading={isLoadingTotalBalance}
+              size="medium"
+              className="border-none bg-transparent p-0"
+            />
           </div>
           <div className="space-y-1">
             <span className="font-medium text-foreground">

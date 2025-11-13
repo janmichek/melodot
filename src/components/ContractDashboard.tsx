@@ -5,7 +5,7 @@ import {useWeb3AuthContext} from "../App";
 import {donateConfig} from "../generated";
 import {BalanceDisplay} from "@/components/ui/balance-display";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {formatAddressShort} from "../wagmi-config";
+import {formatAddress, formatAddressShort, passetHub} from "../wagmi-config";
 
 export function ContractDashboard() {
   const {contractAddress} = useWeb3AuthContext();
@@ -57,11 +57,11 @@ export function ContractDashboard() {
 
   const stats = [
     {
-      key: "contract-balance",
+      key: "total-donated",
       node: (
         <BalanceDisplay
-          key="contract-balance"
-          label="Contract Balance"
+          key="total-donated"
+          label="Total Donated"
           balance={(totalBalance as bigint) ?? 0n}
           showSymbol
           isLoading={isLoadingTotalBalance}
@@ -152,10 +152,34 @@ export function ContractDashboard() {
   ];
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {stats.map((stat) => (
-        <div key={stat.key}>{stat.node}</div>
-      ))}
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border/40 bg-muted/10 p-4 text-sm text-muted-foreground">
+        <span className="font-medium text-foreground">{passetHub.name}</span>
+        <span>•</span>
+        {contractAddress && (
+          <>
+            <a
+              href={`${passetHub.blockExplorers.default.url}/address/${contractAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-primary hover:underline"
+            >
+              {formatAddress(contractAddress, 6, 4)}
+            </a>
+            <span>•</span>
+          </>
+        )}
+        <span>
+          {isLoadingArtistsCount
+            ? "—"
+            : `${Number((artistsCount as bigint) ?? 0n)} artists`}
+        </span>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map((stat) => (
+          <div key={stat.key}>{stat.node}</div>
+        ))}
+      </div>
     </div>
   );
 }
