@@ -1,7 +1,7 @@
 import "./App.css";
-import {useEffect, useState} from "react";
+import {type CSSProperties, useEffect, useState} from "react";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import {useWeb3Auth, useWeb3AuthConnect, useWeb3AuthDisconnect,} from "@web3auth/modal/react";
+import {useWeb3Auth, useWeb3AuthConnect, useWeb3AuthDisconnect} from "@web3auth/modal/react";
 import {useAccount} from "wagmi";
 import {donateConfig} from "./generated";
 import {passetHub} from "./wagmi-config";
@@ -9,6 +9,7 @@ import {AppSidebar} from "./components/AppSidebar";
 import {SidebarInset, SidebarProvider} from "@/components/ui/sidebar";
 import {Home} from "./pages/Home";
 import {Claim} from "./pages/Claim";
+import {Donations} from "./pages/Donations";
 import {Owner} from "./pages/Owner";
 import {Header} from "./components/Header";
 
@@ -88,13 +89,22 @@ export function useWeb3AuthContext() {
 function App() {
   return (
     <BrowserRouter>
-      <SidebarProvider>
+      <SidebarProvider
+        defaultOpen
+        style={
+          {
+            "--sidebar-width": "19rem",
+            "--sidebar-width-mobile": "18rem",
+          } as CSSProperties
+        }
+      >
         <SidebarInset className="bg-background">
           <Header />
-          <div className="flex flex-1 flex-col gap-4 p-4">
-            <main className="main-content flex-1">
+          <div className="@container/main flex flex-1 flex-col gap-4 px-4 py-4 sm:px-6 sm:py-6">
+            <main className="flex flex-1 flex-col">
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/donations" element={<Donations />} />
                 <Route path="/claim" element={<Claim />} />
                 <Route path="/owner" element={<Owner />} />
               </Routes>

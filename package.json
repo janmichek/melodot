@@ -9,7 +9,7 @@
     "start": "vercel dev",
     "build": "tsc && vite build",
     "generate": "wagmi generate",
-    "test:api": "bash ./api/test-api.sh",
+    "test:api": "bun run api/test-api.ts",
     "test:e2e": "playwright test",
     "test:contract": "cd contracts && bun install && bun run test",
     "deploy-contract": "cd contracts && bun install && bun run deploy-contract && cd .. && bun run generate",

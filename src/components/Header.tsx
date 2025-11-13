@@ -1,6 +1,7 @@
 import {Loader2} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {SidebarTrigger} from "@/components/ui/sidebar";
+import {ModeToggle} from "./ui/mode-toggle";
 import {useWeb3AuthContext} from "../App";
 import {formatAddress} from "../wagmi-config";
 
@@ -30,8 +31,9 @@ export function Header() {
       className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75"
       data-testid="header"
     >
-      <div className="flex items-center justify-end gap-4 px-4 py-3">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-4 px-4 py-3">
+        <SidebarTrigger className="lg:hidden" />
+        <div className="flex flex-1 items-center justify-end gap-3">
           {isConnected && address ? (
             <Button
               onClick={handleDisconnect}
@@ -64,7 +66,7 @@ export function Header() {
               )}
             </Button>
           )}
-          <SidebarTrigger className="lg:hidden" />
+          <ModeToggle />
         </div>
       </div>
     </header>

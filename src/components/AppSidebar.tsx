@@ -18,7 +18,6 @@ import {Link, useLocation} from "react-router-dom";
 import {useReadContract} from "wagmi";
 import type {Abi} from "viem";
 import {donateConfig} from "../generated";
-import {Footer} from "@/components/Footer";
 import {Spinner} from "@/components/ui/spinner";
 import LogoSvg from "@/assets/icons/beatchain-logo.svg";
 
@@ -63,65 +62,81 @@ export function AppSidebar() {
     },
   ];
 
+  const renderConnectArea = () => {
+    if (isConnected && address) {
+      return <UserMenu />;
+    }
+
+    return (
+      <Button
+        onClick={() => connect()}
+        disabled={connecting || !providerReady}
+        className="w-full"
+      >
+        {connecting || !providerReady ? <Spinner size="sm" className="inline" /> : "Connect"}
+      </Button>
+    );
+  };
+
   return (
-    <Sidebar side="right" collapsible="icon" className="border-l border-border">
-      <SidebarHeader className="border-b border-border">
+    <Sidebar side="right" collapsible="icon" className="border-l border-border/60">
+      <SidebarHeader className="border-b border-border/60">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="h-11 px-2 data-[state=collapsed]/sidebar-wrapper:justify-center"
             >
               <a href="#" className="flex items-center gap-2">
-                <img src={LogoSvg} alt="BeatChain Logo" className="w-6 h-6" />
-                <span className="text-base font-semibold">BeatChain</span>
+                <img src={LogoSvg} alt="BeatChain Logo" className="h-6 w-6" />
+                <span className="text-base font-semibold group-data-[state=collapsed]/sidebar-wrapper:hidden">
+                  BeatChain
+                </span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent>
-        <div className="group-data-[collapsible=icon]:hidden">
-          {isConnected && address ? (
-            <UserMenu/>
-          ) : (
-            <Button
-              onClick={() => connect()}
-              disabled={connecting || !providerReady}
-              variant="default"
-              className="w-full">
-              {connecting || !providerReady ?
-                <Spinner size="sm" className="inline"/>
-                : "Connect"}
-            </Button>
-          )}
-        </div>
+      <SidebarContent className="gap-6">
+        <SidebarGroup className="group-data-[state=collapsed]/sidebar-wrapper:hidden">
+          {renderConnectArea()}
+        </SidebarGroup>
 
-        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarMenu>
-            {(!balance || balance === 0n) && (
+        <SidebarGroup className="gap-3">
+          {(!balance || balance === 0n) && (
+            <SidebarMenu className="group-data-[state=collapsed]/sidebar-wrapper:hidden">
               <SidebarMenuItem>
-                <a
-                  href="https://faucet.polkadot.io/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm font-medium text-primary transition hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
-                  💧 Get Test Tokens
-                </a>
+                <SidebarMenuButton asChild>
+                  <a
+                    href="https://faucet.polkadot.io/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm font-medium text-primary transition hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    💧 Get Test Tokens
+                  </a>
+                </SidebarMenuButton>
               </SidebarMenuItem>
-            )}
+            </SidebarMenu>
+          )}
 
+          <SidebarGroupLabel className="group-data-[state=collapsed]/sidebar-wrapper:hidden">
+            Navigation
+          </SidebarGroupLabel>
+          <SidebarMenu>
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild
+                <SidebarMenuButton
+                  asChild
                   isActive={location.pathname === item.url}
+                  className="justify-start"
                 >
-                  <Link to={item.url} className="w-full">
-                    <item.icon/>
-                    <span>{item.title}</span>
+                  <Link to={item.url} className="flex w-full items-center gap-2">
+                    <item.icon className="h-4 w-4" />
+                    <span className="truncate group-data-[state=collapsed]/sidebar-wrapper:hidden">
+                      {item.title}
+                    </span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -130,11 +145,10 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-border">
-        <div className="group-data-[collapsible=icon]:hidden">
-          <Footer contractAddress={contractAddress}></Footer>
+      <SidebarFooter className="border-t border-border/60 gap-4">
+        <div className="flex items-center justify-center">
+          <ModeToggle />
         </div>
-        <ModeToggle/>
       </SidebarFooter>
     </Sidebar>
   );

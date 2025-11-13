@@ -6,10 +6,6 @@ import {formatAddress, passetHub} from "../wagmi-config";
 import {BalanceDisplay} from "./ui/balance-display";
 import {Button} from "@/components/ui/button";
 
-interface ContractInfoFooterProps {
-  contractAddress: `0x${string}`;
-}
-
 interface ArtistItem {
   id: string;
   totalBalance: bigint;
@@ -30,7 +26,6 @@ function ArtistsList({ count, contractAddress }: { count: bigint; contractAddres
 
       setIsLoading(true);
       try {
-        // Fetch all artist IDs
         const idPromises = [];
         for (let i = 0; i < Number(count); i++) {
           idPromises.push(
@@ -39,25 +34,23 @@ function ArtistsList({ count, contractAddress }: { count: bigint; contractAddres
               abi: donateConfig.abi as Abi,
               functionName: "artistIds",
               args: [i],
-            })
+            }),
           );
         }
 
         const artistIds = await Promise.all(idPromises);
 
-        // Fetch data for each artist
         const dataPromises = (artistIds as string[]).map((artistId) =>
           publicClient.readContract({
             address: contractAddress,
             abi: donateConfig.abi as Abi,
             functionName: "artists",
             args: [artistId],
-          })
+          }),
         );
 
         const artistDataResults = await Promise.all(dataPromises);
 
-        // Map to artist items
         const items = (artistIds as string[]).map((artistId, index) => {
           const [totalBalance, isClaimed] = artistDataResults[index] as [bigint, boolean];
           return {
@@ -82,15 +75,11 @@ function ArtistsList({ count, contractAddress }: { count: bigint; contractAddres
     <div className="space-y-4 rounded-lg border border-border/40 bg-muted/10 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-semibold text-foreground">
-          All Artists in Contract ({count.toString()})
+          Artists in Contract ({count.toString()})
         </h3>
-        <span className="text-xs text-muted-foreground">
-          Updated in real-time
-        </span>
+        <span className="text-xs text-muted-foreground">Updated in real-time</span>
       </div>
-      {isLoading && (
-        <p className="text-sm text-muted-foreground">Loading artists...</p>
-      )}
+      {isLoading && <p className="text-sm text-muted-foreground">Loading artists...</p>}
       {!isLoading && artistItems.length === 0 && (
         <p className="text-sm text-muted-foreground">No artists found</p>
       )}
@@ -130,12 +119,12 @@ function ArtistsList({ count, contractAddress }: { count: bigint; contractAddres
   );
 }
 
-interface FooterProps {
+interface DonationsListProps {
   contractAddress: `0x${string}`;
 }
 
-export function Footer({ contractAddress }: FooterProps) {
-  const [isArtistsExpanded, setIsArtistsExpanded] = useState(false);
+export function DonationsList({ contractAddress }: DonationsListProps) {
+  const [isArtistsExpanded, setIsArtistsExpanded] = useState(true);
 
   const { data: count } = useReadContract({
     address: contractAddress,
@@ -153,9 +142,9 @@ export function Footer({ contractAddress }: FooterProps) {
   const platformBalance = typeof balance === "bigint" ? balance : undefined;
 
   return (
-    <footer
+    <section
       className="flex flex-col gap-4 rounded-xl border border-border bg-muted/5 p-4 text-sm text-muted-foreground"
-      data-testid="footer"
+      data-testid="donations-list"
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-medium text-foreground">{passetHub.name}</span>
@@ -188,6 +177,9 @@ export function Footer({ contractAddress }: FooterProps) {
       {artistCount > 0 && isArtistsExpanded && (
         <ArtistsList count={BigInt(artistCount)} contractAddress={contractAddress} />
       )}
-    </footer>
+    </section>
   );
 }
+
+
+

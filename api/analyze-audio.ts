@@ -2,6 +2,20 @@ import type {VercelRequest, VercelResponse} from '@vercel/node';
 import formidable from 'formidable';
 import fs from 'fs';
 
+const SHAZAM_API_URL =
+  process.env.SHAZAM_API_URL ??
+  'https://shazam-core.p.rapidapi.com/v1/tracks/recognize';
+
+const SHAZAM_API_HOST =
+  process.env.SHAZAM_API_HOST ?? 'shazam-core.p.rapidapi.com';
+
+const SPOTIFY_SERVICE_URL =
+  process.env.SPOTIFY_SERVICE_URL ?? 'http://localhost:3000';
+
+const SPOTIFY_TRACK_INFO_PATH =
+  process.env.SPOTIFY_TRACK_INFO_PATH ?? '/api/track-info';
+
+
 interface ShazamTrack {
   subtitle?: string;
   [key: string]: any;
@@ -65,17 +79,14 @@ export default async function handler(
     const blob = new Blob([fileBuffer], { type: uploadedFile.mimetype || 'audio/webm' });
     formData.append('file', blob, 'audio.webm');
 
-    const shazamResponse = await fetch(
-      'https://shazam-core.p.rapidapi.com/v1/tracks/recognize',
-      {
-        method: 'POST',
-        headers: {
-          'X-RapidAPI-Key': process.env.VITE_RAPIDAPI_KEY,
-          'X-RapidAPI-Host': 'shazam-core.p.rapidapi.com',
-        },
-        body: formData,
-      }
-    );
+    const shazamResponse = await fetch(SHAZAM_API_URL, {
+      method: 'POST',
+      headers: {
+        'X-RapidAPI-Key': process.env.VITE_RAPIDAPI_KEY,
+        'X-RapidAPI-Host': SHAZAM_API_HOST,
+      },
+      body: formData,
+    });
 
     if (!shazamResponse.ok) {
       const errorText = await shazamResponse.text();
@@ -94,9 +105,10 @@ export default async function handler(
 
     if (spotifyUri) {
       try {
-        const baseUrl = 'http://localhost:3000';
         const spotifyResponse = await fetch(
-          `${baseUrl}/api/track-info?uri=${encodeURIComponent(spotifyUri)}`
+          `${SPOTIFY_SERVICE_URL}${SPOTIFY_TRACK_INFO_PATH}?uri=${encodeURIComponent(
+            spotifyUri
+          )}`
         );
 
         if (spotifyResponse.ok) {
