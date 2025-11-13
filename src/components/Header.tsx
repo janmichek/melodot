@@ -7,7 +7,7 @@ export function Header() {
       data-testid="header"
     >
       <div className="flex items-center justify-end px-4 py-3">
-        <SidebarTrigger className="ml-auto lg:hidden" />
+        <SidebarTrigger className="ml-auto" />
       </div>
     </header>
   );

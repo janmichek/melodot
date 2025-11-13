@@ -4,7 +4,6 @@ import type {Abi} from "viem";
 import {donateConfig} from "../generated";
 import {formatAddress, passetHub} from "../wagmi-config";
 import {BalanceDisplay} from "./ui/balance-display";
-import {Button} from "@/components/ui/button";
 
 interface ArtistItem {
   id: string;
@@ -124,8 +123,6 @@ interface DonationsListProps {
 }
 
 export function DonationsList({ contractAddress }: DonationsListProps) {
-  const [isArtistsExpanded, setIsArtistsExpanded] = useState(true);
-
   const { data: count } = useReadContract({
     address: contractAddress,
     abi: donateConfig.abi as Abi,
@@ -158,23 +155,12 @@ export function DonationsList({ contractAddress }: DonationsListProps) {
           {formatAddress(contractAddress, 6, 4)}
         </a>
         <span>•</span>
-        {artistCount > 0 ? (
-          <Button
-            onClick={() => setIsArtistsExpanded((prev) => !prev)}
-            variant="ghost"
-            size="sm"
-            className="h-8 px-3"
-          >
-            {artistCount} artists {isArtistsExpanded ? "▼" : "▲"}
-          </Button>
-        ) : (
-          <span>{artistCount} artists</span>
-        )}
+        <span>{artistCount} artists</span>
         <span>•</span>
         <BalanceDisplay balance={platformBalance} showSymbol={true} size="small" />
       </div>
 
-      {artistCount > 0 && isArtistsExpanded && (
+      {artistCount > 0 && (
         <ArtistsList count={BigInt(artistCount)} contractAddress={contractAddress} />
       )}
     </section>

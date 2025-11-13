@@ -20,7 +20,7 @@ import {useReadContract} from "wagmi";
 import type {Abi} from "viem";
 import {donateConfig} from "../generated";
 import {Spinner} from "@/components/ui/spinner";
-import LogoSvg from "@/assets/icons/beatchain-logo.svg";
+import {Logo} from "./Logo";
 
 export function AppSidebar() {
   const {
@@ -94,7 +94,7 @@ export function AppSidebar() {
               className="h-11 px-2 data-[state=collapsed]/sidebar-wrapper:justify-center"
             >
               <Link to="/" className="flex items-center gap-2">
-                <img src={LogoSvg} alt="BeatChain Logo" className="h-6 w-6" />
+                <Logo className="h-6 w-6 text-sidebar-foreground" />
                 <span className="text-base font-semibold group-data-[state=collapsed]/sidebar-wrapper:hidden">
                   BeatChain
                 </span>

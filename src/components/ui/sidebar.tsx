@@ -4,10 +4,11 @@ import {Button} from "@/components/ui/button";
 
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
+const SIDEBAR_WIDTH_ICON = "4rem"
 
 const SidebarContext = React.createContext<{
   open: boolean
-  setOpen: (open: boolean) => void
+  setOpen: (open: boolean | ((open: boolean) => boolean)) => void
   openMobile: boolean
   setOpenMobile: (open: boolean) => void
 } | null>(null)
@@ -72,6 +73,7 @@ const SidebarProvider = React.forwardRef<
             {
               "--sidebar-width": SIDEBAR_WIDTH,
               "--sidebar-width-mobile": SIDEBAR_WIDTH_MOBILE,
+              "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
               ...style,
             } as React.CSSProperties
           }
@@ -92,13 +94,22 @@ const Sidebar = React.forwardRef<
     collapsible?: "offcanvas" | "icon" | "none"
   }
 >(({ side = "left", collapsible = "offcanvas", className, children, ...props }, ref) => {
-  const { openMobile, setOpenMobile } = useSidebar()
+  const { open, openMobile, setOpenMobile } = useSidebar()
+
+  const isIconCollapsible = collapsible === "icon"
+  const isDesktopCollapsed = isIconCollapsible ? !open : false
 
   if (collapsible === "none") {
     return (
       <div
         ref={ref}
-        className={clsx("flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground", className)}
+        data-desktop="true"
+        data-state="expanded"
+        data-collapsible="none"
+        className={clsx(
+          "sidebar-wrapper group/sidebar-wrapper flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
+          className
+        )}
         {...props}
       >
         {children}
@@ -125,8 +136,10 @@ const Sidebar = React.forwardRef<
       <div
         ref={ref}
         data-mobile="true"
+        data-state={openMobile ? "expanded" : "collapsed"}
+        data-collapsible={collapsible}
         className={clsx(
-          "fixed inset-y-0 z-50 flex w-[--sidebar-width-mobile] flex-col bg-sidebar text-sidebar-foreground transition-transform duration-200 lg:hidden",
+          "sidebar-wrapper group/sidebar-wrapper fixed inset-y-0 z-50 flex w-[--sidebar-width-mobile] flex-col bg-sidebar text-sidebar-foreground transition-transform duration-200 lg:hidden",
           side === "left" ? "left-0" : "right-0",
           openMobile
             ? "translate-x-0"
@@ -144,8 +157,15 @@ const Sidebar = React.forwardRef<
       <div
         ref={ref}
         data-desktop="true"
+        data-state={isDesktopCollapsed ? "collapsed" : "expanded"}
+        data-collapsible={collapsible}
         className={clsx(
-          "hidden lg:flex h-screen w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
+          "sidebar-wrapper group/sidebar-wrapper hidden h-screen shrink-0 flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out lg:flex",
+          isIconCollapsible
+            ? isDesktopCollapsed
+              ? "w-[--sidebar-width-icon]"
+              : "w-[--sidebar-width]"
+            : "w-[--sidebar-width]",
           className
         )}
         {...props}
@@ -161,7 +181,7 @@ const SidebarTrigger = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<"button">
 >(({ className, onClick, ...props }, ref) => {
-  const { openMobile, setOpenMobile } = useSidebar()
+  const { open, setOpen, openMobile, setOpenMobile } = useSidebar()
 
   return (
     <Button
@@ -171,8 +191,18 @@ const SidebarTrigger = React.forwardRef<
         "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-9 w-9",
         className
       )}
+      aria-expanded={openMobile || open}
       onClick={(event) => {
         onClick?.(event)
+
+        const targetWindow = event.currentTarget.ownerDocument?.defaultView
+        const isDesktop = targetWindow?.matchMedia?.("(min-width: 1024px)").matches ?? false
+
+        if (isDesktop) {
+          setOpen((prev) => !prev)
+          return
+        }
+
         setOpenMobile(!openMobile)
       }}
       {...props}
