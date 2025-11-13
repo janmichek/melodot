@@ -32,6 +32,101 @@ code {
 	width: 100%;
 }
 
+.audio-player-toggle-wrapper {
+	position: relative;
+	width: 160px;
+	height: 160px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	perspective: 1200px;
+	filter: drop-shadow(0 0 20px rgba(var(--primary-color-rgb), 0.25));
+	transition: transform 0.45s ease, filter 0.45s ease;
+}
+
+.audio-player-toggle-wrapper::before {
+	content: "";
+	position: absolute;
+	inset: -24px;
+	border-radius: 50%;
+	background: conic-gradient(
+		from 270deg,
+		rgba(var(--primary-color-rgb), 0.75) 0%,
+		rgba(var(--primary-accent-rgb), 0.08) 40%,
+		rgba(var(--primary-color-rgb), 0.6) 75%,
+		rgba(var(--primary-accent-rgb), 0.08) 100%
+	);
+	opacity: 0.35;
+	transform: scale(0.9) rotate(-12deg);
+	transition: opacity 0.6s ease, transform 0.6s ease;
+	filter: blur(18px);
+	pointer-events: none;
+	z-index: -1;
+}
+
+.audio-player-toggle-wrapper--idle::before {
+	animation: idleGlow 6s ease-in-out infinite;
+}
+
+.audio-player-toggle-wrapper--recording {
+	transform: scale(1.04) translateZ(0);
+	filter: drop-shadow(0 0 35px rgba(var(--primary-color-rgb), 0.35));
+}
+
+.audio-player-toggle-wrapper--recording::before {
+	opacity: 0.55;
+	transform: scale(1.12) rotate(24deg);
+}
+
+.audio-player-toggle-button {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	pointer-events: none;
+	transform: scale(0.82) rotateX(32deg);
+	filter: blur(6px) saturate(0.65);
+	transition:
+		opacity 0.35s ease,
+		transform 0.45s cubic-bezier(0.18, 0.89, 0.32, 1.28),
+		filter 0.45s ease;
+}
+
+.audio-player-toggle-button-visible {
+	opacity: 1;
+	pointer-events: auto;
+	transform: scale(1) rotateX(0deg);
+	filter: blur(0) saturate(1);
+	transition-delay: 40ms;
+}
+
+.audio-player-toggle-button-hidden {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.audio-player-toggle-button-visible .audio-player-button-inner {
+	animation: buttonBreath 2.4s ease-in-out infinite;
+}
+
+.audio-player-toggle-button-visible .audio-player-recording-pulse,
+.audio-player-toggle-button-visible .audio-player-recording-pulse-2,
+.audio-player-toggle-button-visible .audio-player-recording-pulse-3 {
+	animation-play-state: running;
+}
+
+.audio-player-toggle-button-hidden .audio-player-recording-pulse,
+.audio-player-toggle-button-hidden .audio-player-recording-pulse-2,
+.audio-player-toggle-button-hidden .audio-player-recording-pulse-3 {
+	animation-play-state: paused;
+}
+
+.audio-player-toggle-button-hidden .audio-player-button-inner {
+	animation: none;
+}
+
 .audio-player-button {
 	position: relative;
 	height: 160px;
@@ -42,7 +137,6 @@ code {
 	padding: 0;
 	transition: transform 0.2s ease;
 	border-radius: 50%;
-	animation: buttonPulse 1.5s ease-in-out infinite;
 }
 
 .audio-player-button:active {
@@ -69,6 +163,11 @@ code {
 }
 
 @media (min-width: 640px) {
+	.audio-player-toggle-wrapper {
+		width: 200px;
+		height: 200px;
+	}
+
 	.audio-player-button {
 		height: 200px;
 		width: 200px;
@@ -150,6 +249,30 @@ code {
 	100% {
 		transform: scale(3);
 		opacity: 0;
+	}
+}
+
+@keyframes idleGlow {
+	0%, 100% {
+		opacity: 0.35;
+		transform: scale(0.9) rotate(-12deg);
+	}
+	45% {
+		opacity: 0.5;
+		transform: scale(0.94) rotate(-4deg);
+	}
+	70% {
+		opacity: 0.42;
+		transform: scale(0.88) rotate(-16deg);
+	}
+}
+
+@keyframes buttonBreath {
+	0%, 100% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.05);
 	}
 }
 

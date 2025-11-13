@@ -93,12 +93,12 @@ export function AppSidebar() {
               asChild
               className="h-11 px-2 data-[state=collapsed]/sidebar-wrapper:justify-center"
             >
-              <a href="#" className="flex items-center gap-2">
+              <Link to="/" className="flex items-center gap-2">
                 <img src={LogoSvg} alt="BeatChain Logo" className="h-6 w-6" />
                 <span className="text-base font-semibold group-data-[state=collapsed]/sidebar-wrapper:hidden">
                   BeatChain
                 </span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

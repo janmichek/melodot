@@ -4,6 +4,7 @@ import type {Abi} from "viem";
 import {donateConfig} from "../generated";
 import {formatAddress, passetHub} from "../wagmi-config";
 import {BalanceDisplay} from "./ui/balance-display";
+import {Button} from "@/components/ui/button";
 
 interface ArtistItem {
   id: string;
@@ -70,40 +71,50 @@ function ArtistsList({ count, contractAddress }: { count: bigint; contractAddres
     fetchArtistData();
   }, [count, publicClient, contractAddress]);
 
-  const hasArtists = artistItems.length > 0;
-
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 rounded-lg border border-border/40 bg-muted/10 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-semibold text-foreground">
-          Artists ({count.toString()})
+          Artists in Contract ({count.toString()})
         </h3>
-        <span className="text-xs text-muted-foreground">Auto-refresh</span>
+        <span className="text-xs text-muted-foreground">Updated in real-time</span>
       </div>
-      {isLoading && <p className="text-sm text-muted-foreground">Loading artists…</p>}
-      {!isLoading && !hasArtists && (
-        <p className="text-sm text-muted-foreground">No artists yet.</p>
+      {isLoading && <p className="text-sm text-muted-foreground">Loading artists...</p>}
+      {!isLoading && artistItems.length === 0 && (
+        <p className="text-sm text-muted-foreground">No artists found</p>
       )}
-      {!isLoading && hasArtists && (
-        <ul className="space-y-2">
-          {artistItems.map((artist) => (
-            <li key={artist.id} className="rounded border border-border/50 p-3">
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-mono text-muted-foreground">{artist.id}</span>
-                <span className={artist.isClaimed ? "text-emerald-600" : "text-amber-600"}>
-                  {artist.isClaimed ? "Claimed" : "Available"}
+      <div className="grid gap-3">
+        {artistItems.map((artist) => (
+          <div
+            key={artist.id}
+            className="space-y-3 rounded-md border border-border/30 bg-background/80 p-3"
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-foreground">
+                Artist:{" "}
+                <span className="font-mono text-xs text-muted-foreground">
+                  {artist.id}
                 </span>
-              </div>
-              <BalanceDisplay
-                balance={artist.totalBalance}
-                label="Balance"
-                showSymbol={true}
-                size="small"
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+              </p>
+              <span
+                className={
+                  artist.isClaimed
+                    ? "rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-500"
+                    : "rounded-full bg-amber-500/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-600"
+                }
+              >
+                {artist.isClaimed ? "✓ Claimed" : "○ Available"}
+              </span>
+            </div>
+            <BalanceDisplay
+              balance={artist.totalBalance}
+              label="Balance"
+              showSymbol={true}
+              size="small"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -132,31 +143,35 @@ export function DonationsList({ contractAddress }: DonationsListProps) {
 
   return (
     <section
-      className="space-y-3 rounded border border-border/60 p-4 text-sm text-muted-foreground"
+      className="flex flex-col gap-4 rounded-xl border border-border bg-muted/5 p-4 text-sm text-muted-foreground"
       data-testid="donations-list"
     >
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2">
         <span className="font-medium text-foreground">{passetHub.name}</span>
+        <span>•</span>
         <a
           href={`${passetHub.blockExplorers.default.url}/address/${contractAddress}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-primary underline-offset-2 hover:underline"
+          className="font-medium text-primary hover:underline"
         >
           {formatAddress(contractAddress, 6, 4)}
         </a>
-        <BalanceDisplay balance={platformBalance} showSymbol={true} size="small" />
+        <span>•</span>
         {artistCount > 0 ? (
-          <button
-            type="button"
+          <Button
             onClick={() => setIsArtistsExpanded((prev) => !prev)}
-            className="text-xs font-medium text-primary"
+            variant="ghost"
+            size="sm"
+            className="h-8 px-3"
           >
-            {artistCount} artists {isArtistsExpanded ? "▾" : "▴"}
-          </button>
+            {artistCount} artists {isArtistsExpanded ? "▼" : "▲"}
+          </Button>
         ) : (
           <span>{artistCount} artists</span>
         )}
+        <span>•</span>
+        <BalanceDisplay balance={platformBalance} showSymbol={true} size="small" />
       </div>
 
       {artistCount > 0 && isArtistsExpanded && (
