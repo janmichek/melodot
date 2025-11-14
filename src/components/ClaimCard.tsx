@@ -8,6 +8,7 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {useWeb3AuthContext} from "../App";
+import {useQuery} from "@tanstack/react-query";
 
 interface ClaimCardProps {
   contractAddress: `0x${string}` | undefined;
@@ -45,6 +46,27 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
       setParsedArtistId(null);
     }
   }, [artistUrl]);
+
+  // Fetch artist biography when URL is pasted
+  const { data: biographyData, isLoading: isLoadingBiography } = useQuery<{ biography?: string; status?: boolean; rawData?: any }>({
+    queryKey: ['artist-biography', artistUrl],
+    queryFn: async () => {
+      if (!artistUrl.trim() || !artistUrl.includes('open.spotify.com/artist/')) {
+        return null;
+      }
+      const response = await fetch(`/api/spotify/artist-biography?artistUrl=${encodeURIComponent(artistUrl.trim())}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Failed to fetch biography:', errorData);
+        throw new Error(errorData.error || 'Failed to fetch biography');
+      }
+      const data = await response.json();
+      console.log('Artist Biography Data:', data);
+      return data;
+    },
+    enabled: !!artistUrl.trim() && artistUrl.includes('open.spotify.com/artist/'),
+    retry: 1,
+  });
 
   const { data: artistInfoData, refetch } = useReadContract({
     address: contractAddress,
@@ -143,6 +165,22 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
         {artistUrl && !parsedArtistId && (
           <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
             Invalid Spotify artist URL. Please paste a valid URL like: https://open.spotify.com/artist/...
+          </div>
+        )}
+
+        {/* Artist Biography Section */}
+        {isLoadingBiography && (
+          <div className="rounded-lg border border-border/40 bg-muted/10 p-4 text-sm text-muted-foreground">
+            Loading artist biography...
+          </div>
+        )}
+
+        {biographyData?.biography && !isLoadingBiography && (
+          <div className="space-y-2 rounded-lg border border-border/40 bg-muted/10 p-4">
+            <h3 className="text-sm font-semibold text-foreground">Artist Biography</h3>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+              {biographyData.biography}
+            </p>
           </div>
         )}
 
