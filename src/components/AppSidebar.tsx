@@ -80,6 +80,7 @@ export function AppSidebar() {
   ];
 
   // Conditional "Withdraw Fees" item for owners
+  // move to menu items but make conditional, therfore cosnt to function
   const ownerMenuItems = isOwner
     ? [
         {
@@ -90,6 +91,7 @@ export function AppSidebar() {
       ]
     : [];
 
+  // todo move directly to tempalte
   const renderConnectArea = () => {
     if (isConnected && address) {
       return <UserMenu />;
@@ -169,10 +171,8 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-border/60 gap-4">
-        <div className="flex items-center justify-center">
+      <SidebarFooter className="border-t border-border/60 gap-4 flex items-center">
           <ModeToggle />
-        </div>
       </SidebarFooter>
     </Sidebar>
   );

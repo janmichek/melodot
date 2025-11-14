@@ -14,7 +14,7 @@ interface DonationSummaryByArtistProps {
   donations: Donation[];
 }
 
-export function DonationSummaryByArtist({
+export function DonationsArtistsTable({
   donations,
 }: DonationSummaryByArtistProps) {
   // Group donations by artist and calculate totals

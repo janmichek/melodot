@@ -44,19 +44,19 @@ export function apiPlugin(): Plugin {
           const urlPath = req.url.split('?')[0]; // Remove query string
           const apiRoute = urlPath.replace('/api/', ''); // e.g., 'analyze-audio' or 'spotify/track/info'
 
-          // Map route to file path
+          // Map route to file path (flat structure)
           // /api/analyze-audio -> api/analyze-audio.ts
-          // /api/spotify/track-info -> api/spotify/track-info.ts
-          // /api/spotify/artist-biography -> api/spotify/artist-biography.ts
+          // /api/spotify-track-info -> api/spotify-track-info.ts
+          // /api/spotify-artist-biography -> api/spotify-artist-biography.ts
           let apiFilePath: string;
           if (apiRoute === 'analyze-audio') {
             apiFilePath = resolve(process.cwd(), 'api', 'analyze-audio.ts');
-          } else if (apiRoute === 'spotify/track-info') {
-            apiFilePath = resolve(process.cwd(), 'api', 'spotify', 'track-info.ts');
-          } else if (apiRoute === 'spotify/profile') {
-            apiFilePath = resolve(process.cwd(), 'api', 'spotify', 'profile.ts');
-          } else if (apiRoute === 'spotify/artist-biography') {
-            apiFilePath = resolve(process.cwd(), 'api', 'spotify', 'artist-biography.ts');
+          } else if (apiRoute === 'spotify-track-info') {
+            apiFilePath = resolve(process.cwd(), 'api', 'spotify-track-info.ts');
+          } else if (apiRoute === 'spotify-profile') {
+            apiFilePath = resolve(process.cwd(), 'api', 'spotify-profile.ts');
+          } else if (apiRoute === 'spotify-artist-biography') {
+            apiFilePath = resolve(process.cwd(), 'api', 'spotify-artist-biography.ts');
           } else {
             // Unknown route
             res.writeHead(404, { 'Content-Type': 'application/json' });

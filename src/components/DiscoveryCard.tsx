@@ -102,29 +102,6 @@ export default function DiscoveryCard({ discovery, onSearchAgain, children }: Di
                     <p className="text-muted-foreground text-xs">Album</p>
                     <p className="font-medium">{discovery.spotifyInfo.album.name}</p>
                   </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs">Release Date</p>
-                    <p className="font-medium">{discovery.spotifyInfo.album.releaseDate}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs">Popularity</p>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-[#1DB954] transition-all duration-500"
-                          style={{ width: `${discovery.spotifyInfo.popularity}%` }}
-                        />
-                      </div>
-                      <span className="font-medium text-xs">{discovery.spotifyInfo.popularity}</span>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs">Duration</p>
-                    <p className="font-medium">
-                      {Math.floor(discovery.spotifyInfo.durationMs / 60000)}:
-                      {String(Math.floor((discovery.spotifyInfo.durationMs % 60000) / 1000)).padStart(2, '0')}
-                    </p>
-                  </div>
                 </div>
                 {discovery.spotifyInfo.artists && discovery.spotifyInfo.artists.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">

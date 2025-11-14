@@ -55,7 +55,7 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
       if (!artistUrl.trim() || !artistUrl.includes('open.spotify.com/artist/')) {
         return null;
       }
-      const response = await fetch(`/api/spotify/artist-biography?artistUrl=${encodeURIComponent(artistUrl.trim())}`);
+      const response = await fetch(`/api/spotify-artist-biography?artistUrl=${encodeURIComponent(artistUrl.trim())}`);
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Failed to fetch biography:', errorData);
@@ -178,12 +178,7 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
           value={artistUrl}
           onChange={(e) => setArtistUrl(e.target.value)}
         />
-
-        {artistUrl && !parsedArtistId && (
-          <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-            Invalid Spotify artist URL. Please paste a valid URL like: https://open.spotify.com/artist/...
-          </div>
-        )}
+        
 
     
 
