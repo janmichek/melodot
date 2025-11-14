@@ -55,7 +55,7 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
       if (!artistUrl.trim() || !artistUrl.includes('open.spotify.com/artist/')) {
         return null;
       }
-      const response = await fetch(`/api/spotify/artist-biography?artistUrl=${encodeURIComponent(artistUrl.trim())}`);
+      const response = await fetch(`/api/spotify-artist-biography?artistUrl=${encodeURIComponent(artistUrl.trim())}`);
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Failed to fetch biography:', errorData);

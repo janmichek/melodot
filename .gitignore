@@ -10,3 +10,4 @@ contracts/cache
 contracts/cache-pvm
 contracts/ignition/deployments
 contracts/typechain-types
+.env

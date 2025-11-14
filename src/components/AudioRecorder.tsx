@@ -96,7 +96,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
         if (spotifyDeeplink) {
           try {
             const spotifyResponse = await fetch(
-              `/api/spotify/track/info?uri=${encodeURIComponent(spotifyDeeplink)}`
+              `/api/spotify-track-info?uri=${encodeURIComponent(spotifyDeeplink)}`
             );
             if (spotifyResponse.ok) {
               const spotifyInfo = await spotifyResponse.json();

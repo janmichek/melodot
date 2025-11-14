@@ -126,7 +126,7 @@ async function runAnalyzeAudioTests() {
 // Spotify Profile API Tests
 // ============================================================================
 
-const API_PROFILE_PATH = process.env.API_PROFILE_PATH ?? "/api/spotify/profile";
+const API_PROFILE_PATH = process.env.API_PROFILE_PATH ?? "/api/spotify-profile";
 const PROFILE_API_URL = `${API_BASE_URL}${API_PROFILE_PATH}`;
 
 async function testProfileReachable() {
@@ -291,7 +291,7 @@ async function runProfileTests() {
 // Spotify Track Info API Tests
 // ============================================================================
 
-const API_TRACK_INFO_PATH = process.env.API_TRACK_INFO_PATH ?? "/api/spotify/track-info";
+const API_TRACK_INFO_PATH = process.env.API_TRACK_INFO_PATH ?? "/api/spotify-track-info";
 const TRACK_INFO_API_URL = `${API_BASE_URL}${API_TRACK_INFO_PATH}`;
 
 async function testTrackInfoReachable() {
@@ -486,18 +486,188 @@ async function runTrackInfoTests() {
 }
 
 // ============================================================================
+// Spotify Artist Biography API Tests
+// ============================================================================
+
+const API_ARTIST_BIO_PATH = process.env.API_ARTIST_BIO_PATH ?? "/api/spotify-artist-biography";
+const ARTIST_BIO_API_URL = `${API_BASE_URL}${API_ARTIST_BIO_PATH}`;
+
+async function testArtistBioReachable() {
+  log.step("1. Checking if Spotify Artist Biography API is accessible...");
+  const reachable = await assertReachable(ARTIST_BIO_API_URL);
+  if (reachable) {
+    log.ok("Spotify Artist Biography API is reachable");
+  } else {
+    log.fail("Failed to reach Spotify Artist Biography API");
+    console.error("Make sure to run: vercel dev");
+    throw new Error("API not reachable");
+  }
+}
+
+async function testArtistBioWrongMethod() {
+  log.step("2. Testing POST request (should only accept GET)...");
+  const response = await fetch(ARTIST_BIO_API_URL, { method: "POST" });
+  const body = await response.text();
+  if (response.status === 405) {
+    log.ok("Correctly returned 405 for wrong method");
+    console.log(formatBody(body));
+  } else {
+    log.fail(`Expected 405, got ${response.status}`);
+    console.log(formatBody(body));
+  }
+}
+
+async function testArtistBioMissingUrl() {
+  log.step("3. Testing GET request without artistUrl parameter...");
+  const response = await fetch(ARTIST_BIO_API_URL, { method: "GET" });
+  const body = await response.text();
+  if (response.status === 400) {
+    log.ok("Correctly returned 400 for missing artist URL");
+    console.log(formatBody(body));
+  } else {
+    log.fail(`Expected 400, got ${response.status}`);
+    console.log(formatBody(body));
+  }
+}
+
+async function testArtistBioInvalidUrl() {
+  log.step("4. Testing GET request with invalid artist URL...");
+  const invalidUrl = "not-a-spotify-url";
+  const response = await fetch(`${ARTIST_BIO_API_URL}?artistUrl=${encodeURIComponent(invalidUrl)}`, {
+    method: "GET"
+  });
+  const body = await response.text();
+  if (response.status === 400) {
+    log.ok("Correctly returned 400 for invalid URL format");
+    console.log(formatBody(body));
+  } else {
+    log.fail(`Expected 400, got ${response.status}`);
+    console.log(formatBody(body));
+  }
+}
+
+async function testArtistBioValidArtistUrl() {
+  log.step("5. Testing GET request with valid artist URL...");
+  const artistUrl = "https://open.spotify.com/artist/6nS5roXSAGhTGr34W6n7Et"; // The Killers
+  const response = await fetch(`${ARTIST_BIO_API_URL}?artistUrl=${encodeURIComponent(artistUrl)}`, {
+    method: "GET"
+  });
+  const body = await response.text();
+
+  if (response.status === 500) {
+    const bodyJson = JSON.parse(body);
+    if (bodyJson.error === 'RapidAPI key not configured') {
+      log.ok("API correctly reports missing RapidAPI credentials");
+      console.log(formatBody(body));
+      console.log(`${COLORS.yellow}Note: Set RAPIDAPI_KEY or VITE_RAPIDAPI_KEY to test actual API calls${COLORS.reset}`);
+      return;
+    }
+  }
+
+  if (response.ok) {
+    log.ok("API successfully fetched artist biography");
+    const data = JSON.parse(body);
+    console.log(formatBody(body));
+
+    if (data.status !== undefined) {
+      log.ok("Response has expected structure");
+    } else {
+      log.fail("Response missing expected fields");
+    }
+  } else {
+    log.fail(`Expected 200, got ${response.status}`);
+    console.log(formatBody(body));
+  }
+}
+
+async function testArtistBioJustArtistId() {
+  log.step("6. Testing GET request with just artist ID (no full URL)...");
+  const artistId = "6nS5roXSAGhTGr34W6n7Et"; // The Killers artist ID
+  const response = await fetch(`${ARTIST_BIO_API_URL}?artistUrl=${encodeURIComponent(artistId)}`, {
+    method: "GET"
+  });
+  const body = await response.text();
+
+  if (response.status === 500) {
+    const bodyJson = JSON.parse(body);
+    if (bodyJson.error === 'RapidAPI key not configured') {
+      log.ok("API correctly reports missing RapidAPI credentials");
+      console.log(formatBody(body));
+      return;
+    }
+  }
+
+  if (response.ok) {
+    log.ok("API successfully handled artist ID format");
+    console.log(formatBody(body));
+  } else {
+    log.fail(`Expected 200, got ${response.status}`);
+    console.log(formatBody(body));
+  }
+}
+
+async function testArtistBioNonExistentArtist() {
+  log.step("7. Testing GET request with non-existent artist ID...");
+  const fakeArtistUrl = "https://open.spotify.com/artist/00000000000000000000XX";
+  const response = await fetch(`${ARTIST_BIO_API_URL}?artistUrl=${encodeURIComponent(fakeArtistUrl)}`, {
+    method: "GET"
+  });
+  const body = await response.text();
+
+  if (response.status === 500) {
+    const bodyJson = JSON.parse(body);
+    if (bodyJson.error === 'RapidAPI key not configured') {
+      log.ok("API correctly reports missing RapidAPI credentials");
+      console.log(formatBody(body));
+      return;
+    }
+  }
+
+  // API might return 200 with empty biography or error status
+  if (response.ok || response.status === 404 || response.status === 400) {
+    log.ok("API handled non-existent artist appropriately");
+    console.log(formatBody(body));
+  } else {
+    log.fail(`Unexpected status: ${response.status}`);
+    console.log(formatBody(body));
+  }
+}
+
+async function runArtistBioTests() {
+  log.section("Testing Spotify Artist Biography API");
+  log.step(`API URL: ${ARTIST_BIO_API_URL}`);
+  console.log("");
+
+  await testArtistBioReachable();
+  console.log("");
+  await testArtistBioWrongMethod();
+  console.log("");
+  await testArtistBioMissingUrl();
+  console.log("");
+  await testArtistBioInvalidUrl();
+  console.log("");
+  await testArtistBioValidArtistUrl();
+  console.log("");
+  await testArtistBioJustArtistId();
+  console.log("");
+  await testArtistBioNonExistentArtist();
+}
+
+// ============================================================================
 // Main Test Runner
 // ============================================================================
 
 async function main() {
   log.banner("API Test Suite - All Endpoints");
-  
+
   try {
     await runAnalyzeAudioTests();
     console.log("");
     await runProfileTests();
     console.log("");
     await runTrackInfoTests();
+    console.log("");
+    await runArtistBioTests();
     console.log("");
     log.banner("All Tests Complete");
   } catch (error) {

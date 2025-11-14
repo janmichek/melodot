@@ -7,6 +7,7 @@ import {Button} from "@/components/ui/button";
 import type {Abi} from "viem";
 import {parseEther} from "viem";
 import {useWeb3AuthContext} from "../App";
+import {useQueryClient} from "@tanstack/react-query";
 
 interface DonationFormProps {
   artistId: string;
@@ -15,7 +16,8 @@ interface DonationFormProps {
 
 export function DonationForm({ artistId, onSuccess }: DonationFormProps) {
   const [isDonating, setIsDonating] = useState(false);
-  const { isConnected, connect, contractAddress } = useWeb3AuthContext();
+  const { isConnected, connect, contractAddress, address } = useWeb3AuthContext();
+  const queryClient = useQueryClient();
 
   const {
     data: hash,
@@ -29,12 +31,31 @@ export function DonationForm({ artistId, onSuccess }: DonationFormProps) {
     isSuccess: isConfirmed
   } = useWaitForTransactionReceipt({hash,});
 
-  // Call onSuccess callback when transaction is confirmed
+  // Call onSuccess callback and refetch balance when transaction is confirmed
   useEffect(() => {
-    if (isConfirmed) {
+    if (isConfirmed && address) {
+      // Invalidate balance queries to trigger refetch in UserMenu
+      // Wagmi uses query keys like ['balance', { address, chainId }]
+      queryClient.invalidateQueries({
+        predicate: (query) => {
+          const queryKey = query.queryKey;
+          if (!Array.isArray(queryKey) || queryKey[0] !== 'balance') {
+            return false;
+          }
+          const params = queryKey[1];
+          if (typeof params !== 'object' || params === null || !('address' in params)) {
+            return false;
+          }
+          const queryAddress = params.address;
+          return (
+            typeof queryAddress === 'string' &&
+            queryAddress.toLowerCase() === address.toLowerCase()
+          );
+        },
+      });
       onSuccess?.();
     }
-  }, [isConfirmed, onSuccess]);
+  }, [isConfirmed, onSuccess, queryClient, address]);
 
   const donate = async (amount: number) => {
      if (!isConnected) {

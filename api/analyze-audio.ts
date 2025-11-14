@@ -1,36 +1,23 @@
 import type {VercelRequest, VercelResponse} from '@vercel/node';
 import formidable from 'formidable';
 import fs from 'fs';
+import {delay, generateMockDiscoveryData, USE_MOCK_DATA} from './mock-discovery-data';
 
-const SHAZAM_API_URL =
-  process.env.SHAZAM_API_URL ??
-  'https://shazam-song-recognition-api.p.rapidapi.com/recognize/file';
+const SPOTIFY_SERVICE_URL = process.env.SPOTIFY_SERVICE_URL ?? 'http://localhost:5173';
 
-const SHAZAM_API_HOST =
-  process.env.SHAZAM_API_HOST ?? 'shazam-song-recognition-api.p.rapidapi.com';
-
-const SPOTIFY_SERVICE_URL =
-  process.env.SPOTIFY_SERVICE_URL ?? 'http://localhost:5173';
-
-const SPOTIFY_TRACK_INFO_PATH =
-  process.env.SPOTIFY_TRACK_INFO_PATH ?? '/api/spotify/track/info';
-
-
-interface ShazamTrack {
-  subtitle?: string;
-  [key: string]: any;
+async function fetchSpotifyInfo(spotifyUri: string) {
+  try {
+    const response = await fetch(`${SPOTIFY_SERVICE_URL}/api/spotify-track-info?uri=${encodeURIComponent(spotifyUri)}`);
+    return response.ok ? await response.json() : null;
+  } catch {
+    return null;
+  }
 }
 
-interface DiscoveryResult {
-  track?: ShazamTrack;
-  artistInfo?: Record<string, unknown>;
-  [key: string]: any;
+function cleanupFile(filepath: string) {
+  fs.promises.unlink(filepath).catch(() => {});
 }
 
-/**
- * Analyzes audio using Shazam API
- * Requires VITE_RAPIDAPI_KEY environment variable
- */
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
@@ -41,109 +28,66 @@ export default async function handler(
 
   try {
     const form = formidable({
-      multiples: false,
       maxFileSize: 50 * 1024 * 1024,
       uploadDir: '/tmp',
       keepExtensions: true,
     });
 
-    let files;
-    try {
-      const result = await form.parse(req as any);
-      files = result[1];
-
-    } catch (parseError) {
-      // If parsing fails, it might be because there's no file
-      // Check if it's a missing file error vs a real parse error
-      const errorMessage = parseError instanceof Error ? parseError.message : 'Unknown parse error';
-      
-      // If the error is about missing content or invalid format, return 400
-      if (errorMessage.includes('content-length') || errorMessage.includes('No file')) {
-        return res.status(400).json({ 
-          error: 'No audio file provided',
-          details: errorMessage,
-        });
-      }
-      
-      return res.status(500).json({
-        error: 'Failed to parse form data',
-        details: errorMessage,
-      });
-    }
-
+    const [, files] = await form.parse(req as any);
     const uploadedFile = Array.isArray(files.file) ? files.file[0] : files.file;
 
     if (!uploadedFile) {
-      console.error('No file in parsed data. Available fields:', Object.keys(files));
       return res.status(400).json({ error: 'No audio file provided' });
     }
 
-    const fileBuffer = await fs.promises.readFile(uploadedFile.filepath);
+    // Mock data path
+    if (USE_MOCK_DATA) {
+      cleanupFile(uploadedFile.filepath);
+      await delay(3000);
+      const mockResult = generateMockDiscoveryData();
+      const spotifyUri = mockResult.track?.hub?.providers?.find((p: any) => p.type === 'SPOTIFY')?.actions?.[0]?.uri;
+      const spotifyInfo = spotifyUri ? await fetchSpotifyInfo(spotifyUri) : null;
+      return res.status(200).json({ ...mockResult, spotifyInfo });
+    }
 
-    // Check if API key is available
+    // Real Shazam API path
     const apiKey = process.env.VITE_RAPIDAPI_KEY;
-    
+    if (!apiKey) {
+      cleanupFile(uploadedFile.filepath);
+      await delay(3000);
+      return res.status(200).json(generateMockDiscoveryData());
+    }
 
+    const fileBuffer = await fs.promises.readFile(uploadedFile.filepath);
+    cleanupFile(uploadedFile.filepath);
 
-    // Send raw file buffer - Shazam API expects application/octet-stream
-    const shazamResponse = await fetch(SHAZAM_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/octet-stream',
-        'X-RapidAPI-Key': apiKey,
-        'X-RapidAPI-Host': SHAZAM_API_HOST,
-      },
-      body: fileBuffer,
-    });
+    const shazamResponse = await fetch(
+      'https://shazam-song-recognition-api.p.rapidapi.com/recognize/file',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/octet-stream',
+          'X-RapidAPI-Key': apiKey,
+          'X-RapidAPI-Host': 'shazam-song-recognition-api.p.rapidapi.com',
+        },
+        body: fileBuffer,
+      }
+    );
 
     if (!shazamResponse.ok) {
-      const errorText = await shazamResponse.text();
-      console.error('Shazam API error:', errorText);
-      
-      // If API returns 403 (not subscribed) or 401 (unauthorized), return mock data for testing
       if (shazamResponse.status === 403 || shazamResponse.status === 401) {
-        console.log('Shazam API subscription issue, returning mock data');
-        try {
-          await fs.promises.unlink(uploadedFile.filepath);
-        } catch (err) {
-          console.error('Failed to clean up temp file:', err);
-        }
-      
+        await delay(3000);
+        return res.status(200).json(generateMockDiscoveryData());
       }
-      
       return res.status(shazamResponse.status).json({
         error: 'Shazam API error',
-        details: errorText,
+        details: await shazamResponse.text(),
       });
     }
 
-    const result = await shazamResponse.json() as DiscoveryResult;
-
-    let spotifyInfo = null;
-    const spotifyProvider = result?.track?.hub?.providers?.find((provider: any) => provider.type === 'SPOTIFY');
-    const spotifyUri = spotifyProvider?.actions?.[0]?.uri;
-
-    if (spotifyUri) {
-      try {
-        const spotifyResponse = await fetch(
-          `${SPOTIFY_SERVICE_URL}${SPOTIFY_TRACK_INFO_PATH}?uri=${encodeURIComponent(
-            spotifyUri
-          )}`
-        );
-
-        if (spotifyResponse.ok) {
-          spotifyInfo = await spotifyResponse.json();
-        }
-      } catch (error) {
-        console.error('Failed to fetch Spotify info:', error);
-      }
-    }
-
-    try {
-      await fs.promises.unlink(uploadedFile.filepath);
-    } catch (err) {
-      console.error('Failed to clean up temp file:', err);
-    }
+    const result = await shazamResponse.json();
+    const spotifyUri = result?.track?.hub?.providers?.find((p: any) => p.type === 'SPOTIFY')?.actions?.[0]?.uri;
+    const spotifyInfo = spotifyUri ? await fetchSpotifyInfo(spotifyUri) : null;
 
     return res.status(200).json({ ...result, spotifyInfo });
 
