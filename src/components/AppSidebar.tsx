@@ -1,4 +1,6 @@
 import {useEffect} from "react";
+import {useAccount, useReadContract} from "wagmi";
+import type {Abi} from "viem";
 import {useWeb3AuthContext} from "../App";
 import {UserMenu} from "./UserMenu";
 import {Button} from "@/components/ui/button";
@@ -14,10 +16,11 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {Coins, List, Mic} from "lucide-react";
+import {Coins, List, Mic, Wallet} from "lucide-react";
 import {Link, useLocation} from "react-router-dom";
 import {Spinner} from "@/components/ui/spinner";
 import {Logo} from "./Logo";
+import {donateConfig} from "../generated";
 
 export function AppSidebar() {
   const {
@@ -26,10 +29,28 @@ export function AppSidebar() {
     connect,
     connecting,
     providerReady,
+    contractAddress,
   } = useWeb3AuthContext();
+  const {address: connectedAddress} = useAccount();
 
   const location = useLocation();
   const {setOpenMobile} = useSidebar();
+
+  // Check if connected user is the contract owner
+  const {data: ownerAddress} = useReadContract({
+    address: contractAddress as `0x${string}` | undefined,
+    abi: donateConfig.abi as Abi,
+    functionName: "owner",
+    query: {
+      enabled: !!contractAddress && isConnected,
+    },
+  });
+
+  const ownerWalletAddress = ownerAddress as `0x${string}` | undefined;
+  const isOwner =
+    !!ownerWalletAddress &&
+    !!connectedAddress &&
+    connectedAddress.toLowerCase() === ownerWalletAddress.toLowerCase();
 
   useEffect(() => {
     setOpenMobile(false);
@@ -52,11 +73,22 @@ export function AppSidebar() {
       icon: Coins,
     },
     {
-      title: "Owner Panel",
+      title: "About",
       url: "/owner",
       icon: Coins,
     },
   ];
+
+  // Conditional "Withdraw Fees" item for owners
+  const ownerMenuItems = isOwner
+    ? [
+        {
+          title: "Withdraw Fees",
+          url: "/owner",
+          icon: Wallet,
+        },
+      ]
+    : [];
 
   const renderConnectArea = () => {
     if (isConnected && address) {
@@ -102,6 +134,22 @@ export function AppSidebar() {
         <SidebarGroup className="gap-3">
           <SidebarMenu>
             {menuItems.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={location.pathname === item.url}
+                  className="justify-start"
+                >
+                  <Link to={item.url} className="flex w-full items-center gap-2">
+                    <item.icon className="h-4 w-4" />
+                    <span className="truncate">
+                      {item.title}
+                    </span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+            {ownerMenuItems.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   asChild

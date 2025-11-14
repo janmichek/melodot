@@ -3,7 +3,6 @@ import {usePublicClient, useReadContract} from "wagmi";
 import type {Abi} from "viem";
 import {donateConfig} from "../generated";
 import {BalanceDisplay} from "./ui/balance-display";
-import {DonationsTable} from "./DonationsTable";
 import {DonationTransactions} from "./DonationTransactions";
 
 interface ArtistItem {
@@ -138,13 +137,6 @@ export function DonationsList({ contractAddress }: DonationsListProps) {
     >
       {/* Donation Transactions - Shows all transactions with donor addresses */}
       <DonationTransactions contractAddress={contractAddress} />
-      
-      {artistCount > 0 && (
-        <>
-          <DonationsTable contractAddress={contractAddress} />
-          <ArtistsList count={BigInt(artistCount)} contractAddress={contractAddress} />
-        </>
-      )}
     </section>
   );
 }
