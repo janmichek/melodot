@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {SidebarMenu, SidebarMenuButton, SidebarMenuItem,} from "@/components/ui/sidebar";
+import {ExternalLink} from "lucide-react";
 
 export function UserMenu() {
   const {
@@ -33,6 +34,8 @@ export function UserMenu() {
     balance && balance.value
       ? `${formatPasBalance(balance.value)} ${CURRENCY_SYMBOL}`
       : `0 ${CURRENCY_SYMBOL}`;
+
+  const hasZeroBalance = !balanceLoading && balance && balance.value === 0n;
 
   const getChainName = () => {
     if (chainId === passetHub.id) return "Passet Hub";
@@ -81,6 +84,19 @@ export function UserMenu() {
               <div className="font-medium">{getChainName()}</div>
             </div>
             <DropdownMenuSeparator/>
+          
+            {hasZeroBalance && (
+              <>
+                <DropdownMenuItem
+                  onClick={() => window.open(passetHub.faucetUrl, '_blank')}
+                  className="text-yellow-600 dark:text-yellow-500"
+                >
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  Get Test Tokens
+                </DropdownMenuItem>
+                <DropdownMenuSeparator/>
+              </>
+            )}
             <DropdownMenuItem onClick={() => disconnect()}>
               Disconnect
             </DropdownMenuItem>

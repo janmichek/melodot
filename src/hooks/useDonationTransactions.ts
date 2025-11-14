@@ -82,8 +82,8 @@ export function useDonationTransactions(
                   abi: donateConfig.abi as Abi,
                   data: functionData,
                 });
-                
-                if (decoded.functionName === "donateToArtist" && decoded.args[0]) {
+
+                if (decoded.functionName === "donateToArtist" && decoded.args?.[0]) {
                   artistId = decoded.args[0] as string;
                 } else {
                   continue; // Not a donateToArtist call

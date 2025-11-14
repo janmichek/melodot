@@ -113,8 +113,8 @@ export function DonationsTable({ contractAddress }: DonationsTableProps) {
                         abi: donateConfig.abi as Abi,
                         data: tx.input as `0x${string}`,
                       });
-                      return decoded.functionName === "donateToArtist" && 
-                             decoded.args[0] === artistId;
+                      return decoded.functionName === "donateToArtist" &&
+                             decoded.args?.[0] === artistId;
                     } catch {
                       // If decoding fails, we can't verify the artistId
                       // Skip this transaction if we can't decode it

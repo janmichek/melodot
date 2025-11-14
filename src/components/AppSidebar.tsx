@@ -16,9 +16,6 @@ import {
 } from "@/components/ui/sidebar";
 import {Coins, List, Mic} from "lucide-react";
 import {Link, useLocation} from "react-router-dom";
-import {useReadContract} from "wagmi";
-import type {Abi} from "viem";
-import {donateConfig} from "../generated";
 import {Spinner} from "@/components/ui/spinner";
 import {Logo} from "./Logo";
 
@@ -29,7 +26,6 @@ export function AppSidebar() {
     connect,
     connecting,
     providerReady,
-    contractAddress,
   } = useWeb3AuthContext();
 
   const location = useLocation();
@@ -38,12 +34,6 @@ export function AppSidebar() {
   useEffect(() => {
     setOpenMobile(false);
   }, [location.pathname, setOpenMobile]);
-
-  const {data: balance} = useReadContract({
-    address: contractAddress,
-    abi: donateConfig.abi as Abi,
-    functionName: "balance",
-  });
 
   const menuItems = [
     {
@@ -91,7 +81,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="h-11 px-2"
+              className="h-11 px-2 hover:bg-transparent"
             >
               <Link to="/" className="flex items-center gap-2">
                 <Logo className="h-6 w-6 text-sidebar-foreground" />
@@ -110,23 +100,6 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup className="gap-3">
-          {(!balance || balance === 0n) && (
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a
-                    href="https://faucet.polkadot.io/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm font-medium text-primary transition hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  >
-                    💧 Get Test Tokens
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          )}
-
           <SidebarMenu>
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.title}>

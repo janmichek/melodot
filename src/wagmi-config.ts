@@ -1,5 +1,4 @@
 import {createConfig, http} from "wagmi";
-import {type Chain} from "viem";
 import {mainnet} from "wagmi/chains";
 
 export const passetHub = {
@@ -21,7 +20,8 @@ export const passetHub = {
       url: "https://blockscout-passet-hub.parity-testnet.parity.io",
     },
   },
-} as const satisfies Chain;
+  faucetUrl: "https://faucet.polkadot.io/?parachain=1111",
+} as const;
 
 export const wagmiConfig = createConfig({
   chains: [passetHub, mainnet],
