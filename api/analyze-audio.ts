@@ -4,10 +4,10 @@ import fs from 'fs';
 
 const SHAZAM_API_URL =
   process.env.SHAZAM_API_URL ??
-  'https://shazam-core.p.rapidapi.com/v1/tracks/recognize';
+  'https://shazam-song-recognition-api.p.rapidapi.com/recognize/file';
 
 const SHAZAM_API_HOST =
-  process.env.SHAZAM_API_HOST ?? 'shazam-core.p.rapidapi.com';
+  process.env.SHAZAM_API_HOST ?? 'shazam-song-recognition-api.p.rapidapi.com';
 
 const SPOTIFY_SERVICE_URL =
   process.env.SPOTIFY_SERVICE_URL ?? 'http://localhost:5173';
@@ -85,17 +85,15 @@ export default async function handler(
     
 
 
-    const formData = new FormData();
-    const blob = new Blob([fileBuffer], { type: uploadedFile.mimetype || 'audio/webm' });
-    formData.append('file', blob, 'audio.webm');
-
+    // Send raw file buffer - Shazam API expects application/octet-stream
     const shazamResponse = await fetch(SHAZAM_API_URL, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/octet-stream',
         'X-RapidAPI-Key': apiKey,
         'X-RapidAPI-Host': SHAZAM_API_HOST,
       },
-      body: formData,
+      body: fileBuffer,
     });
 
     if (!shazamResponse.ok) {
