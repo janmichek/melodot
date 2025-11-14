@@ -185,21 +185,7 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
           </div>
         )}
 
-        {/* Artist Biography Section */}
-        {isLoadingBiography && (
-          <div className="rounded-lg border border-border/40 bg-muted/10 p-4 text-sm text-muted-foreground">
-            Loading artist biography...
-          </div>
-        )}
-
-        {biographyData?.biography && !isLoadingBiography && (
-          <div className="space-y-2 rounded-lg border border-border/40 bg-muted/10 p-4">
-            <h3 className="text-sm font-semibold text-foreground">Artist Biography</h3>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
-              {biographyData.biography}
-            </p>
-          </div>
-        )}
+    
 
         {parsedArtistId && artistBalance !== null && artistBalance === 0n && (
           <div className="rounded-lg border border-border/40 bg-muted/10 p-4 text-center text-sm text-muted-foreground">
@@ -276,84 +262,102 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
             Loading...
           </div>
         )}
+        
+        {!isConnected ? (
+          <div className="w-full rounded-md border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-sm text-amber-600">
+            ⚠️ Connect your wallet to claim this artist balance
+          </div>
+        ) : (
+          <div className="flex w-full flex-col gap-3">
+            {/* Verification Instructions */}
+            <div className="rounded-lg border border-border/40 bg-muted/10 p-4 space-y-3">
+              <h4 className="text-sm font-semibold text-foreground">Verification Instructions</h4>
+              <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
+                <li>
+                  Copy this code:{' '}
+                  <code className="px-2 py-1 rounded bg-background border border-border font-mono text-foreground">resonated</code>
+                  {' '}
+                  <button
+                    onClick={handleCopyCode}
+                    className="px-2 py-1 text-xs rounded border border-border hover:bg-muted transition-colors"
+                    title="Copy code"
+                  >
+                    {isCodeCopied ? '✓ Copied' : '📋 Copy'}
+                  </button>
+                </li>
+                <li>
+                  Go to your{' '}
+                  <a
+                    href={`https://artists.spotify.com/c/artist/${parsedArtistId}/profile/about`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    Spotify artist profile
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                      <polyline points="15 3 21 3 21 9" />
+                      <line x1="10" x2="21" y1="14" y2="3" />
+                    </svg>
+                  </a>
+                </li>
+                <li>Paste temporarily the code to about section</li>
+                <li>Come back and click 'Verify'</li>
+              </ol>
+            </div>
+            <Button
+              onClick={handleClaimArtist}
+              disabled={isClaiming || isClaimPending || isConfirming}
+              className="w-full sm:w-auto"
+            >
+              {isClaimPending
+                ? "Sending transaction..."
+                : isConfirming
+                  ? "Confirming..."
+                  : isClaiming
+                    ? "Processing..."
+                    : "Verify"}
+            </Button>
+            {claimError && (
+              <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {claimError}
+              </div>
+            )}
+            {txHash && !claimError && (
+              <div className="rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-primary">
+                Transaction submitted: {txHash.slice(0, 10)}...
+              </div>
+            )}
+          </div>
+        )}
       </CardContent>
       {parsedArtistId && !artistClaimed && artistBalance !== null && artistBalance > 0n && (
         <CardFooter className="flex flex-col gap-4">
-          {!isConnected ? (
-            <div className="w-full rounded-md border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-sm text-amber-600">
-              ⚠️ Connect your wallet to claim this artist balance
+          
+          
+          {/* Artist Biography Section */}
+          {isLoadingBiography && (
+            <div className="rounded-lg border border-border/40 bg-muted/10 p-4 text-sm text-muted-foreground">
+              Loading artist biography...
             </div>
-          ) : (
-            <div className="flex w-full flex-col gap-3">
-              {/* Verification Instructions */}
-              <div className="rounded-lg border border-border/40 bg-muted/10 p-4 space-y-3">
-                <h4 className="text-sm font-semibold text-foreground">Verification Instructions</h4>
-                <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
-                  <li>
-                    Copy this code:{' '}
-                    <code className="px-2 py-1 rounded bg-background border border-border font-mono text-foreground">resonated</code>
-                    {' '}
-                    <button
-                      onClick={handleCopyCode}
-                      className="px-2 py-1 text-xs rounded border border-border hover:bg-muted transition-colors"
-                      title="Copy code"
-                    >
-                      {isCodeCopied ? '✓ Copied' : '📋 Copy'}
-                    </button>
-                  </li>
-                  <li>
-                    Go to your{' '}
-                    <a
-                      href={`https://artists.spotify.com/c/artist/${parsedArtistId}/profile/about`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline inline-flex items-center gap-1"
-                    >
-                      Spotify artist profile
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                        <polyline points="15 3 21 3 21 9" />
-                        <line x1="10" x2="21" y1="14" y2="3" />
-                      </svg>
-                    </a>
-                  </li>
-                  <li>Paste temporarily the code to about section</li>
-                  <li>Come back and click 'Verify'</li>
-                </ol>
-              </div>
-              <Button
-                onClick={handleClaimArtist}
-                disabled={isClaiming || isClaimPending || isConfirming}
-                className="w-full sm:w-auto"
-              >
-                {isClaimPending
-                  ? "Sending transaction..."
-                  : isConfirming
-                  ? "Confirming..."
-                  : isClaiming
-                  ? "Processing..."
-                  : "Verify"}
-              </Button>
-              {claimError && (
-                <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                  {claimError}
-                </div>
-              )}
-              {txHash && !claimError && (
-                <div className="rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-primary">
-                  Transaction submitted: {txHash.slice(0, 10)}...
-                </div>
-              )}
+          )}
+          
+          {biographyData?.biography && !isLoadingBiography && (
+            <div className="space-y-2 rounded-lg border border-border/40 bg-muted/10 p-4">
+              <h3 className="text-sm font-semibold text-foreground">Artist Biography</h3>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                {biographyData.biography}
+              </p>
             </div>
           )}
         </CardFooter>
