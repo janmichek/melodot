@@ -1,7 +1,7 @@
 import type {VercelRequest, VercelResponse} from '@vercel/node';
 import formidable from 'formidable';
 import fs from 'fs';
-import {delay, generateMockDiscoveryData, USE_MOCK_DATA} from './mock-discovery-data';
+import {delay, mockDiscoveryData, USE_MOCK_DATA} from './mock-discovery-data';
 
 const SPOTIFY_SERVICE_URL = process.env.SPOTIFY_SERVICE_URL ?? 'http://localhost:5173';
 
@@ -44,18 +44,7 @@ export default async function handler(
     if (USE_MOCK_DATA) {
       cleanupFile(uploadedFile.filepath);
       await delay(3000);
-      const mockResult = generateMockDiscoveryData();
-      const spotifyUri = mockResult.track?.hub?.providers?.find((p: any) => p.type === 'SPOTIFY')?.actions?.[0]?.uri;
-      const spotifyInfo = spotifyUri ? await fetchSpotifyInfo(spotifyUri) : null;
-      return res.status(200).json({ ...mockResult, spotifyInfo });
-    }
-
-    // Real Shazam API path
-    const apiKey = process.env.VITE_RAPIDAPI_KEY;
-    if (!apiKey) {
-      cleanupFile(uploadedFile.filepath);
-      await delay(3000);
-      return res.status(200).json(generateMockDiscoveryData());
+      return res.status(200).json(mockDiscoveryData);
     }
 
     const fileBuffer = await fs.promises.readFile(uploadedFile.filepath);
@@ -67,7 +56,7 @@ export default async function handler(
         method: 'POST',
         headers: {
           'Content-Type': 'application/octet-stream',
-          'X-RapidAPI-Key': apiKey,
+          'X-RapidAPI-Key': process.env.VITE_RAPIDAPI_KEY,
           'X-RapidAPI-Host': 'shazam-song-recognition-api.p.rapidapi.com',
         },
         body: fileBuffer,
@@ -75,10 +64,6 @@ export default async function handler(
     );
 
     if (!shazamResponse.ok) {
-      if (shazamResponse.status === 403 || shazamResponse.status === 401) {
-        await delay(3000);
-        return res.status(200).json(generateMockDiscoveryData());
-      }
       return res.status(shazamResponse.status).json({
         error: 'Shazam API error',
         details: await shazamResponse.text(),
