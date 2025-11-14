@@ -36,6 +36,7 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
   const [artistClaimed, setArtistClaimed] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
+  const [isCodeCopied, setIsCodeCopied] = useState(false);
 
   // Parse artist ID when URL changes
   useEffect(() => {
@@ -141,6 +142,22 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
       setArtistClaimed(isClaimed);
     }
   }, [artistInfoData]);
+
+  useEffect(() => {
+    if (isCodeCopied) {
+      const timer = setTimeout(() => setIsCodeCopied(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isCodeCopied]);
+
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText('resonated');
+      setIsCodeCopied(true);
+    } catch (err) {
+      console.error('Failed to copy code:', err);
+    }
+  };
 
   const statusBadgeClasses = artistClaimed
     ? "rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-500"
@@ -268,6 +285,52 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
             </div>
           ) : (
             <div className="flex w-full flex-col gap-3">
+              {/* Verification Instructions */}
+              <div className="rounded-lg border border-border/40 bg-muted/10 p-4 space-y-3">
+                <h4 className="text-sm font-semibold text-foreground">Verification Instructions</h4>
+                <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
+                  <li>
+                    Copy this code:{' '}
+                    <code className="px-2 py-1 rounded bg-background border border-border font-mono text-foreground">resonated</code>
+                    {' '}
+                    <button
+                      onClick={handleCopyCode}
+                      className="px-2 py-1 text-xs rounded border border-border hover:bg-muted transition-colors"
+                      title="Copy code"
+                    >
+                      {isCodeCopied ? '✓ Copied' : '📋 Copy'}
+                    </button>
+                  </li>
+                  <li>
+                    Go to your{' '}
+                    <a
+                      href={`https://artists.spotify.com/c/artist/${parsedArtistId}/profile/about`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      Spotify artist profile
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" x2="21" y1="14" y2="3" />
+                      </svg>
+                    </a>
+                  </li>
+                  <li>Paste temporarily the code to about section</li>
+                  <li>Come back and click 'Verify'</li>
+                </ol>
+              </div>
               <Button
                 onClick={handleClaimArtist}
                 disabled={isClaiming || isClaimPending || isConfirming}
@@ -279,7 +342,7 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
                   ? "Confirming..."
                   : isClaiming
                   ? "Processing..."
-                  : "Claim Artist Balance"}
+                  : "Verify"}
               </Button>
               {claimError && (
                 <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
