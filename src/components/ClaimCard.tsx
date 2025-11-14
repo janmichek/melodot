@@ -13,19 +13,44 @@ interface ClaimCardProps {
   contractAddress: `0x${string}` | undefined;
 }
 
+// Parse artist ID from Spotify URL
+function parseArtistIdFromUrl(url: string): string | null {
+  try {
+    // Match patterns like:
+    // https://open.spotify.com/artist/6nS5roXSAGhTGr34W6n7Et?si=...
+    // https://open.spotify.com/artist/6nS5roXSAGhTGr34W6n7Et
+    // open.spotify.com/artist/6nS5roXSAGhTGr34W6n7Et
+    const match = url.match(/artist\/([a-zA-Z0-9]+)/);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+}
+
 export function ClaimCard({ contractAddress }: ClaimCardProps) {
   const { isConnected } = useWeb3AuthContext();
-  const [manualArtistId, setManualArtistId] = useState('');
+  const [artistUrl, setArtistUrl] = useState('');
+  const [parsedArtistId, setParsedArtistId] = useState<string | null>(null);
   const [artistBalance, setArtistBalance] = useState<bigint | null>(null);
   const [artistClaimed, setArtistClaimed] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
 
+  // Parse artist ID when URL changes
+  useEffect(() => {
+    if (artistUrl.trim()) {
+      const artistId = parseArtistIdFromUrl(artistUrl.trim());
+      setParsedArtistId(artistId);
+    } else {
+      setParsedArtistId(null);
+    }
+  }, [artistUrl]);
+
   const { data: artistInfoData, refetch } = useReadContract({
     address: contractAddress,
     abi: donateConfig.abi as Abi,
     functionName: 'getArtistInfo',
-    args: manualArtistId ? [manualArtistId] : undefined,
+    args: parsedArtistId ? [parsedArtistId] : undefined,
   });
 
   const [txHash, setTxHash] = useState<string | undefined>();
@@ -37,8 +62,8 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
   });
 
   const handleClaimArtist = async () => {
-    if (!manualArtistId || !contractAddress) {
-      setClaimError('Artist ID is required');
+    if (!parsedArtistId || !contractAddress) {
+      setClaimError('Valid Spotify artist URL is required');
       return;
     }
 
@@ -51,7 +76,7 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
         address: contractAddress as `0x${string}`,
         abi: donateConfig.abi as Abi,
         functionName: 'claimArtist',
-        args: [manualArtistId],
+        args: [parsedArtistId],
       });
       if (hash !== undefined) {
         setTxHash(hash);
@@ -102,20 +127,32 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Manual Artist Verification</CardTitle>
+        <CardTitle>Artist Claiming</CardTitle>
         <CardDescription>
-          Enter your Spotify Artist ID to check your balance and claim status
+          Paste your Spotify artist URL to check donations and claim your balance
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <Input
           type="text"
-          placeholder="Enter Spotify Artist ID (e.g., 1234567890)"
-          value={manualArtistId}
-          onChange={(e) => setManualArtistId(e.target.value)}
+          placeholder="https://open.spotify.com/artist/..."
+          value={artistUrl}
+          onChange={(e) => setArtistUrl(e.target.value)}
         />
 
-        {manualArtistId && (
+        {artistUrl && !parsedArtistId && (
+          <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+            Invalid Spotify artist URL. Please paste a valid URL like: https://open.spotify.com/artist/...
+          </div>
+        )}
+
+        {parsedArtistId && artistBalance !== null && artistBalance === 0n && (
+          <div className="rounded-lg border border-border/40 bg-muted/10 p-4 text-center text-sm text-muted-foreground">
+            Not found
+          </div>
+        )}
+
+        {parsedArtistId && artistBalance !== null && artistBalance > 0n && (
           <div className="space-y-4 rounded-lg border border-border/40 bg-muted/10 p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h3 className="text-sm font-semibold text-foreground">
@@ -128,12 +165,12 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
             <div className="space-y-2 text-sm text-muted-foreground">
               <div className="flex flex-wrap items-center gap-2 text-foreground">
                 <strong className="font-semibold">Artist ID:</strong>
-                <span className="font-mono">{manualArtistId}</span>
+                <span className="font-mono">{parsedArtistId}</span>
               </div>
               <div className="flex flex-wrap items-center gap-2 text-foreground">
                 <strong className="font-semibold">Spotify Profile:</strong>
                 <a
-                  href={`https://open.spotify.com/artist/${manualArtistId}`}
+                  href={`https://open.spotify.com/artist/${parsedArtistId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-primary hover:underline"
@@ -162,33 +199,30 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
                 <strong className="text-sm font-semibold text-foreground">
                   Balance:
                 </strong>
-                {artistBalance !== null ? (
-                  <BalanceDisplay
-                    balance={artistBalance}
-                    showSymbol={true}
-                    size="small"
-                  />
-                ) : (
-                  <span className="text-sm text-muted-foreground">Loading...</span>
-                )}
+                <BalanceDisplay
+                  balance={artistBalance}
+                  showSymbol={true}
+                  size="small"
+                />
               </div>
-              {artistBalance === 0n && (
-                <p className="text-sm text-muted-foreground">
-                  ℹ️ No donations found for this artist ID
-                </p>
-              )}
             </div>
 
-            {artistClaimed && contractAddress && manualArtistId && (
+            {artistClaimed && contractAddress && parsedArtistId && (
               <ArtistWithdrawForm
                 contractAddress={contractAddress}
-                artistId={manualArtistId}
+                artistId={parsedArtistId}
               />
             )}
           </div>
         )}
+
+        {parsedArtistId && artistBalance === null && (
+          <div className="rounded-lg border border-border/40 bg-muted/10 p-4 text-center text-sm text-muted-foreground">
+            Loading...
+          </div>
+        )}
       </CardContent>
-      {manualArtistId && !artistClaimed && artistBalance !== null && artistBalance > 0n && (
+      {parsedArtistId && !artistClaimed && artistBalance !== null && artistBalance > 0n && (
         <CardFooter className="flex flex-col gap-4">
           {!isConnected ? (
             <div className="w-full rounded-md border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-sm text-amber-600">
