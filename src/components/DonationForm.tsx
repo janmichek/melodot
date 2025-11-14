@@ -36,6 +36,7 @@ export function DonationForm({ artistId, onSuccess }: DonationFormProps) {
     if (isConfirmed && address) {
       // Invalidate balance queries to trigger refetch in UserMenu
       // Wagmi uses query keys like ['balance', { address, chainId }]
+      // todo move to updateBalance funxtion
       queryClient.invalidateQueries({
         predicate: (query) => {
           const queryKey = query.queryKey;
@@ -73,7 +74,6 @@ export function DonationForm({ artistId, onSuccess }: DonationFormProps) {
         functionName: "donateToArtist",
         args: [artistId],
         value: parseEther(amount.toString()),
-        // gas: BigInt(300000), // Fixed gas limit to avoid gas estimation issues
       });
     } catch (err) {
       console.error("Error donating:", err);

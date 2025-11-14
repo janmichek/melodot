@@ -178,12 +178,7 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
           value={artistUrl}
           onChange={(e) => setArtistUrl(e.target.value)}
         />
-
-        {artistUrl && !parsedArtistId && (
-          <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-            Invalid Spotify artist URL. Please paste a valid URL like: https://open.spotify.com/artist/...
-          </div>
-        )}
+        
 
     
 

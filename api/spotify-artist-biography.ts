@@ -83,6 +83,7 @@ export default async function handler(
     let errorMessage = '';
 
     try {
+      todo move all fetch blocks from api folder to api/api.ts
       biographyResponse = await fetch(rapidApiUrl, {
         method: 'GET',
         headers: {
@@ -119,14 +120,15 @@ export default async function handler(
                      overviewData.artist?.description ||
                      overviewData.artist?.about ||
                      null;
+    // todo reduce unused || conditions. investigate what i read on FE
 
     return res.status(200).json({
       status: overviewData.status || true,
       biography: biography,
       rawData: overviewData, // Include raw data for debugging
+      // todo remove if no need for raw data are unused?
     });
   } catch (error) {
-    console.error('Error fetching artist biography:', error);
     return res.status(500).json({
       error: 'Failed to fetch artist biography',
       details: error instanceof Error ? error.message : 'Unknown error',

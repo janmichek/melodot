@@ -15,8 +15,8 @@ export class AudioRecorderPage extends BasePage {
   constructor(page: Page) {
     super(page);
     this.recorderContainer = page.locator('.shazam-container');
-    this.recordButton = page.locator('button.record-button, button:has-text("Listen")').first();
-    this.stopButton = page.locator('button.stop-button, button:has-text("Stop")');
+    this.recordButton = page.locator('button.audio-player-button:has(.audio-player-start-bg)').first();
+    this.stopButton = page.locator('button.audio-player-button:has(.audio-player-recording-bg)');
     this.recordingIndicator = page.locator('.recording-active, .pulse, [class*="recording"]');
     this.analyzingText = page.locator('text=/analyzing|processing|identifying/i');
     this.discoveryCard = page.locator('.discovery-card, [class*="discovery"]');

@@ -3,7 +3,7 @@ import {usePublicClient, useReadContract} from "wagmi";
 import type {Abi} from "viem";
 import {donateConfig} from "../generated";
 import {BalanceDisplay} from "./ui/balance-display";
-import {DonationTransactions} from "./DonationTransactions";
+import {DonationsTransactionsTable} from "./DonationsTransactionsTable";
 
 interface ArtistItem {
   id: string;
@@ -129,14 +129,14 @@ export function DonationsList({ contractAddress }: DonationsListProps) {
   });
 
   const artistCount = count ? Number(count) : 0;
-
+// todo look for unused vatiables and functions in this file
   return (
     <section
       className="flex flex-col gap-4 rounded-xl border border-border bg-muted/5 p-4 text-sm text-muted-foreground"
       data-testid="donations-list"
     >
       {/* Donation Transactions - Shows all transactions with donor addresses */}
-      <DonationTransactions contractAddress={contractAddress} />
+      <DonationsTransactionsTable contractAddress={contractAddress} />
     </section>
   );
 }

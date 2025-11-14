@@ -1,5 +1,5 @@
 // Toggle mock data: set to true for mock data (with 3 second delay), false for real Shazam API
-export const USE_MOCK_DATA = true;
+export const USE_MOCK_DATA = false;
 
 export function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -9,7 +9,7 @@ export const mockDiscoveryData = {
 
     track: {
       title: "Sweet Like Honey",
-      subtitle: "Honey T\"",
+      subtitle: "Honey T",
       images: {
         coverart: "https://i.scdn.co/image/ab67616d0000b2739c1f9a6e6b4c4e8b6d5e5f5f"
       },

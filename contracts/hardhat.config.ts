@@ -14,7 +14,6 @@ if (!privateKey) {
 }
 
 const config: HardhatUserConfig = {
-  // todo update to highest solitity version and refactor in whol eproject
   solidity: "0.8.19",
   resolc: {
     compilerSource: "npm",

@@ -1,14 +1,14 @@
 import {useDonationTransactions} from "../hooks/useDonationTransactions";
 import {RecentDonationTransactions} from "./RecentDonationTransactions";
-import {DonationSummaryByArtist} from "./DonationSummaryByArtist";
-import {TopDonors} from "./TopDonors";
+import {DonationsArtistsTable} from "./DonationsArtistsTable";
+import {DonationsDonorsTable} from "./DonationsDonorsTable";
 
 interface DonationTransactionsProps {
   contractAddress: `0x${string}`;
   artistId?: string;
 }
 
-export function DonationTransactions({
+export function DonationsTransactionsTable({
   contractAddress,
   artistId,
 }: DonationTransactionsProps) {
@@ -52,10 +52,10 @@ export function DonationTransactions({
   return (
     <div className="space-y-6">
       {/* Top Donors - only show when not filtering by artist */}
-      {!artistId && <TopDonors donations={filteredDonations} limit={10} />}
+      {!artistId && <DonationsDonorsTable donations={filteredDonations} limit={10} />}
 
       {/* Summary by Artist - only show when not filtering by artist */}
-      {!artistId && <DonationSummaryByArtist donations={filteredDonations} />}
+      {!artistId && <DonationsArtistsTable donations={filteredDonations} />}
 
       {/* Individual Transactions */}
       <RecentDonationTransactions

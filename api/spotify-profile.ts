@@ -55,9 +55,11 @@ export default async function handler(
       images: profile.images || [],
       uri: profile.uri,
       externalUrls: profile.external_urls,
+      // todo reduce unused attrs, check the fronrend
     });
   } catch (error) {
     console.error('Spotify profile error:', error);
+    // todo remove res status block in all api folder and simpli just console.log
     return res.status(500).json({
       error: 'Failed to fetch profile',
       details: error instanceof Error ? error.message : 'Unknown error',

@@ -682,3 +682,5 @@ main().catch((error) => {
   console.error(error);
   process.exit(1);
 });
+
+// todo make sure tests are up to date

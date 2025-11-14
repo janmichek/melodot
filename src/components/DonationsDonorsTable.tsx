@@ -9,16 +9,17 @@ interface DonorStats {
   transactionCount: number;
 }
 
-interface TopDonorsProps {
+interface DonationsDonorsTableProps {
   donations: Donation[];
   limit?: number;
 }
 
+// todo simplify reuse from wagmi
 const EXPLORER_BASE_URL =
   passetHub?.blockExplorers?.default?.url ??
   "https://blockscout-passet-hub.parity-testnet.parity.io";
 
-export function TopDonors({ donations, limit = 10 }: TopDonorsProps) {
+export function DonationsDonorsTable({ donations, limit = 10 }: DonationsDonorsTableProps) {
   // Group donations by donor and calculate totals
   const donorStats = donations.reduce(
     (acc, donation) => {
