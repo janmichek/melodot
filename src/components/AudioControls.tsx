@@ -21,12 +21,16 @@ export default function AudioControls({
 
   return (
     <div className="audio-player-container audio-player-recording-area">
-      {!isProcessing && (
+      <div className="audio-player-button-wrapper">
         <RecordButton
           onStart={onStart}
+          className={isProcessing ? "audio-player-button-hidden" : "audio-player-button-visible"}
         />
-      )}
-      {isProcessing && <StopButton onClick={onStop} />}
+        <StopButton 
+          onClick={onStop}
+          className={isProcessing ? "audio-player-button-visible" : "audio-player-button-hidden"}
+        />
+      </div>
     </div>
   );
 }

@@ -10,10 +10,10 @@ const SHAZAM_API_HOST =
   process.env.SHAZAM_API_HOST ?? 'shazam-core.p.rapidapi.com';
 
 const SPOTIFY_SERVICE_URL =
-  process.env.SPOTIFY_SERVICE_URL ?? 'http://localhost:3000';
+  process.env.SPOTIFY_SERVICE_URL ?? 'http://localhost:5173';
 
 const SPOTIFY_TRACK_INFO_PATH =
-  process.env.SPOTIFY_TRACK_INFO_PATH ?? '/api/track-info';
+  process.env.SPOTIFY_TRACK_INFO_PATH ?? '/api/spotify/track/info';
 
 
 interface ShazamTrack {
