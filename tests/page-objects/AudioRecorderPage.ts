@@ -17,7 +17,7 @@ export class AudioRecorderPage extends BasePage {
     this.recorderContainer = page.locator('.shazam-container');
     this.recordButton = page.locator('button.audio-player-button:has(.audio-player-start-bg)').first();
     this.stopButton = page.locator('button.audio-player-button:has(.audio-player-recording-bg)');
-    this.recordingIndicator = page.locator('.recording-active, .pulse, [class*="recording"]');
+    this.recordingIndicator = page.locator('.audio-player-recording-pulse').first();
     this.analyzingText = page.locator('text=/analyzing|processing|identifying/i');
     this.discoveryCard = page.locator('.discovery-card, [class*="discovery"]');
     this.searchAgainButton = page.locator('button:has-text("Search Again"), button:has-text("Try Again")');
@@ -44,7 +44,7 @@ export class AudioRecorderPage extends BasePage {
 
   async stopRecording() {
     if (await this.isElementVisible(this.stopButton)) {
-      await this.stopButton.click();
+      await this.stopButton.click({ force: true });
     }
   }
 
