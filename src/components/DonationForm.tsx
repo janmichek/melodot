@@ -86,9 +86,8 @@ export function DonationForm({ artistId, onSuccess }: DonationFormProps) {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <p className="text-sm text-muted-foreground">Artist ID: {artistId}</p>
-        <div className="flex flex-wrap gap-2">
+      <div className="space-y-3">
+        <div className="flex flex-wrap gap-3">
           {[1, 2, 10, 50, 100].map((amount) => (
             <Button
               key={amount}
@@ -96,6 +95,8 @@ export function DonationForm({ artistId, onSuccess }: DonationFormProps) {
               onClick={() => donate(amount)}
               disabled={isDonating || isWriting || isConfirming}
               variant="outline"
+              size="lg"
+              className="min-w-[100px] font-semibold"
             >
               {`${amount} ${CURRENCY_SYMBOL}`}
             </Button>

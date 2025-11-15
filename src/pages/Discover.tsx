@@ -1,14 +1,11 @@
 import {useState} from "react";
 import AudioRecorder from "../components/AudioRecorder";
 import DiscoveryCard from "../components/DiscoveryCard";
-import {DonationForm} from "../components/DonationForm";
 import {DiscoveryResult} from "../types";
 import {Button} from "@/components/ui/button";
 
 export function Discover() {
   const [discoveryData, setDiscoveryData] = useState<DiscoveryResult | null>(null);
-
-  const artistId = discoveryData?.spotifyInfo?.artists?.[0]?.id;
 
   return (
     <div className="flex min-h-full w-full items-center justify-center py-6">
@@ -24,9 +21,7 @@ export function Discover() {
           >
             ← Discover again
           </Button>
-          <DiscoveryCard discovery={discoveryData!}>
-            {artistId && <DonationForm artistId={artistId} />}
-          </DiscoveryCard>
+          <DiscoveryCard discovery={discoveryData!} />
         </div>
       )}
     </div>

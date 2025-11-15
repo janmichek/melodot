@@ -1,16 +1,15 @@
 import {DiscoveryResult} from "../types";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Badge} from "@/components/ui/badge";
 import {Separator} from "@/components/ui/separator";
-import {Calendar, ExternalLink, Music, Music2, User} from "lucide-react";
+import {ExternalLink, Music, Music2, User} from "lucide-react";
+import {DonationForm} from "./DonationForm";
 
 interface DiscoveryCardProps {
   discovery: DiscoveryResult;
-  children?: any;
 }
 
-export default function DiscoveryCard({ discovery, children }: DiscoveryCardProps) {
+export default function DiscoveryCard({ discovery }: DiscoveryCardProps) {
   if (!discovery) {
     return null;
   }
@@ -45,92 +44,29 @@ export default function DiscoveryCard({ discovery, children }: DiscoveryCardProp
       <CardContent className="p-6">
         <div className="flex flex-row">
           {track.images?.coverart && (
-            <div className="relative group">
-              <div className="relative w-48 h-48 mx-auto md:mx-0">
-                <img
-                  src={track.images.coverart}
-                  alt="Album cover"
-                  className="w-full h-full object-cover rounded-xl shadow-2xl ring-1 ring-border/50 transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
+            <div className="relative w-48 h-48 mx-auto md:mx-0">
+              <img
+                src={track.images.coverart}
+                alt="Album cover"
+                className="w-full h-full object-cover rounded-xl shadow-2xl ring-1 ring-border/50"
+              />
             </div>
           )}
 
           <div className="space-4 flex flex-col justify-center">
             <div className="space-y-2">
-              <div className="flex items-start gap-2">
-                <Music2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-1">
-                    Track Title
-                  </p>
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground leading-tight">
-                    {track.title}
-                  </h2>
-                </div>
-              </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground leading-tight">
+                {track.title}
+              </h2>
 
-              <div className="flex items-center gap-2 mt-3">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
-                    Artist
-                  </p>
-                  <p className="text-lg font-semibold text-foreground/90">
-                    {track.subtitle}
-                  </p>
-                </div>
-              </div>
-
-              {releasedMetadata?.text && (
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <Badge variant="secondary" className="font-normal">
-                    {releasedMetadata.text}
-                  </Badge>
-                </div>
-              )}
+              <p className="text-lg font-semibold text-foreground/90">
+                {track.subtitle}
+              </p>
             </div>
 
-            {/* Spotify Track Info */}
-            {discovery.spotifyInfo && (
-              <div className="mt-4 space-y-2 p-4 bg-muted/30 rounded-lg border border-border/50">
-                <h3 className="text-sm font-semibold text-foreground/80 uppercase tracking-wide flex items-center gap-2">
-                  <svg className="h-4 w-4 text-[#1DB954]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-                  </svg>
-                  Spotify Details
-                </h3>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <p className="text-muted-foreground text-xs">Album</p>
-                    <p className="font-medium">{discovery.spotifyInfo.album.name}</p>
-                  </div>
-                </div>
-                {discovery.spotifyInfo.artists && discovery.spotifyInfo.artists.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {discovery.spotifyInfo.artists.map((artist) => (
-                      <Button
-                        key={artist.id}
-                        variant="outline"
-                        size="sm"
-                        asChild
-                        className="hover:bg-[#1DB954]/10 hover:text-[#1DB954] hover:border-[#1DB954]/50 transition-colors"
-                      >
-                        <a href={artist.url} target="_blank" rel="noopener noreferrer">
-                          <User className="h-3 w-3 mr-1" />
-                          {artist.name}
-                        </a>
-                      </Button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
 
             {spotifyUri && (
-              <div className="mt-4">
+              <div className="mt-4 space-y-3">
                 <Button
                   asChild
                   className="w-full md:w-auto bg-[#1DB954] hover:bg-[#1ed760] text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
@@ -153,17 +89,65 @@ export default function DiscoveryCard({ discovery, children }: DiscoveryCardProp
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 </Button>
+
+                {/* Spotify Artist Links */}
+                {discovery.spotifyInfo?.artists && discovery.spotifyInfo.artists.length > 0 && (
+                  <div className="flex flex-wrap gap-3">
+                    {discovery.spotifyInfo.artists.map((artist) => (
+                      <a
+                        key={artist.id}
+                        href={artist.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-[#1DB954] hover:text-[#1ed760] underline underline-offset-4 hover:underline-offset-2 transition-all"
+                      >
+                        <svg
+                          className="h-4 w-4"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                        </svg>
+                        {artist.name}
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
 
         {/* Donation Section */}
-        {children && (
+        {discovery.spotifyInfo?.artists?.[0]?.id && (
           <>
             <Separator className="my-6" />
             <div className="space-y-4">
-              {children}
+              <h3 className="text-sm font-semibold text-foreground/80 uppercase tracking-wide flex items-center gap-2">
+                <Music2 className="h-4 w-4" />
+                Donate to artists
+              </h3>
+
+              <div className="space-y-3">
+                <DonationForm artistId={discovery.spotifyInfo.artists[0].id} />
+              </div>
+
+              {/* Audio Preview Link */}
+              {discovery.spotifyInfo?.previewUrl && (
+                <div className="mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                  >
+                    <a href={discovery.spotifyInfo.previewUrl} target="_blank" rel="noopener noreferrer">
+                      <Music className="h-3 w-3 mr-1" />
+                      Play Audio Preview
+                    </a>
+                  </Button>
+                </div>
+              )}
             </div>
           </>
         )}
