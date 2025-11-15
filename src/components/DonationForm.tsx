@@ -1,12 +1,12 @@
 import {useEffect, useState} from "react";
 import {useWaitForTransactionReceipt, useWriteContract} from "wagmi";
-import {donateConfig} from "../generated";
-import {CURRENCY_SYMBOL} from "../wagmi-config";
-import {TxNotification} from "./ui/tx-notification";
+import {donateConfig} from "@/generated";
+import {CURRENCY_SYMBOL} from "@/wagmi-config";
+import {TxNotification} from "@/components/ui/tx-notification";
 import {Button} from "@/components/ui/button";
 import type {Abi} from "viem";
 import {parseEther} from "viem";
-import {useWeb3AuthContext} from "../hooks/useWeb3AuthContext";
+import {useWeb3AuthContext} from "@/hooks/useWeb3AuthContext";
 import {useQueryClient} from "@tanstack/react-query";
 
 interface DonationFormProps {

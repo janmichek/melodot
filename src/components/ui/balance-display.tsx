@@ -1,5 +1,5 @@
 import {clsx} from "clsx";
-import {CURRENCY_SYMBOL, formatPasBalance} from "../../wagmi-config";
+import {CURRENCY_SYMBOL, formatPasBalance} from "@/wagmi-config";
 
 export interface BalanceDisplayProps {
   balance?: bigint;

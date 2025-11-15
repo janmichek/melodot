@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from "react";
-import {useAudioRecorder} from "../hooks/audio";
-import AudioControls from "./AudioControls";
-import {DiscoveryResult} from "../types";
+import {useAudioRecorder} from "@/hooks/audio";
+import AudioControls from "@/components/AudioControls";
+import {DiscoveryResult} from "@/types";
 import {Button} from "@/components/ui/button";
 
 const ATTEMPT_DURATIONS = [3, 5, 10, 15]; // seconds for each attempt

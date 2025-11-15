@@ -1,6 +1,6 @@
-import {formatAddress, passetHub} from "../wagmi-config";
-import {BalanceDisplay} from "./ui/balance-display";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "./ui/table";
+import {formatAddress, passetHub} from "@/wagmi-config";
+import {BalanceDisplay} from "@/components/ui/balance-display";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
 import {ExternalLink} from "lucide-react";
 
 // Simple date formatter
@@ -15,9 +15,7 @@ const formatTimeAgo = (timestamp: number): string => {
   return `${days}d ago`;
 };
 
-const EXPLORER_BASE_URL =
-  passetHub?.blockExplorers?.default?.url ??
-  "https://blockscout-passet-hub.parity-testnet.parity.io";
+const EXPLORER_BASE_URL = passetHub.blockExplorers.default.url
 
 export interface Donation {
   txHash: string;

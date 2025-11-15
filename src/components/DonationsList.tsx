@@ -1,4 +1,4 @@
-import {DonationsTransactionsTable} from "./DonationsTransactionsTable";
+import {DonationsTransactionsTable} from "@/components/DonationsTransactionsTable";
 
 interface DonationsListProps {
   contractAddress: `0x${string}`;

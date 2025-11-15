@@ -1,9 +1,9 @@
-import {DiscoveryResult} from "../types";
+import {DiscoveryResult} from "@/types";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Separator} from "@/components/ui/separator";
 import {ExternalLink, Facebook, Instagram, Music, Music2, User, Youtube} from "lucide-react";
-import {DonationForm} from "./DonationForm";
+import {DonationForm} from "@/components/DonationForm";
 import spotifyIcon from "@/assets/icons/spotify.svg";
 
 interface DiscoveryCardProps {
@@ -43,9 +43,9 @@ export default function DiscoveryCard({ discovery }: DiscoveryCardProps) {
       </CardHeader>
 
       <CardContent className="p-6">
-        <div className="flex flex-row">
+        <div className="flex flex-row gap-6">
           {track.images?.coverart && (
-            <div className="relative w-48 h-48 mx-auto md:mx-0">
+            <div className="relative w-48 h-48 flex-shrink-0 mx-auto md:mx-0 aspect-square">
               <img
                 src={track.images.coverart}
                 alt="Album cover"
@@ -54,7 +54,7 @@ export default function DiscoveryCard({ discovery }: DiscoveryCardProps) {
             </div>
           )}
 
-          <div className="space-4 flex flex-col justify-center">
+          <div className="space-4 flex flex-col justify-center flex-1 min-w-0">
             <div className="space-y-2">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground leading-tight">
                 {track.title}
@@ -115,7 +115,9 @@ export default function DiscoveryCard({ discovery }: DiscoveryCardProps) {
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-foreground/80 uppercase tracking-wide flex items-center gap-2">
                 <Music2 className="h-4 w-4" />
-                Donate to artists
+                {discovery.spotifyInfo.artists.length === 1
+                  ? "Donate to Artist"
+                  : `Donate to ${discovery.spotifyInfo.artists.length} artists`}
               </h3>
 
               <div className="space-y-3">

@@ -1,8 +1,8 @@
 import {useEffect, useState} from 'react';
 import {isAddress} from 'viem';
 import {clsx} from 'clsx';
-import {Input} from './input';
-import {Button} from './button';
+import {Input} from '@/components/ui/input';
+import {Button} from '@/components/ui/button';
 
 export interface AddressInputProps {
   value: string;

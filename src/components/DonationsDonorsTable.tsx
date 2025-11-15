@@ -1,7 +1,7 @@
-import {formatAddress, EXPLORER_BASE_URL} from "../wagmi-config";
-import {BalanceDisplay} from "./ui/balance-display";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "./ui/table";
-import {Donation} from "./RecentDonationTransactions";
+import {EXPLORER_BASE_URL, formatAddress} from "@/wagmi-config";
+import {BalanceDisplay} from "@/components/ui/balance-display";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
+import {Donation} from "@/components/RecentDonationTransactions";
 
 interface DonorStats {
   donor: string;

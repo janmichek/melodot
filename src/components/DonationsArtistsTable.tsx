@@ -1,6 +1,6 @@
-import {BalanceDisplay} from "./ui/balance-display";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "./ui/table";
-import {Donation} from "./RecentDonationTransactions";
+import {BalanceDisplay} from "@/components/ui/balance-display";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
+import {Donation} from "@/components/RecentDonationTransactions";
 
 interface ArtistStats {
   artistId: string;

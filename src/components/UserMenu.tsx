@@ -1,8 +1,8 @@
 import {useEffect, useRef} from "react";
 import {useBalance, useChainId} from "wagmi";
-import {CURRENCY_SYMBOL, formatAddress, formatPasBalance, passetHub} from "../wagmi-config";
-import {useWeb3AuthContext} from "../hooks/useWeb3AuthContext";
-import {Spinner} from "./ui/spinner";
+import {CURRENCY_SYMBOL, formatAddress, formatPasBalance, passetHub} from "@/wagmi-config";
+import {useWeb3AuthContext} from "@/hooks/useWeb3AuthContext";
+import {Spinner} from "@/components/ui/spinner";
 import Jazzicon from "@metamask/jazzicon";
 import {
   DropdownMenu,

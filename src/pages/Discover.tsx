@@ -1,7 +1,7 @@
 import {useState} from "react";
-import AudioRecorder from "../components/AudioRecorder";
-import DiscoveryCard from "../components/DiscoveryCard";
-import {DiscoveryResult} from "../types";
+import AudioRecorder from "@/components/AudioRecorder";
+import DiscoveryCard from "@/components/DiscoveryCard";
+import {DiscoveryResult} from "@/types";
 import {Button} from "@/components/ui/button";
 
 export function Discover() {

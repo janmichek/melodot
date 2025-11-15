@@ -1,13 +1,13 @@
 import "./App.css";
 import {type CSSProperties} from "react";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import {AppSidebar} from "./components/AppSidebar";
+import {AppSidebar} from "@/components/AppSidebar";
 import {SidebarInset, SidebarProvider} from "@/components/ui/sidebar";
-import {Discover} from "./pages/Discover";
-import {Claim} from "./pages/Claim";
-import {Donations} from "./pages/Donations";
-import {Owner} from "./pages/Owner";
-import {Header} from "./components/Header";
+import {Discover} from "@/pages/Discover";
+import {Claim} from "@/pages/Claim";
+import {Donations} from "@/pages/Donations";
+import {Owner} from "@/pages/Owner";
+import {Header} from "@/components/Header";
 
 function App() {
   return (

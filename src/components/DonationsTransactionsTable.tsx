@@ -1,7 +1,7 @@
-import {useDonationTransactions} from "../hooks/useDonationTransactions";
-import {RecentDonationTransactions} from "./RecentDonationTransactions";
-import {DonationsArtistsTable} from "./DonationsArtistsTable";
-import {DonationsDonorsTable} from "./DonationsDonorsTable";
+import {useDonationTransactions} from "@/hooks/useDonationTransactions";
+import {RecentDonationTransactions} from "@/components/RecentDonationTransactions";
+import {DonationsArtistsTable} from "@/components/DonationsArtistsTable";
+import {DonationsDonorsTable} from "@/components/DonationsDonorsTable";
 
 interface DonationTransactionsProps {
   contractAddress: `0x${string}`;

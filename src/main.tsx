@@ -2,13 +2,13 @@ import "./index.css";
 import "./App.css";
 
 import ReactDOM from "react-dom/client";
-import { Web3AuthProvider } from "@web3auth/modal/react";
-import web3AuthContextConfig from "./web3authContext";
-import { WagmiProvider } from "@web3auth/modal/react/wagmi";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { wagmiConfig } from "./wagmi-config";
-import { ThemeProvider } from "./components/ui/theme-provider";
-import App from "./App";
+import {Web3AuthProvider} from "@web3auth/modal/react";
+import web3AuthContextConfig from "@/web3authContext";
+import {WagmiProvider} from "@web3auth/modal/react/wagmi";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {wagmiConfig} from "@/wagmi-config";
+import {ThemeProvider} from "@/components/ui/theme-provider";
+import App from "@/App";
 
 const queryClient = new QueryClient();
 const rootElement = document.getElementById("root");

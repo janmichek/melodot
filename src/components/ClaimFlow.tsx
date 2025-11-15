@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {useWaitForTransactionReceipt, useWriteContract} from "wagmi";
-import {donateConfig} from "../generated";
+import {donateConfig} from "@/generated";
 import type {Abi} from "viem";
 import {Button} from "@/components/ui/button";
 

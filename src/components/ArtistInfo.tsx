@@ -1,5 +1,5 @@
-import {ArtistWithdrawForm} from "./ArtistWithdrawForm";
-import {BalanceDisplay} from "./ui/balance-display";
+import {ArtistWithdrawForm} from "@/components/ArtistWithdrawForm";
+import {BalanceDisplay} from "@/components/ui/balance-display";
 import {ExternalLink} from "lucide-react";
 
 interface ArtistInfoProps {

@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {clsx} from 'clsx';
-import {Alert, AlertDescription, AlertTitle} from './alert';
-import {Button} from './button';
+import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
+import {Button} from '@/components/ui/button';
 import {CheckCircle2, Clock, ExternalLink, Loader2, X, XCircle} from 'lucide-react';
 
 const BLOCK_EXPLORER_BASE = 'https://blockscout-passet-hub.parity-testnet.parity.io';

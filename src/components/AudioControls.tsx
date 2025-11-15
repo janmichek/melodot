@@ -1,5 +1,5 @@
-import StopButton from "./StopButton";
-import RecordButton from "./RecordButton";
+import StopButton from "@/components/StopButton";
+import RecordButton from "@/components/RecordButton";
 
 interface AudioControlsProps {
   hasPermission: boolean;

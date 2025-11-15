@@ -1,6 +1,6 @@
 import {useMemo} from "react";
-import {useWeb3AuthContext} from "../hooks/useWeb3AuthContext";
-import {passetHub} from "../wagmi-config";
+import {useWeb3AuthContext} from "@/hooks/useWeb3AuthContext";
+import {passetHub} from "@/wagmi-config";
 import {DonationsList} from "@/components/DonationsList";
 
 const EXPLORER_BASE_URL =

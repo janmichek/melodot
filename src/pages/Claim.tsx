@@ -1,5 +1,5 @@
-import {useWeb3AuthContext} from "../hooks/useWeb3AuthContext";
-import {ClaimCard} from "../components/ClaimCard";
+import {useWeb3AuthContext} from "@/hooks/useWeb3AuthContext";
+import {ClaimCard} from "@/components/ClaimCard";
 
 export function Claim() {
   const { contractAddress } = useWeb3AuthContext();

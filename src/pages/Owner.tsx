@@ -1,14 +1,14 @@
 import {useEffect, useState} from "react";
 import {useAccount, useReadContract} from "wagmi";
 import type {Abi} from "viem";
-import {useWeb3AuthContext} from "../hooks/useWeb3AuthContext";
-import {OwnerWithdrawForm} from "../components/OwnerWithdrawForm";
-import {ContractDashboard} from "../components/ContractDashboard";
-import {donateConfig} from "../generated";
+import {useWeb3AuthContext} from "@/hooks/useWeb3AuthContext";
+import {OwnerWithdrawForm} from "@/components/OwnerWithdrawForm";
+import {ContractDashboard} from "@/components/ContractDashboard";
+import {donateConfig} from "@/generated";
 import {BalanceDisplay} from "@/components/ui/balance-display";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
-import {formatAddressShort} from "../wagmi-config";
+import {formatAddressShort} from "@/wagmi-config";
 
 export function Owner() {
   const {

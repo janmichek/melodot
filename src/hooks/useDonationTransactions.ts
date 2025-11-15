@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {usePublicClient} from "wagmi";
 import type {Abi} from "viem";
 import {decodeFunctionData, encodeFunctionData} from "viem";
-import {donateConfig} from "../generated";
+import {donateConfig} from "@/generated";
 
 export interface DonationTransaction {
   txHash: `0x${string}`;

@@ -1,10 +1,10 @@
 import {useEffect} from "react";
 import {useAccount, useReadContract} from "wagmi";
 import type {Abi} from "viem";
-import {useWeb3AuthContext} from "../hooks/useWeb3AuthContext";
-import {UserMenu} from "./UserMenu";
+import {useWeb3AuthContext} from "@/hooks/useWeb3AuthContext";
+import {UserMenu} from "@/components/UserMenu";
 import {Button} from "@/components/ui/button";
-import {ModeToggle} from "./ui/mode-toggle";
+import {ModeToggle} from "@/components/ui/mode-toggle";
 import {
   Sidebar,
   SidebarContent,
@@ -19,8 +19,8 @@ import {
 import {Coins, List, Mic, Wallet} from "lucide-react";
 import {Link, useLocation} from "react-router-dom";
 import {Spinner} from "@/components/ui/spinner";
-import logoIcon from "../assets/icons/beatchain-logo.svg";
-import {donateConfig} from "../generated";
+import logoIcon from "@/assets/icons/beatchain-logo.svg";
+import {donateConfig} from "@/generated";
 
 export function AppSidebar() {
   const {

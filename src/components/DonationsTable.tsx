@@ -2,9 +2,9 @@ import {useEffect, useState} from "react";
 import {usePublicClient, useReadContract} from "wagmi";
 import type {Abi} from "viem";
 import {decodeFunctionData, encodeFunctionData} from "viem";
-import {donateConfig} from "../generated";
-import {BalanceDisplay} from "./ui/balance-display";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "./ui/table";
+import {donateConfig} from "@/generated";
+import {BalanceDisplay} from "@/components/ui/balance-display";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
 
 interface ArtistDonation {
   id: string;

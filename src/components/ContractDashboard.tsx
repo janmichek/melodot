@@ -1,11 +1,11 @@
 import {useMemo} from "react";
 import {useReadContract} from "wagmi";
 import type {Abi} from "viem";
-import {useWeb3AuthContext} from "../hooks/useWeb3AuthContext";
-import {donateConfig} from "../generated";
+import {useWeb3AuthContext} from "@/hooks/useWeb3AuthContext";
+import {donateConfig} from "@/generated";
 import {BalanceDisplay} from "@/components/ui/balance-display";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {formatAddress, formatAddressShort, passetHub} from "../wagmi-config";
+import {formatAddress, formatAddressShort, passetHub} from "@/wagmi-config";
 
 export function ContractDashboard() {
   const {contractAddress} = useWeb3AuthContext();
