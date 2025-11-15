@@ -105,12 +105,6 @@ export function ArtistWithdrawForm({
 
   return (
     <div className="mt-6 space-y-4 rounded-lg border border-border bg-muted/5 p-4">
-      <div className="space-y-1">
-        <h4 className="text-base font-semibold">Withdraw Claimed Balance</h4>
-        <p className="text-sm text-muted-foreground">
-          Send your claimed balance to a wallet address.
-        </p>
-      </div>
       <div className="space-y-4">
         <AddressInput
           value={withdrawAddress}

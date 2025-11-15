@@ -1,12 +1,23 @@
 import {ArtistWithdrawForm} from "@/components/ArtistWithdrawForm";
 import {BalanceDisplay} from "@/components/ui/balance-display";
-import {ExternalLink} from "lucide-react";
+
+interface ArtistData {
+  id: string;
+  name: string;
+  images: Array<{
+    url: string;
+    height: number;
+    width: number;
+  }>;
+}
 
 interface ArtistInfoProps {
   artistId: string;
   artistBalance: bigint;
   artistClaimed: boolean;
   contractAddress?: `0x${string}`;
+  artistData?: ArtistData | null;
+  isLoadingArtist?: boolean;
 }
 
 export function ArtistInfo({
@@ -14,10 +25,15 @@ export function ArtistInfo({
   artistBalance,
   artistClaimed,
   contractAddress,
+  artistData,
+  isLoadingArtist = false,
 }: ArtistInfoProps) {
   const statusBadgeClasses = artistClaimed
     ? "rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-500"
     : "rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-600";
+
+  const artistImage = artistData?.images?.[0]?.url;
+  const artistName = artistData?.name;
 
   return (
     <div className="space-y-4 rounded-lg border border-border/40 bg-muted/10 p-4">
@@ -25,40 +41,61 @@ export function ArtistInfo({
         <h3 className="text-sm font-semibold text-foreground">
           Artist Information
         </h3>
-        <span className={statusBadgeClasses}>
-          {artistClaimed ? "✓ Already Claimed" : "○ Available to Claim"}
-        </span>
       </div>
-      <div className="space-y-2 text-sm text-muted-foreground">
-        <div className="flex flex-wrap items-center gap-2 text-foreground">
-          <strong className="font-semibold">Artist ID:</strong>
-          <span className="font-mono">{artistId}</span>
+      
+      {isLoadingArtist ? (
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <div className="h-12 w-12 animate-pulse rounded-full bg-muted" />
+          <div className="space-y-1">
+            <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+            <div className="h-3 w-24 animate-pulse rounded bg-muted" />
+          </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2 text-foreground">
-          <strong className="font-semibold">Spotify Profile:</strong>
-          <a
-            href={`https://open.spotify.com/artist/${artistId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-primary hover:underline"
-          >
-            View on Spotify
-            <ExternalLink className="h-3.5 w-3.5" />
-          </a>
+      ) : artistData && (artistImage || artistName) ? (
+        <div className="flex items-center gap-3">
+          {artistImage && (
+            <img
+              src={artistImage}
+              alt={artistName || artistId}
+              className="h-16 w-16 rounded-full object-cover"
+            />
+          )}
+          <div className="flex-1 space-y-1">
+            {artistName && (
+              <h4 className="text-base font-semibold text-foreground">
+                {artistName}
+              </h4>
+            )}
+            <div className="flex items-center gap-2">
+              <BalanceDisplay
+                balance={artistBalance}
+                showSymbol={true}
+                size="small"
+              />
+              <span className={statusBadgeClasses}>
+                {artistClaimed ? "✓ Already Claimed" : "○ Available to Claim"}
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="space-y-2">
-        <div className="space-y-1">
-          <strong className="text-sm font-semibold text-foreground">
-            Balance:
-          </strong>
-          <BalanceDisplay
-            balance={artistBalance}
-            showSymbol={true}
-            size="small"
-          />
+      ) : (
+        <div className="space-y-2 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-2 text-foreground">
+            <strong className="font-semibold">Artist ID:</strong>
+            <span className="font-mono">{artistId}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <BalanceDisplay
+              balance={artistBalance}
+              showSymbol={true}
+              size="small"
+            />
+            <span className={statusBadgeClasses}>
+              {artistClaimed ? "✓ Already Claimed" : "○ Available to Claim"}
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       {artistClaimed && contractAddress && (
         <ArtistWithdrawForm

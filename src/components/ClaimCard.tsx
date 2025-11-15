@@ -2,15 +2,22 @@ import {useEffect, useState} from "react";
 import {useReadContract} from "wagmi";
 import {donateConfig} from "@/generated";
 import type {Abi} from "viem";
-import {Input} from "@/components/ui/input";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {useWeb3AuthContext} from "@/hooks/useWeb3AuthContext";
-import {ArtistInfo} from "@/components/ArtistInfo";
-import {VerificationFlow} from "@/components/VerificationFlow";
-import {ClaimFlow} from "@/components/ClaimFlow";
+import {ClaimGuide} from "@/components/ClaimGuide";
 
 interface ClaimCardProps {
   contractAddress: `0x${string}` | undefined;
+}
+
+interface ArtistData {
+  id: string;
+  name: string;
+  images: Array<{
+    url: string;
+    height: number;
+    width: number;
+  }>;
 }
 
 // Parse artist ID from Spotify URL
@@ -31,6 +38,8 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
   const { isConnected } = useWeb3AuthContext();
   const [artistUrl, setArtistUrl] = useState('');
   const [parsedArtistId, setParsedArtistId] = useState<string | null>(null);
+  const [artistData, setArtistData] = useState<ArtistData | null>(null);
+  const [isLoadingArtist, setIsLoadingArtist] = useState(false);
   const [artistBalance, setArtistBalance] = useState<bigint | null>(null);
   const [artistClaimed, setArtistClaimed] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -44,8 +53,36 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
       setParsedArtistId(artistId);
     } else {
       setParsedArtistId(null);
+      setArtistData(null);
     }
   }, [artistUrl]);
+
+  // Fetch artist data when artist ID is parsed
+  useEffect(() => {
+    if (!parsedArtistId) {
+      setArtistData(null);
+      return;
+    }
+
+    setIsLoadingArtist(true);
+    fetch(`/api/artist?artistUrl=${encodeURIComponent(artistUrl.trim())}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch artist data');
+        }
+        return res.json();
+      })
+      .then((data: ArtistData) => {
+        setArtistData(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching artist data:', error);
+        setArtistData(null);
+      })
+      .finally(() => {
+        setIsLoadingArtist(false);
+      });
+  }, [parsedArtistId, artistUrl]);
 
   // Reset verification state when artist ID changes
   useEffect(() => {
@@ -116,73 +153,33 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Artist Claiming</CardTitle>
+        <CardTitle>Claim guide</CardTitle>
         <CardDescription>
-          Paste your Spotify artist URL to check donations and claim your balance
+          Follow these steps to verify your identity and claim your donations
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <Input
-          type="text"
-          placeholder="https://open.spotify.com/artist/..."
-          value={artistUrl}
-          onChange={(e) => setArtistUrl(e.target.value)}
+        {!isConnected && parsedArtistId && artistBalance !== null && artistBalance > 0n && (
+          <div className="w-full rounded-md border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-sm text-amber-600">
+            ⚠️ Sign in to claim this artist balance
+          </div>
+        )}
+
+        <ClaimGuide
+          artistId={parsedArtistId || ""}
+          artistUrl={artistUrl}
+          contractAddress={contractAddress}
+          artistBalance={artistBalance}
+          artistData={artistData}
+          isLoadingArtist={isLoadingArtist}
+          isVerified={isVerified}
+          isVerifying={isVerifying}
+          verifyError={verifyError}
+          artistClaimed={artistClaimed}
+          onArtistUrlChange={setArtistUrl}
+          onVerify={handleVerify}
+          onClaimSuccess={handleClaimSuccess}
         />
-        
-
-    
-
-        {parsedArtistId && artistBalance !== null && artistBalance === 0n && (
-          <div className="rounded-lg border border-border/40 bg-muted/10 p-4 text-center text-sm text-muted-foreground">
-            Not found
-          </div>
-        )}
-
-        {parsedArtistId && artistBalance !== null && artistBalance > 0n && (
-          <ArtistInfo
-            artistId={parsedArtistId}
-            artistBalance={artistBalance}
-            artistClaimed={artistClaimed}
-            contractAddress={contractAddress}
-          />
-        )}
-
-        {parsedArtistId && artistBalance === null && (
-          <div className="rounded-lg border border-border/40 bg-muted/10 p-4 text-center text-sm text-muted-foreground">
-            Loading...
-          </div>
-        )}
-        
-        {parsedArtistId && artistBalance !== null && artistBalance > 0n && (
-          <>
-            {!isConnected ? (
-              <div className="w-full rounded-md border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-sm text-amber-600">
-                ⚠️ Sign in to claim this artist balance
-              </div>
-            ) : (
-              <>
-                {!artistClaimed && (
-                  <VerificationFlow
-                    artistId={parsedArtistId}
-                    isVerified={isVerified}
-                    isVerifying={isVerifying}
-                    verifyError={verifyError}
-                    onVerify={handleVerify}
-                  />
-                )}
-                {contractAddress && (
-                  <ClaimFlow
-                    artistId={parsedArtistId}
-                    contractAddress={contractAddress}
-                    isVerified={isVerified}
-                    artistClaimed={artistClaimed}
-                    onClaimSuccess={handleClaimSuccess}
-                  />
-                )}
-              </>
-            )}
-          </>
-        )}
       </CardContent>
     </Card>
   );
