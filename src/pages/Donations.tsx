@@ -35,13 +35,9 @@ export function Donations() {
         )}
       </header>
 
-      {!contractAddress ? (
-        <div className="space-y-2 rounded-md border border-border bg-muted/30 px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>Connect your wallet to view live donations.</p>
-        </div>
-      ) : (
+  
         <DonationsList contractAddress={contractAddress} />
-      )}
+
     </section>
   );
 }

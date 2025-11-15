@@ -27,24 +27,12 @@ export default async function handler(
   try {
     const biography = await fetchRapidApiBiography(artistId) as RapidApiResponse;
     
-    // Extract biography from overview response
-    const bio =
-      biography.biography ||
-      biography.data?.biography ||
-      biography.artist?.biography ||
-      null;
+    const bio = biography.biography;
     
-    // Verification code to check for
     const verificationCode = '#8';
     
-    // Check if bio contains the verification code
-    const isVerified = bio !== null && typeof bio === 'string' && bio.includes(verificationCode);
-    
     return res.status(200).json({
-      verified: isVerified,
-      message: isVerified 
-        ? 'Verification successful' 
-        : 'Verification code not found in artist bio',
+      verified: bio.includes(verificationCode),
     });
   } catch (error) {
     const status = (error as any)?.status ?? 500;

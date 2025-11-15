@@ -98,7 +98,7 @@ export function UserMenu() {
               </>
             )}
             <DropdownMenuItem onClick={() => disconnect()}>
-              Disconnect
+              Sign Out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -79,7 +79,7 @@ export function AppSidebar() {
     },
   ];
 
-  // Conditional "Withdraw Fees" item for owners
+  // todo merge it to one const , change to function and add owner condition
   const ownerMenuItems = isOwner
     ? [
         {
@@ -124,7 +124,7 @@ export function AppSidebar() {
               disabled={connecting || !providerReady}
               className="w-full"
             >
-              {connecting || !providerReady ? <Spinner size="sm" className="inline" /> : "Connect"}
+              {connecting || !providerReady ? <Spinner size="sm" className="inline" /> : "Sign In"}
             </Button>
           )}
         </SidebarGroup>

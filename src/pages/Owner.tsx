@@ -56,7 +56,7 @@ export function Owner() {
 
   const adminButtonLabel = (() => {
     if (!isConnected) {
-      return connecting ? "Connecting..." : "Connect Wallet";
+      return connecting ? "Connecting..." : "Sign In";
     }
     if (isOwner) {
       return showWithdrawForm ? "Hide Withdrawal Form" : "Withdraw Platform Fees";
@@ -64,7 +64,7 @@ export function Owner() {
     return "Owner Access Required";
   })();
 
-  const adminButtonDisabled =
+  const adminButtonDisabled =k
     (!isConnected && (connecting || !providerReady)) ||
     (isConnected && !isOwner);
 
@@ -143,9 +143,10 @@ export function Owner() {
           >
             {adminButtonLabel}
           </Button>
+          {/*todo simplify conditions*/}
           <span className="text-xs text-muted-foreground">
             {!isConnected
-              ? "Connect with the contract owner wallet to unlock admin actions."
+              ? "Sign in with the contract owner wallet to unlock admin actions."
               : isOwner
                 ? "Keep the form open to submit a withdrawal transaction."
                 : "You must switch to the contract owner wallet to manage fees."}
