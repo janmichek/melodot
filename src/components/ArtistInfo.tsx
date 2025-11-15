@@ -1,4 +1,3 @@
-import {ArtistWithdrawForm} from "@/components/ArtistWithdrawForm";
 import {BalanceDisplay} from "@/components/ui/balance-display";
 
 interface ArtistData {
@@ -95,13 +94,6 @@ export function ArtistInfo({
             </span>
           </div>
         </div>
-      )}
-
-      {artistClaimed && contractAddress && (
-        <ArtistWithdrawForm
-          contractAddress={contractAddress}
-          artistId={artistId}
-        />
       )}
     </div>
   );

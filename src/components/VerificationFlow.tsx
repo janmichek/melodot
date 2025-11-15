@@ -8,6 +8,12 @@ interface VerificationFlowProps {
   isVerifying: boolean;
   verifyError: string | null;
   onVerify: () => void;
+  /**
+   * DEMO/TEMPORARY: Demo verify handler that bypasses verification
+   * Uses hardcoded profile: https://open.spotify.com/artist/52iWG2c2P0K6HmGrAAUyoP
+   * TODO: Remove this in production
+   */
+  onDemoVerify?: () => void;
 }
 
 export function VerificationFlow({
@@ -16,6 +22,7 @@ export function VerificationFlow({
   isVerifying,
   verifyError,
   onVerify,
+  onDemoVerify,
 }: VerificationFlowProps) {
   const [isCodeCopied, setIsCodeCopied] = useState(false);
 
@@ -96,21 +103,35 @@ export function VerificationFlow({
 
       {/* Verify Button */}
       {!isVerified && (
-        <Button
-          onClick={onVerify}
-          disabled={isVerifying || !artistId}
-          className="w-full"
-          variant="default"
-        >
-          {isVerifying ? (
-            <>
-              <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-              Verifying...
-            </>
-          ) : (
-            'Verify Bio'
+        <div className="flex w-full gap-2">
+          <Button
+            onClick={onVerify}
+            disabled={isVerifying || !artistId}
+            className="flex-1"
+            variant="default"
+          >
+            {isVerifying ? (
+              <>
+                <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
+                Verifying...
+              </>
+            ) : (
+              'Verify Bio'
+            )}
+          </Button>
+          {/* DEMO/TEMPORARY: Demo claim button - bypasses verification using hardcoded profile */}
+          {/* TODO: Remove this button in production */}
+          {onDemoVerify && (
+            <Button
+              onClick={onDemoVerify}
+              disabled={isVerifying || !artistId}
+              variant="secondary"
+              className="flex-1"
+            >
+              Demo (fake) claim
+            </Button>
           )}
-        </Button>
+        </div>
       )}
 
       {/* Verify Error */}

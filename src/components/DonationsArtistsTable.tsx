@@ -1,8 +1,12 @@
+import {useEffect, useState} from "react";
+import {usePublicClient} from "wagmi";
+import type {Abi} from "viem";
 import {BalanceDisplay} from "@/components/ui/balance-display";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
 import {Donation} from "@/components/RecentDonationTransactions";
 import {useArtistNames} from "@/hooks/useArtistNames";
 import {ExternalLink} from "lucide-react";
+import {donateConfig} from "@/generated";
 
 interface ArtistStats {
   artistId: string;
@@ -14,11 +18,16 @@ interface ArtistStats {
 
 interface DonationSummaryByArtistProps {
   donations: Donation[];
+  contractAddress?: `0x${string}`;
 }
 
 export function DonationsArtistsTable({
   donations,
+  contractAddress,
 }: DonationSummaryByArtistProps) {
+  const publicClient = usePublicClient();
+  const [artistClaimStatus, setArtistClaimStatus] = useState<Record<string, boolean>>({});
+  const [isLoadingClaimStatus, setIsLoadingClaimStatus] = useState(false);
   // Group donations by artist and calculate totals
   const artistStats = donations.reduce(
     (acc, donation) => {
@@ -44,6 +53,43 @@ export function DonationsArtistsTable({
   const artistIds = artistStatsArray.map(stat => stat.artistId);
   const { artistNames, isLoading: isLoadingNames } = useArtistNames(artistIds);
 
+  // Fetch claim status for all artists
+  useEffect(() => {
+    const fetchClaimStatus = async () => {
+      if (!publicClient || !contractAddress || artistIds.length === 0) {
+        return;
+      }
+
+      setIsLoadingClaimStatus(true);
+      try {
+        const claimStatusPromises = artistIds.map((artistId) =>
+          publicClient.readContract({
+            address: contractAddress,
+            abi: donateConfig.abi as Abi,
+            functionName: "getArtistInfo",
+            args: [artistId],
+          })
+        );
+
+        const results = await Promise.all(claimStatusPromises);
+        const statusMap: Record<string, boolean> = {};
+        
+        artistIds.forEach((artistId, index) => {
+          const [, isClaimed] = results[index] as [bigint, boolean];
+          statusMap[artistId] = isClaimed;
+        });
+
+        setArtistClaimStatus(statusMap);
+      } catch (error) {
+        console.error("Error fetching artist claim status:", error);
+      } finally {
+        setIsLoadingClaimStatus(false);
+      }
+    };
+
+    fetchClaimStatus();
+  }, [publicClient, contractAddress, artistIds.join(",")]);
+
   if (artistStatsArray.length === 0) {
     return null;
   }
@@ -57,6 +103,7 @@ export function DonationsArtistsTable({
         <TableHeader>
           <TableRow>
             <TableHead>Artist Name</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Transactions</TableHead>
             <TableHead>Donated</TableHead>
             <TableHead>Artist Reward</TableHead>
@@ -83,6 +130,21 @@ export function DonationsArtistsTable({
                     </a>
                   ) : (
                     <span className="text-xs text-muted-foreground">—</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {isLoadingClaimStatus ? (
+                    <span className="text-xs text-muted-foreground">Loading...</span>
+                  ) : (
+                    <span
+                      className={
+                        artistClaimStatus[stat.artistId]
+                          ? "rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-500"
+                          : "rounded-full bg-amber-500/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-600"
+                      }
+                    >
+                      {artistClaimStatus[stat.artistId] ? "Claimed" : "Available"}
+                    </span>
                   )}
                 </TableCell>
                 <TableCell>

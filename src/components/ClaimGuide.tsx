@@ -6,6 +6,7 @@ import {VerificationFlow} from "@/components/VerificationFlow";
 import {ClaimFlow} from "@/components/ClaimFlow";
 import {ArtistWithdrawForm} from "@/components/ArtistWithdrawForm";
 import {ArtistInfo} from "@/components/ArtistInfo";
+import {CURRENCY_SYMBOL, formatPasBalance} from "@/wagmi-config";
 
 interface ArtistData {
   id: string;
@@ -30,6 +31,12 @@ interface ClaimGuideProps {
   artistClaimed: boolean;
   onArtistUrlChange: (url: string) => void;
   onVerify: () => void;
+  /**
+   * DEMO/TEMPORARY: Demo verify handler that bypasses verification
+   * Uses hardcoded profile: https://open.spotify.com/artist/52iWG2c2P0K6HmGrAAUyoP
+   * TODO: Remove this in production
+   */
+  onDemoVerify?: () => void;
   onClaimSuccess?: () => void;
 }
 
@@ -56,6 +63,7 @@ export function ClaimGuide({
   artistClaimed,
   onArtistUrlChange,
   onVerify,
+  onDemoVerify,
   onClaimSuccess,
 }: ClaimGuideProps) {
   const hasValidUrl = !!artistId;
@@ -101,16 +109,17 @@ export function ClaimGuide({
       description: "Add verification code to your Spotify artist bio",
       status: !hasValidUrl
         ? "disabled"
-        : isVerified
+        : artistClaimed || isVerified
           ? "completed"
           : "active",
-      content: hasValidUrl && !isVerified ? (
+      content: hasValidUrl && !isVerified && !artistClaimed ? (
         <VerificationFlow
           artistId={artistId}
           isVerified={isVerified}
           isVerifying={isVerifying}
           verifyError={verifyError}
           onVerify={onVerify}
+          onDemoVerify={onDemoVerify}
         />
       ) : undefined,
     },
@@ -118,11 +127,13 @@ export function ClaimGuide({
       number: 3,
       title: "Claim Your Balance",
       description: "Claim ownership of your artist donations",
-      status: !hasValidUrl || !isVerified
+      status: !hasValidUrl
         ? "disabled"
         : artistClaimed
           ? "completed"
-          : "active",
+          : !isVerified
+            ? "disabled"
+            : "active",
       content:
         hasValidUrl && isVerified && !artistClaimed && contractAddress ? (
           <ClaimFlow
@@ -143,6 +154,7 @@ export function ClaimGuide({
         <ArtistWithdrawForm
           contractAddress={contractAddress}
           artistId={artistId}
+          artistBalance={artistBalance}
           onWithdrawSuccess={onClaimSuccess}
         />
       ) : hasValidUrl ? (
@@ -160,7 +172,9 @@ export function ClaimGuide({
               disabled={true}
               className="w-full sm:w-auto"
             >
-              Withdraw All
+              {artistBalance !== null
+                ? `Withdraw ${formatPasBalance(artistBalance)} ${CURRENCY_SYMBOL}`
+                : "Withdraw All"}
             </Button>
           </div>
         </div>

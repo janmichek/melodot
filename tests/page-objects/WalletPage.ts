@@ -3,24 +3,26 @@ import {BasePage} from './BasePage';
 
 export class WalletPage extends BasePage {
   readonly connectButton: Locator;
-  readonly disconnectButton: Locator;
-  readonly headerAddress: Locator;
-  readonly headerBalance: Locator;
-  readonly chainBadge: Locator;
+  readonly signOutButton: Locator;
+  readonly userMenuTrigger: Locator;
+  readonly userAddress: Locator;
+  readonly userBalance: Locator;
+  readonly networkInfo: Locator;
   readonly faucetLink: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.connectButton = page.locator('button', { hasText: 'Connect' });
-    this.disconnectButton = page.locator('.header-disconnect-btn');
-    this.headerAddress = page.locator('.header-address');
-    this.headerBalance = page.locator('.header-balance');
-    this.chainBadge = page.locator('.header-chain-badge');
-    this.faucetLink = page.locator('.header-faucet-link');
+    this.connectButton = page.locator('button:has-text("Sign In")');
+    this.signOutButton = page.getByRole('menuitem', { name: /sign out/i });
+    this.userMenuTrigger = page.locator('[data-slot="trigger"]').filter({ has: page.locator('div[class*="jazzicon"]') }).or(page.locator('button').filter({ has: page.locator('div[class*="rounded"]') }));
+    this.userAddress = page.locator('.truncate.font-medium');
+    this.userBalance = page.locator('.truncate.text-xs.text-muted-foreground');
+    this.networkInfo = page.getByText(/Passet Hub|Ethereum|Unknown/);
+    this.faucetLink = page.getByRole('menuitem', { name: /get test tokens/i });
   }
 
   async isWalletConnected(): Promise<boolean> {
-    return await this.isElementVisible(this.headerAddress);
+    return await this.isElementVisible(this.userAddress);
   }
 
   async connect() {
@@ -32,27 +34,28 @@ export class WalletPage extends BasePage {
 
   async disconnect() {
     if (await this.isWalletConnected()) {
-      await this.disconnectButton.click();
+      await this.userMenuTrigger.click();
+      await this.signOutButton.click();
       await expect(this.connectButton).toBeVisible({ timeout: 5000 });
     }
   }
 
   async getWalletAddress(): Promise<string> {
-    return await this.getTextContent(this.headerAddress);
+    return await this.getTextContent(this.userAddress);
   }
 
   async getBalance(): Promise<string> {
-    return await this.getTextContent(this.headerBalance);
+    return await this.getTextContent(this.userBalance);
   }
 
   async getChainName(): Promise<string> {
-    return await this.getTextContent(this.chainBadge);
+    await this.userMenuTrigger.click();
+    return await this.getTextContent(this.networkInfo);
   }
 
   async verifyWalletConnected() {
-    await expect(this.headerAddress).toBeVisible();
-    await expect(this.headerBalance).toBeVisible();
-    await expect(this.disconnectButton).toBeVisible();
+    await expect(this.userAddress).toBeVisible();
+    await expect(this.userBalance).toBeVisible();
   }
 
   async verifyWalletDisconnected() {

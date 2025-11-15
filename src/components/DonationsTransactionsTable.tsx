@@ -2,6 +2,7 @@ import {useDonationTransactions} from "@/hooks/useDonationTransactions";
 import {RecentDonationTransactions} from "@/components/RecentDonationTransactions";
 import {DonationsArtistsTable} from "@/components/DonationsArtistsTable";
 import {DonationsDonorsTable} from "@/components/DonationsDonorsTable";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 
 interface DonationTransactionsProps {
   contractAddress: `0x${string}`;
@@ -49,20 +50,36 @@ export function DonationsTransactionsTable({
     );
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Individual Transactions - shown first */}
+  // If filtering by artist, show only transactions (no tabs)
+  if (artistId) {
+    return (
       <RecentDonationTransactions
         donations={filteredDonations}
         artistId={artistId}
       />
+    );
+  }
 
-      {/* Top Donors - only show when not filtering by artist */}
-      {!artistId && <DonationsDonorsTable donations={filteredDonations} limit={10} />}
-
-      {/* Summary by Artist - only show when not filtering by artist */}
-      {!artistId && <DonationsArtistsTable donations={filteredDonations} />}
-    </div>
+  return (
+    <Tabs defaultValue="transactions" className="w-full">
+      <TabsList className="grid w-full grid-cols-3">
+        <TabsTrigger value="transactions">Transactions</TabsTrigger>
+        <TabsTrigger value="donors">Top Donors</TabsTrigger>
+        <TabsTrigger value="artists">Summary by Artist</TabsTrigger>
+      </TabsList>
+      <TabsContent value="transactions" className="mt-4">
+        <RecentDonationTransactions
+          donations={filteredDonations}
+          artistId={artistId}
+        />
+      </TabsContent>
+      <TabsContent value="donors" className="mt-4">
+        <DonationsDonorsTable donations={filteredDonations} limit={10} />
+      </TabsContent>
+      <TabsContent value="artists" className="mt-4">
+        <DonationsArtistsTable donations={filteredDonations} contractAddress={contractAddress} />
+      </TabsContent>
+    </Tabs>
   );
 }
 

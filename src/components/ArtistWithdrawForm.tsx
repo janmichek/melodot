@@ -6,16 +6,19 @@ import {TxNotification} from "@/components/ui/tx-notification";
 import type {Abi} from "viem";
 import {isAddress} from "viem";
 import {Button} from "@/components/ui/button";
+import {CURRENCY_SYMBOL, formatPasBalance} from "@/wagmi-config";
 
 interface ArtistWithdrawFormProps {
   contractAddress: `0x${string}`;
   artistId: string;
+  artistBalance: bigint | null;
   onWithdrawSuccess?: () => void;
 }
 
 export function ArtistWithdrawForm({
   contractAddress,
   artistId,
+  artistBalance,
   onWithdrawSuccess,
 }: ArtistWithdrawFormProps) {
   const [withdrawAddress, setWithdrawAddress] = useState('');
@@ -124,6 +127,8 @@ export function ArtistWithdrawForm({
             ? "Sending transaction..."
             : isConfirming
             ? "Confirming..."
+            : artistBalance !== null
+            ? `Withdraw ${formatPasBalance(artistBalance)} ${CURRENCY_SYMBOL}`
             : "Withdraw All"}
         </Button>
 

@@ -3,6 +3,8 @@ import {useWaitForTransactionReceipt, useWriteContract} from "wagmi";
 import {donateConfig} from "@/generated";
 import type {Abi} from "viem";
 import {Button} from "@/components/ui/button";
+import {Check, ExternalLink, Loader2} from "lucide-react";
+import {EXPLORER_BASE_URL} from "@/wagmi-config";
 
 interface ClaimFlowProps {
   artistId: string;
@@ -22,6 +24,7 @@ export function ClaimFlow({
   const [isClaiming, setIsClaiming] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | undefined>();
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const {writeContract, isPending: isClaimPending} = useWriteContract();
 
@@ -77,7 +80,14 @@ export function ClaimFlow({
       setIsClaiming(false);
       setClaimError(null);
       setTxHash(undefined);
+      setShowSuccess(true);
+      // Call success handler to update parent state
       onClaimSuccess?.();
+      // Keep success message visible for 3 seconds even after state updates
+      const timer = setTimeout(() => {
+        setShowSuccess(false);
+      }, 3000);
+      return () => clearTimeout(timer);
     }
   }, [isConfirmed, onClaimSuccess]);
 
@@ -89,29 +99,62 @@ export function ClaimFlow({
     }
   }, [confirmError]);
 
-  // Don't render if already claimed
-  if (artistClaimed) {
+  // Show success message even if already claimed (briefly after claim)
+  if (artistClaimed && !showSuccess) {
     return null;
   }
 
   return (
     <div className="flex w-full flex-col gap-3">
       {/* Claim Button */}
-      {isVerified && (
+      {isVerified && !isConfirmed && !showSuccess && (
         <Button
           onClick={handleClaim}
           disabled={isClaiming || isClaimPending || isConfirming}
           className="w-full"
           variant="default"
         >
-          {isClaimPending
-            ? "Sending transaction..."
-            : isConfirming
-              ? "Confirming..."
-              : isClaiming
-                ? "Processing..."
-                : "Claim Artist Balance"}
+          {isClaimPending || isConfirming || isClaiming ? (
+            <>
+              <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
+              {isClaimPending
+                ? "Sending transaction..."
+                : isConfirming
+                  ? "Confirming..."
+                  : "Processing..."}
+            </>
+          ) : (
+            "Claim Artist Balance"
+          )}
         </Button>
+      )}
+
+      {/* Loading State */}
+      {(isClaimPending || isConfirming || isClaiming) && !isConfirmed && !showSuccess && (
+        <div className="rounded-lg border border-primary/40 bg-primary/10 p-4">
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            <span className="text-sm font-semibold text-primary">
+              {isClaimPending
+                ? "Sending transaction to blockchain..."
+                : isConfirming
+                  ? "Waiting for transaction confirmation..."
+                  : "Processing your claim..."}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Success Message */}
+      {(isConfirmed || showSuccess) && (
+        <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-4">
+          <div className="flex items-center gap-2">
+            <Check className="h-5 w-5 text-emerald-500" />
+            <span className="text-sm font-semibold text-emerald-600">
+              Successfully claimed! You can now withdraw your balance.
+            </span>
+          </div>
+        </div>
       )}
 
       {/* Claim Error */}
@@ -121,10 +164,49 @@ export function ClaimFlow({
         </div>
       )}
 
-      {/* Transaction Status */}
+      {/* Live Transaction Status */}
       {txHash && !claimError && (
-        <div className="rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-primary">
-          Transaction submitted: {txHash.slice(0, 10)}...
+        <div className="rounded-lg border border-primary/40 bg-primary/10 p-3">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              {isConfirming ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  <span className="text-sm font-semibold text-primary">
+                    Waiting for confirmation...
+                  </span>
+                </>
+              ) : isConfirmed ? (
+                <>
+                  <Check className="h-4 w-4 text-emerald-500" />
+                  <span className="text-sm font-semibold text-emerald-600">
+                    Transaction confirmed
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  <span className="text-sm font-semibold text-primary">
+                    Transaction submitted
+                  </span>
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="font-mono">
+                {txHash.slice(0, 6)}...{txHash.slice(-4)}
+              </span>
+              <a
+                href={`${EXPLORER_BASE_URL}/tx/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-primary hover:underline"
+              >
+                View on Explorer
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+          </div>
         </div>
       )}
     </div>

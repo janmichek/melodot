@@ -136,9 +136,42 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
     }
   };
 
-  const handleClaimSuccess = () => {
-    setIsVerified(false); // Reset verification after successful claim
-    void refetch();
+  const handleClaimSuccess = async () => {
+    // Reset verification after successful claim
+    setIsVerified(false);
+    
+    // Refetch artist info to get updated claimed status
+    try {
+      const result = await refetch();
+      if (result.data !== undefined) {
+        const [balance, isClaimed] = result.data as [bigint, boolean];
+        // Immediately update state for reactive UI update
+        setArtistBalance(balance);
+        setArtistClaimed(isClaimed);
+      }
+    } catch (error) {
+      console.error('Error refetching artist info:', error);
+      // Still try to refetch in background
+      void refetch();
+    }
+  };
+
+  /**
+   * DEMO/TEMPORARY: Demo verify handler that bypasses bio verification
+   * Keeps the user's pasted profile URL but skips the bio verification step
+   * Sets verification to true to allow claiming without checking for #8 in bio
+   * TODO: Remove this function in production
+   */
+  const handleDemoVerify = () => {
+    if (!parsedArtistId) {
+      setVerifyError('Please paste a Spotify artist URL first');
+      return;
+    }
+    
+    // Bypass verification by setting isVerified to true
+    // This allows claiming without checking for #8 in the artist bio
+    setIsVerified(true);
+    setVerifyError(null);
   };
 
   useEffect(() => {
@@ -178,6 +211,7 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
           artistClaimed={artistClaimed}
           onArtistUrlChange={setArtistUrl}
           onVerify={handleVerify}
+          onDemoVerify={handleDemoVerify}
           onClaimSuccess={handleClaimSuccess}
         />
       </CardContent>
