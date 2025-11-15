@@ -3,6 +3,7 @@ import {useAudioRecorder} from "@/hooks/audio";
 import AudioControls from "@/components/AudioControls";
 import {DiscoveryResult} from "@/types";
 import {Button} from "@/components/ui/button";
+import {Alert, AlertDescription} from "@/components/ui/alert";
 
 const ATTEMPT_DURATIONS = [3, 5, 10, 15]; // seconds for each attempt
 
@@ -206,14 +207,14 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
       )}
 
       {allAttemptsFailed && (
-        <div className="w-full max-w-md rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
-          <p className="mb-4 text-sm text-muted-foreground">
+        <Alert variant="destructive">
+          <AlertDescription className="mb-4">
             No match found after {ATTEMPT_DURATIONS.length} attempts
-          </p>
+          </AlertDescription>
           <Button onClick={reset} variant="secondary">
             Try Again
           </Button>
-        </div>
+        </Alert>
       )}
 
       {errorMessage && (
