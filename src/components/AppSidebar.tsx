@@ -137,10 +137,11 @@ export function AppSidebar() {
                   asChild
                   isActive={location.pathname === item.url}
                   className="justify-start"
+                  size="lg"
                 >
-                  <Link to={item.url} className="flex w-full items-center gap-2">
-                    <item.icon className="h-4 w-4" />
-                    <span className="truncate">
+                  <Link to={item.url} className="flex w-full items-center gap-3">
+                    <item.icon className="h-5 w-5" />
+                    <span className="truncate text-base">
                       {item.title}
                     </span>
                   </Link>
@@ -153,10 +154,11 @@ export function AppSidebar() {
                   asChild
                   isActive={location.pathname === item.url}
                   className="justify-start"
+                  size="lg"
                 >
-                  <Link to={item.url} className="flex w-full items-center gap-2">
-                    <item.icon className="h-4 w-4" />
-                    <span className="truncate">
+                  <Link to={item.url} className="flex w-full items-center gap-3">
+                    <item.icon className="h-5 w-5" />
+                    <span className="truncate text-base">
                       {item.title}
                     </span>
                   </Link>

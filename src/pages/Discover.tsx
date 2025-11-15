@@ -21,7 +21,10 @@ export function Discover() {
           >
             ← Discover again
           </Button>
-          <DiscoveryCard discovery={discoveryData!} />
+          <DiscoveryCard 
+            discovery={discoveryData!} 
+            onDiscoverAgain={() => setDiscoveryData(null)}
+          />
         </div>
       )}
     </div>

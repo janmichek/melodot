@@ -8,9 +8,10 @@ import spotifyIcon from "@/assets/icons/spotify.svg";
 
 interface DiscoveryCardProps {
   discovery: DiscoveryResult;
+  onDiscoverAgain?: () => void;
 }
 
-export default function DiscoveryCard({ discovery }: DiscoveryCardProps) {
+export default function DiscoveryCard({ discovery, onDiscoverAgain }: DiscoveryCardProps) {
   if (!discovery) {
     return null;
   }
@@ -109,7 +110,7 @@ export default function DiscoveryCard({ discovery }: DiscoveryCardProps) {
         </div>
 
         {/* Donation Section */}
-        {discovery.spotifyInfo?.artists?.[0]?.id && (
+        {discovery.spotifyInfo?.artists && discovery.spotifyInfo.artists.length > 0 && (
           <>
             <Separator className="my-6" />
             <div className="space-y-4">
@@ -121,7 +122,10 @@ export default function DiscoveryCard({ discovery }: DiscoveryCardProps) {
               </h3>
 
               <div className="space-y-3">
-                <DonationForm artistId={discovery.spotifyInfo.artists[0].id} />
+                <DonationForm 
+                  artists={discovery.spotifyInfo.artists} 
+                  onDiscoverAgain={onDiscoverAgain}
+                />
               </div>
 
               {/* Audio Preview Link */}
