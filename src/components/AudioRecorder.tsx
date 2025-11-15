@@ -25,16 +25,16 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
   const [duration, setDuration] = useState(0);
   const [attemptIndex, setAttemptIndex] = useState(0);
   const [allAttemptsFailed, setAllAttemptsFailed] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isDiscovering, setIsDiscovering] = useState(false);
   const isProcessingAttempt = useRef(false);
   const pendingRecordingStart = useRef(false);
 
-  // Analyze audio when ready
+  // Discover audio when ready
   useEffect(() => {
-    if (isAnalyzing && audioBlob && !isProcessingAttempt.current) {
-      void analyze();
+    if (isDiscovering && audioBlob && !isProcessingAttempt.current) {
+      void discover();
     }
-  }, [isAnalyzing, audioBlob]);
+  }, [isDiscovering, audioBlob]);
 
   // Timer effect that tracks recording duration
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
 
   // Auto-start recording when permission is granted after user clicked record
   useEffect(() => {
-    if (permission && pendingRecordingStart.current && !isRecording && !isAnalyzing) {
+    if (permission && pendingRecordingStart.current && !isRecording && !isDiscovering) {
       pendingRecordingStart.current = false;
       setAttemptIndex(0);
       setAllAttemptsFailed(false);
@@ -51,7 +51,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
       isProcessingAttempt.current = false;
       startRecording();
     }
-  }, [permission, isRecording, isAnalyzing, startRecording]);
+  }, [permission, isRecording, isDiscovering, startRecording]);
 
   // Auto-stop recording when duration threshold is reached for current attempt
   useEffect(() => {
@@ -59,13 +59,13 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
       const targetDuration = ATTEMPT_DURATIONS[attemptIndex];
 
       if (duration >= targetDuration) {
-        setIsAnalyzing(true);
+        setIsDiscovering(true);
         stopRecording();
       }
     }
   }, [duration, isRecording, attemptIndex]);
 
-  async function analyze() {
+  async function discover() {
     if (isProcessingAttempt.current) return;
     isProcessingAttempt.current = true;
 
@@ -134,13 +134,13 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
       setTimeout(() => startRecording(), 100);
     } else {
       setAllAttemptsFailed(true);
-      setIsAnalyzing(false);
+      setIsDiscovering(false);
       stopRecording();
     }
   }
 
   async function record() {
-    if (!isRecording && !isAnalyzing) {
+    if (!isRecording && !isDiscovering) {
       // If no permission, request it first
       if (!permission) {
         pendingRecordingStart.current = true;
@@ -148,7 +148,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
         // Recording will start automatically via useEffect when permission is granted
         return;
       }
-      
+
       // Start recording if we already have permission
       setAttemptIndex(0);
       setAllAttemptsFailed(false);
@@ -161,13 +161,13 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
   function stop() {
     if (isRecording) {
       stopRecording();
-      setIsAnalyzing(false);
+      setIsDiscovering(false);
       reset();
     }
   }
 
   function reset() {
-    setIsAnalyzing(false);
+    setIsDiscovering(false);
     setDuration(0);
     setAttemptIndex(0);
     setAllAttemptsFailed(false);
@@ -199,7 +199,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
         <AudioControls
           hasPermission={permission}
           isRecording={isRecording}
-          isRecognizing={isAnalyzing}
+          isDiscovering={isDiscovering}
           onStart={record}
           onStop={stop}
         />

@@ -4,7 +4,7 @@ import RecordButton from "./RecordButton";
 interface AudioControlsProps {
   hasPermission: boolean;
   isRecording: boolean;
-  isRecognizing: boolean;
+  isDiscovering: boolean;
   onStart: () => void;
   onStop: () => void;
 }
@@ -12,12 +12,11 @@ interface AudioControlsProps {
 export default function AudioControls({
   hasPermission,
   isRecording,
-  isRecognizing,
+  isDiscovering,
   onStart,
   onStop,
 }: AudioControlsProps) {
-  const isProcessing = hasPermission && (isRecording || isRecognizing);
-  const isReadyToRecord = hasPermission && !isRecording && !isRecognizing;
+  const isProcessing = hasPermission && (isRecording || isDiscovering);
 
   return (
     <div className="audio-player-container audio-player-recording-area">

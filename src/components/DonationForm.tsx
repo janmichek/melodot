@@ -89,7 +89,7 @@ export function DonationForm({ artistId, onSuccess }: DonationFormProps) {
       <div className="space-y-2">
         <p className="text-sm text-muted-foreground">Artist ID: {artistId}</p>
         <div className="flex flex-wrap gap-2">
-          {[1, 2, 10].map((amount) => (
+          {[1, 2, 10, 50, 100].map((amount) => (
             <Button
               key={amount}
               type="button"

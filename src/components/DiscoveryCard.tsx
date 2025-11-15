@@ -7,11 +7,10 @@ import {Calendar, ExternalLink, Music, Music2, User} from "lucide-react";
 
 interface DiscoveryCardProps {
   discovery: DiscoveryResult;
-  onSearchAgain?: () => void;
   children?: any;
 }
 
-export default function DiscoveryCard({ discovery, onSearchAgain, children }: DiscoveryCardProps) {
+export default function DiscoveryCard({ discovery, children }: DiscoveryCardProps) {
   if (!discovery) {
     return null;
   }
@@ -130,17 +129,8 @@ export default function DiscoveryCard({ discovery, onSearchAgain, children }: Di
               </div>
             )}
 
-            <div className="flex items-center gap-4 mt-4">
-              <Button
-                onClick={onSearchAgain}
-                variant="ghost"
-                size="sm"
-                className="w-fit"
-              >
-                ← Search Again
-              </Button>
-
-              {spotifyUri && (
+            {spotifyUri && (
+              <div className="mt-4">
                 <Button
                   asChild
                   className="w-full md:w-auto bg-[#1DB954] hover:bg-[#1ed760] text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
@@ -163,8 +153,8 @@ export default function DiscoveryCard({ discovery, onSearchAgain, children }: Di
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 </Button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
