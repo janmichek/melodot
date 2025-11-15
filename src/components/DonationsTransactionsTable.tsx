@@ -51,17 +51,17 @@ export function DonationsTransactionsTable({
 
   return (
     <div className="space-y-6">
+      {/* Individual Transactions - shown first */}
+      <RecentDonationTransactions
+        donations={filteredDonations}
+        artistId={artistId}
+      />
+
       {/* Top Donors - only show when not filtering by artist */}
       {!artistId && <DonationsDonorsTable donations={filteredDonations} limit={10} />}
 
       {/* Summary by Artist - only show when not filtering by artist */}
       {!artistId && <DonationsArtistsTable donations={filteredDonations} />}
-
-      {/* Individual Transactions */}
-      <RecentDonationTransactions
-        donations={filteredDonations}
-        artistId={artistId}
-      />
     </div>
   );
 }

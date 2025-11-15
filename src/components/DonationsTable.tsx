@@ -5,6 +5,8 @@ import {decodeFunctionData, encodeFunctionData} from "viem";
 import {donateConfig} from "@/generated";
 import {BalanceDisplay} from "@/components/ui/balance-display";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
+import {useArtistNames} from "@/hooks/useArtistNames";
+import {ExternalLink} from "lucide-react";
 
 interface ArtistDonation {
   id: string;
@@ -166,6 +168,9 @@ export function DonationsTable({ contractAddress }: DonationsTableProps) {
     );
   }
 
+  const artistIds = artistDonations.map(artist => artist.id);
+  const { artistNames, isLoading: isLoadingNames } = useArtistNames(artistIds);
+
   return (
     <div className="rounded-lg border border-border/40 bg-muted/10 p-4">
       <h3 className="mb-4 text-sm font-semibold text-foreground">
@@ -174,45 +179,60 @@ export function DonationsTable({ contractAddress }: DonationsTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Artist ID</TableHead>
+            <TableHead>Artist Name</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Total Donated</TableHead>
+            <TableHead>Donated</TableHead>
             <TableHead>Transactions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {artistDonations.map((artist) => (
-            <TableRow key={artist.id}>
-              <TableCell>
-                <span className="font-mono text-xs text-foreground">
-                  {artist.id}
-                </span>
-              </TableCell>
-              <TableCell>
-                <span
-                  className={
-                    artist.isClaimed
-                      ? "rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-500"
-                      : "rounded-full bg-amber-500/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-600"
-                  }
-                >
-                  {artist.isClaimed ? "Claimed" : "Available"}
-                </span>
-              </TableCell>
-              <TableCell>
-                <BalanceDisplay
-                  balance={artist.totalBalance}
-                  showSymbol={true}
-                  size="small"
-                />
-              </TableCell>
-              <TableCell>
-                <span className="text-sm text-muted-foreground">
-                  {artist.txCount}
-                </span>
-              </TableCell>
-            </TableRow>
-          ))}
+          {artistDonations.map((artist) => {
+            const artistInfo = artistNames[artist.id];
+            return (
+              <TableRow key={artist.id}>
+                <TableCell>
+                  {isLoadingNames ? (
+                    <span className="text-xs text-muted-foreground">Loading...</span>
+                  ) : artistInfo ? (
+                    <a
+                      href={artistInfo.external_urls.spotify || `https://open.spotify.com/artist/${artist.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary hover:underline"
+                    >
+                      {artistInfo.name}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">—</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <span
+                    className={
+                      artist.isClaimed
+                        ? "rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-500"
+                        : "rounded-full bg-amber-500/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-600"
+                    }
+                  >
+                    {artist.isClaimed ? "Claimed" : "Available"}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <BalanceDisplay
+                    balance={artist.totalBalance}
+                    showSymbol={true}
+                    size="small"
+                  />
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm text-muted-foreground">
+                    {artist.txCount}
+                  </span>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

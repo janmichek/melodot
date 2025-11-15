@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {useAudioRecorder} from "@/hooks/audio";
+import {useAudioRecorder} from "@/hooks/useAudio";
 import AudioControls from "@/components/AudioControls";
 import {DiscoveryResult} from "@/types";
 import {Button} from "@/components/ui/button";
@@ -207,7 +207,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
       )}
 
       {allAttemptsFailed && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="w-full max-w-md text-center">
           <AlertDescription className="mb-4">
             No match found after {ATTEMPT_DURATIONS.length} attempts
           </AlertDescription>

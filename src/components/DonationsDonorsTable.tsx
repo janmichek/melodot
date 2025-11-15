@@ -55,7 +55,7 @@ export function DonationsDonorsTable({ donations, limit = 10 }: DonationsDonorsT
           <TableRow>
             <TableHead>Rank</TableHead>
             <TableHead>Donor</TableHead>
-            <TableHead>Total Donated</TableHead>
+            <TableHead>Donated</TableHead>
             <TableHead>Transactions</TableHead>
           </TableRow>
         </TableHeader>

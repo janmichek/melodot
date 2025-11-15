@@ -26,6 +26,10 @@
       "destination": "/api/endpoints/artist"
     },
     {
+      "source": "/api/artists",
+      "destination": "/api/endpoints/artists"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }

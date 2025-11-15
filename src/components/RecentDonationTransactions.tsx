@@ -2,6 +2,7 @@ import {formatAddress, passetHub} from "@/wagmi-config";
 import {BalanceDisplay} from "@/components/ui/balance-display";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
 import {ExternalLink} from "lucide-react";
+import {useArtistNames} from "@/hooks/useArtistNames";
 
 // Simple date formatter
 const formatTimeAgo = (timestamp: number): string => {
@@ -36,10 +37,13 @@ export function RecentDonationTransactions({
   donations,
   artistId,
 }: RecentDonationTransactionsProps) {
+  const artistIds = donations.map(d => d.artistId);
+  const { artistNames, isLoading: isLoadingNames } = useArtistNames(artistIds);
+
   return (
     <div className="rounded-lg border border-border/40 bg-muted/10 p-4">
       <h3 className="mb-4 text-sm font-semibold text-foreground">
-        Recent Donation Transactions {artistId && `for ${artistId}`}
+        Donation Transactions {artistId && `for ${artistId}`}
       </h3>
       <div className="overflow-x-auto">
         <Table>
@@ -47,7 +51,7 @@ export function RecentDonationTransactions({
             <TableRow>
               <TableHead>Transaction</TableHead>
               <TableHead>Donor</TableHead>
-              <TableHead>Artist</TableHead>
+              <TableHead>Artist Name</TableHead>
               <TableHead>Donated</TableHead>
               <TableHead>Artist Reward</TableHead>
               <TableHead>Platform Fee</TableHead>
@@ -55,66 +59,82 @@ export function RecentDonationTransactions({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {donations.map((donation) => (
-              <TableRow key={donation.txHash}>
-                <TableCell>
-                  <a
-                    href={`${EXPLORER_BASE_URL}/tx/${donation.txHash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                  >
-                    {formatAddress(donation.txHash, 8, 6)}
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                </TableCell>
-                <TableCell>
-                  <a
-                    href={`${EXPLORER_BASE_URL}/address/${donation.donor}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-foreground hover:underline"
-                  >
-                    {formatAddress(donation.donor)}
-                  </a>
-                </TableCell>
-                <TableCell>
-                  <span className="font-mono text-xs text-muted-foreground">
-                    {donation.artistId}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <BalanceDisplay
-                    balance={donation.donatedAmount}
-                    showSymbol={true}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <BalanceDisplay
-                    balance={donation.artistReward}
-                    showSymbol={true}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <BalanceDisplay
-                    balance={donation.platformFee}
-                    showSymbol={true}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  {donation.timestamp ? (
-                    <span className="text-xs text-muted-foreground">
-                      {formatTimeAgo(donation.timestamp)}
-                    </span>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">—</span>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+            {donations.map((donation) => {
+              const artistInfo = artistNames[donation.artistId];
+              return (
+                <TableRow key={donation.txHash}>
+                  <TableCell>
+                    <a
+                      href={`${EXPLORER_BASE_URL}/tx/${donation.txHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                    >
+                      {formatAddress(donation.txHash, 8, 6)}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </TableCell>
+                  <TableCell>
+                    <a
+                      href={`${EXPLORER_BASE_URL}/address/${donation.donor}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 font-mono text-xs text-foreground hover:underline"
+                    >
+                      {formatAddress(donation.donor)}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </TableCell>
+                  <TableCell>
+                    {isLoadingNames ? (
+                      <span className="text-xs text-muted-foreground">Loading...</span>
+                    ) : artistInfo ? (
+                      <a
+                        href={artistInfo.external_urls.spotify || `https://open.spotify.com/artist/${donation.artistId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary hover:underline"
+                      >
+                        {artistInfo.name}
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <BalanceDisplay
+                      balance={donation.donatedAmount}
+                      showSymbol={true}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <BalanceDisplay
+                      balance={donation.artistReward}
+                      showSymbol={true}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <BalanceDisplay
+                      balance={donation.platformFee}
+                      showSymbol={true}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {donation.timestamp ? (
+                      <span className="text-xs text-muted-foreground">
+                        {formatTimeAgo(donation.timestamp)}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>

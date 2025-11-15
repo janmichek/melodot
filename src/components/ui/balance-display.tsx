@@ -46,7 +46,7 @@ export function BalanceDisplay({
   return (
     <div
       className={clsx(
-        "flex flex-col rounded-lg border border-border bg-card/40 text-card-foreground backdrop-blur",
+        "flex flex-col rounded-lg bg-card/40 text-card-foreground backdrop-blur",
         containerStyles[size],
         className
       )}

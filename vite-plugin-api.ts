@@ -49,6 +49,7 @@ export function apiPlugin(): Plugin {
           // /api/track -> api/endpoints/track.ts
           // /api/verify -> api/endpoints/verify.ts
           // /api/artist -> api/endpoints/artist.ts
+          // /api/artists -> api/endpoints/artists.ts
           let apiFilePath: string;
           if (apiRoute === 'discover') {
             apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'discover.ts');
@@ -58,6 +59,8 @@ export function apiPlugin(): Plugin {
             apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'verify.ts');
           } else if (apiRoute === 'artist') {
             apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'artist.ts');
+          } else if (apiRoute === 'artists') {
+            apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'artists.ts');
           } else {
             // Unknown route
             res.writeHead(404, { 'Content-Type': 'application/json' });
