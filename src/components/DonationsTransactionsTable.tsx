@@ -64,8 +64,8 @@ export function DonationsTransactionsTable({
     <Tabs defaultValue="transactions" className="w-full">
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="transactions">Transactions</TabsTrigger>
-        <TabsTrigger value="donors">Top Donors</TabsTrigger>
-        <TabsTrigger value="artists">Summary by Artist</TabsTrigger>
+        <TabsTrigger value="artists">Artists</TabsTrigger>
+        <TabsTrigger value="donors">Donors</TabsTrigger>
       </TabsList>
       <TabsContent value="transactions" className="mt-4">
         <RecentDonationTransactions
@@ -73,11 +73,11 @@ export function DonationsTransactionsTable({
           artistId={artistId}
         />
       </TabsContent>
-      <TabsContent value="donors" className="mt-4">
-        <DonationsDonorsTable donations={filteredDonations} limit={10} />
-      </TabsContent>
       <TabsContent value="artists" className="mt-4">
         <DonationsArtistsTable donations={filteredDonations} contractAddress={contractAddress} />
+      </TabsContent>
+      <TabsContent value="donors" className="mt-4">
+        <DonationsDonorsTable donations={filteredDonations} limit={10} />
       </TabsContent>
     </Tabs>
   );

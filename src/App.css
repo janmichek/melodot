@@ -380,10 +380,3 @@ code {
 	transform: scale(1) rotate(0deg);
 	opacity: 1;
 }
-
-.main-content {
-	display: flex;
-	flex-direction: column;
-	gap: 1.5rem;
-}
-

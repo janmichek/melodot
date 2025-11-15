@@ -7,16 +7,7 @@ import {ClaimFlow} from "@/components/ClaimFlow";
 import {ArtistWithdrawForm} from "@/components/ArtistWithdrawForm";
 import {ArtistInfo} from "@/components/ArtistInfo";
 import {CURRENCY_SYMBOL, formatPasBalance} from "@/wagmi-config";
-
-interface ArtistData {
-  id: string;
-  name: string;
-  images: Array<{
-    url: string;
-    height: number;
-    width: number;
-  }>;
-}
+import type {ArtistData} from "@/types";
 
 interface ClaimGuideProps {
   artistId: string;

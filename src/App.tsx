@@ -1,5 +1,4 @@
 import "./App.css";
-import {type CSSProperties} from "react";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {AppSidebar} from "@/components/AppSidebar";
 import {SidebarInset, SidebarProvider} from "@/components/ui/sidebar";
@@ -18,7 +17,7 @@ function App() {
           {
             "--sidebar-width": "19rem",
             "--sidebar-width-mobile": "18rem",
-          } as CSSProperties
+          } as React.CSSProperties
         }
       >
         <SidebarInset className="bg-background flex flex-col min-h-0">

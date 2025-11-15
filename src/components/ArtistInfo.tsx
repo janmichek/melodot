@@ -1,14 +1,5 @@
 import {BalanceDisplay} from "@/components/ui/balance-display";
-
-interface ArtistData {
-  id: string;
-  name: string;
-  images: Array<{
-    url: string;
-    height: number;
-    width: number;
-  }>;
-}
+import type {ArtistData} from "@/types";
 
 interface ArtistInfoProps {
   artistId: string;

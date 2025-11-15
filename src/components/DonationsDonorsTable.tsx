@@ -47,9 +47,6 @@ export function DonationsDonorsTable({ donations, limit = 10 }: DonationsDonorsT
 
   return (
     <div className="rounded-lg border border-border/40 bg-muted/10 p-4">
-      <h3 className="mb-4 text-sm font-semibold text-foreground">
-        Top Donors
-      </h3>
       <Table>
         <TableHeader>
           <TableRow>

@@ -96,9 +96,6 @@ export function DonationsArtistsTable({
 
   return (
     <div className="rounded-lg border border-border/40 bg-muted/10 p-4">
-      <h3 className="mb-4 text-sm font-semibold text-foreground">
-        Donation Summary by Artist
-      </h3>
       <Table>
         <TableHeader>
           <TableRow>

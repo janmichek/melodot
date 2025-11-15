@@ -19,11 +19,15 @@ tests/
 │   ├── WalletPage.ts         # Wallet connection actions
 │   ├── AudioRecorderPage.ts  # Audio recording actions
 │   └── DonationPage.ts       # Donation form actions
-├── 01-wallet-connection.spec.ts
-├── 02-audio-recording.spec.ts
-├── 03-donation.spec.ts
-├── 04-integration-flow.spec.ts
-└── 05-wallet-connected.spec.ts
+├── 01-wallet-connection.spec.ts    # Wallet connection flow tests
+├── 02-audio-recording.spec.ts      # Audio recording tests
+├── 03-donation.spec.ts             # Basic donation flow tests
+├── 04-integration-flow.spec.ts     # End-to-end integration tests
+├── 05-navigation.spec.ts           # Navigation and routing tests
+├── 06-discovery-card.spec.ts       # Discovery card display tests
+├── 07-multi-artist-donation.spec.ts # Multi-artist donation tests
+├── 08-accessibility.spec.ts        # Accessibility compliance tests
+└── 09-error-handling.spec.ts       # Error handling and edge cases
 ```
 
 ## Running Tests
@@ -129,6 +133,13 @@ This requires:
 - ✅ Web3Auth modal appearance
 - ✅ Component state transitions
 - ✅ Error handling display
+- ✅ Discovery card layout and content
+- ✅ Multi-artist selection and donation
+- ✅ Responsive design across viewports
+- ✅ Accessibility compliance (ARIA, keyboard nav, focus)
+- ✅ Social media link display
+- ✅ Transaction status tracking
+- ✅ Edge cases and error scenarios
 
 ### Requires Manual Testing
 - ⏸️ Actual wallet connection via Web3Auth
@@ -162,6 +173,54 @@ End-to-end integration tests:
 - Complete user flows
 - State persistence
 - Multiple recordings
+
+### 05-navigation.spec.ts
+Navigation and routing tests:
+- Page title and header display
+- Theme toggle functionality
+- Responsive layout verification (mobile, tablet, desktop)
+- Cross-viewport compatibility
+
+### 06-discovery-card.spec.ts
+Discovery card display tests:
+- Album artwork display and aspect ratio
+- Spotify listen button
+- Artist links with icons
+- Social media platform buttons
+- External link indicators
+- Card layout and spacing
+
+### 07-multi-artist-donation.spec.ts
+Multi-artist donation flow tests:
+- Artist checkbox selection/deselection
+- Selection count display
+- Total donation calculation
+- Processing status for multiple transactions
+- Individual transaction hash display
+- Block explorer link verification
+- Artist-to-transaction mapping
+
+### 08-accessibility.spec.ts
+Accessibility compliance tests:
+- ARIA labels and roles
+- Keyboard navigation support
+- Tab order and focus management
+- Alt text on images
+- Semantic HTML structure
+- Screen reader compatibility
+- Focus indicators
+- Form label associations
+
+### 09-error-handling.spec.ts
+Error handling and edge case tests:
+- Microphone permission denial
+- Network error handling
+- Transaction rejection scenarios
+- Insufficient balance errors
+- Empty or malformed data
+- Slow network conditions
+- Loading state management
+- Retry mechanisms
 
 
 ## Writing New Tests

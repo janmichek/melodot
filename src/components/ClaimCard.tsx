@@ -5,19 +5,10 @@ import type {Abi} from "viem";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {useWeb3AuthContext} from "@/hooks/useWeb3AuthContext";
 import {ClaimGuide} from "@/components/ClaimGuide";
+import type {ArtistData} from "@/types";
 
 interface ClaimCardProps {
   contractAddress: `0x${string}` | undefined;
-}
-
-interface ArtistData {
-  id: string;
-  name: string;
-  images: Array<{
-    url: string;
-    height: number;
-    width: number;
-  }>;
 }
 
 // Parse artist ID from Spotify URL

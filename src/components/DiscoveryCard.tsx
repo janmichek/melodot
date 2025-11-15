@@ -30,8 +30,6 @@ export default function DiscoveryCard({ discovery, onDiscoverAgain }: DiscoveryC
   }
 
   // Find metadata in sections
-  const metadata = track.sections?.find((section) => section.type === 'SONG')?.metadata;
-  const releasedMetadata = metadata?.find((item) => item.title === 'Released');
   const spotifyUri = track.hub?.actions?.find((action) => action.type === 'uri')?.uri;
 
   return (

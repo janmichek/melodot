@@ -1,4 +1,4 @@
-import {formatAddress, passetHub} from "@/wagmi-config";
+import {EXPLORER_BASE_URL, formatAddress} from "@/wagmi-config";
 import {BalanceDisplay} from "@/components/ui/balance-display";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
 import {ExternalLink} from "lucide-react";
@@ -15,8 +15,6 @@ const formatTimeAgo = (timestamp: number): string => {
   const days = Math.floor(hours / 24);
   return `${days}d ago`;
 };
-
-const EXPLORER_BASE_URL = passetHub.blockExplorers.default.url
 
 export interface Donation {
   txHash: string;
@@ -42,9 +40,6 @@ export function RecentDonationTransactions({
 
   return (
     <div className="rounded-lg border border-border/40 bg-muted/10 p-4">
-      <h3 className="mb-4 text-sm font-semibold text-foreground">
-        Donation Transactions {artistId && `for ${artistId}`}
-      </h3>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
