@@ -1,4 +1,4 @@
-import {useWeb3AuthContext} from "../App";
+import {useWeb3AuthContext} from "../hooks/useWeb3AuthContext";
 import {ClaimCard} from "../components/ClaimCard";
 
 export function Claim() {

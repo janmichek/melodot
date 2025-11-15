@@ -6,7 +6,7 @@ import {TxNotification} from "./ui/tx-notification";
 import {Button} from "@/components/ui/button";
 import type {Abi} from "viem";
 import {parseEther} from "viem";
-import {useWeb3AuthContext} from "../App";
+import {useWeb3AuthContext} from "../hooks/useWeb3AuthContext";
 import {useQueryClient} from "@tanstack/react-query";
 
 interface DonationFormProps {

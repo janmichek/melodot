@@ -1,7 +1,7 @@
 import {useEffect} from "react";
 import {useAccount, useReadContract} from "wagmi";
 import type {Abi} from "viem";
-import {useWeb3AuthContext} from "../App";
+import {useWeb3AuthContext} from "../hooks/useWeb3AuthContext";
 import {UserMenu} from "./UserMenu";
 import {Button} from "@/components/ui/button";
 import {ModeToggle} from "./ui/mode-toggle";

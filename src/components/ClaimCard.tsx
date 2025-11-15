@@ -4,7 +4,7 @@ import {donateConfig} from "../generated";
 import type {Abi} from "viem";
 import {Input} from "@/components/ui/input";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {useWeb3AuthContext} from "../App";
+import {useWeb3AuthContext} from "../hooks/useWeb3AuthContext";
 import {ArtistInfo} from "./ArtistInfo";
 import {VerificationFlow} from "./VerificationFlow";
 import {ClaimFlow} from "./ClaimFlow";

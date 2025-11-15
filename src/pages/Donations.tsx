@@ -1,5 +1,5 @@
 import {useMemo} from "react";
-import {useWeb3AuthContext} from "../App";
+import {useWeb3AuthContext} from "../hooks/useWeb3AuthContext";
 import {passetHub} from "../wagmi-config";
 import {DonationsList} from "@/components/DonationsList";
 

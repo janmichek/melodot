@@ -4,7 +4,7 @@ import AudioControls from "./AudioControls";
 import {DiscoveryResult} from "../types";
 import {Button} from "@/components/ui/button";
 
-const ATTEMPT_DURATIONS = [2, 5, 10, 15]; // seconds for each attempt
+const ATTEMPT_DURATIONS = [3, 5, 10, 15]; // seconds for each attempt
 
 interface AudioRecorderProps {
   onAnalysisComplete: (data: DiscoveryResult) => void;

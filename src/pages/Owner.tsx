@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useAccount, useReadContract} from "wagmi";
 import type {Abi} from "viem";
-import {useWeb3AuthContext} from "../App";
+import {useWeb3AuthContext} from "../hooks/useWeb3AuthContext";
 import {OwnerWithdrawForm} from "../components/OwnerWithdrawForm";
 import {ContractDashboard} from "../components/ContractDashboard";
 import {donateConfig} from "../generated";
@@ -64,7 +64,7 @@ export function Owner() {
     return "Owner Access Required";
   })();
 
-  const adminButtonDisabled =k
+  const adminButtonDisabled =
     (!isConnected && (connecting || !providerReady)) ||
     (isConnected && !isOwner);
 
