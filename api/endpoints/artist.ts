@@ -41,9 +41,6 @@ export default async function handler(
       images: artistData.images,
     });
   } catch (error) {
-    if (error instanceof Error && error.message === 'Spotify API not configured') {
-      return res.status(500).json({ error: error.message });
-    }
     const status = (error as any)?.status ?? 500;
     return res.status(status).json({
       error: `Failed to fetch artist from Spotify: ${error instanceof Error ? error.message : 'Unknown error'}`,

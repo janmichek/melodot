@@ -47,15 +47,15 @@ export function apiPlugin(): Plugin {
           // Map route to file path (endpoints subdirectory)
           // /api/recognize -> api/endpoints/recognize.ts
           // /api/track -> api/endpoints/track.ts
-          // /api/bio -> api/endpoints/bio.ts
+          // /api/verify -> api/endpoints/verify.ts
           // /api/artist -> api/endpoints/artist.ts
           let apiFilePath: string;
           if (apiRoute === 'recognize') {
             apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'recognize.ts');
           } else if (apiRoute === 'track') {
             apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'track.ts');
-          } else if (apiRoute === 'bio') {
-            apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'bio.ts');
+          } else if (apiRoute === 'verify') {
+            apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'verify.ts');
           } else if (apiRoute === 'artist') {
             apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'artist.ts');
           } else {

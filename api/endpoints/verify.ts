@@ -3,11 +3,12 @@ import {fetchRapidApiBiography} from '../api';
 import type {RapidApiResponse} from '../types';
 
 /**
- * Fetches artist biography from RapidAPI Spotify Scraper
+ * Verifies that artist biography contains the verification code #8
  * Requires RAPIDAPI_KEY environment variable
  *
  * Uses the /v1/artist/overview endpoint with artistId parameter
  * Accepts artist ID only
+ * Returns verification result (does not return bio to frontend)
  */
 export default async function handler(
   req: VercelRequest,
@@ -33,14 +34,23 @@ export default async function handler(
       biography.artist?.biography ||
       null;
     
+    // Verification code to check for
+    const verificationCode = '#8';
+    
+    // Check if bio contains the verification code
+    const isVerified = bio !== null && typeof bio === 'string' && bio.includes(verificationCode);
+    
     return res.status(200).json({
-      status: biography.status || true,
-      biography: bio,
+      verified: isVerified,
+      message: isVerified 
+        ? 'Verification successful' 
+        : 'Verification code not found in artist bio',
     });
   } catch (error) {
     const status = (error as any)?.status ?? 500;
     return res.status(status).json({
-      error: `Failed to fetch artist biography: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      error: `Failed to verify artist: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      verified: false,
     });
   }
 }

@@ -25,9 +25,6 @@ export function extractArtistId(artistUrl: string): string | null {
  * @returns Track ID or empty string if invalid
  */
 export function extractTrackId(uri: string): string {
-  // if (uri.startsWith('spotify:track:')) {
-  //   return uri.replace('spotify:track:', '');
-  // } else 
     if (uri.includes('open.spotify.com/track/')) {
     const match = uri.match(/track\/([a-zA-Z0-9]+)/);
     return match ? match[1] : '';

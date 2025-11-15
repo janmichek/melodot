@@ -112,8 +112,8 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
         }
 
         onAnalysisComplete(data);
-        reset();
         isProcessingAttempt.current = false;
+        // Don't reset here - let the parent component handle the state transition
         return;
       }
 
@@ -199,7 +199,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
         <AudioControls
           hasPermission={permission}
           isRecording={isRecording}
-          isAnalyzing={isAnalyzing}
+          isRecognizing={isAnalyzing}
           onStart={record}
           onStop={stop}
         />

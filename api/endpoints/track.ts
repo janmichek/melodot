@@ -41,18 +41,19 @@ export default async function handler(
 
       return res.status(200).json(formatTrackResponse(trackData));
     }
+    // todo simplify
 
     // Handle track IDs
-    // const trackId = extractTrackId(uri);
-    //
-    // if (!trackId) {
-    //   return res.status(400).json({
-    //     error: `Invalid Spotify URI format: ${uri}`,
-    //   });
-    // }
-    //
-    // const trackData = await fetchSpotifyTrack(trackId, accessToken) as SpotifyTrackInfo;
-    // return res.status(200).json(formatTrackResponse(trackData));
+    const trackId = extractTrackId(uri);
+
+    if (!trackId) {
+      return res.status(400).json({
+        error: `Invalid Spotify URI format: ${uri}`,
+      });
+    }
+
+    const trackData = await fetchSpotifyTrack(trackId, accessToken) as SpotifyTrackInfo;
+    return res.status(200).json(formatTrackResponse(trackData));
   } catch (error) {
     const status = (error as any)?.status ?? 500;
     return res.status(status).json({
