@@ -10,8 +10,8 @@
   },
   "rewrites": [
     {
-      "source": "/api/recognize",
-      "destination": "/api/endpoints/recognize"
+      "source": "/api/discover",
+      "destination": "/api/endpoints/discover"
     },
     {
       "source": "/api/track",

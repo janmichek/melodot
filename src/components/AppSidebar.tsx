@@ -58,7 +58,7 @@ export function AppSidebar() {
 
   const menuItems = [
     {
-      title: "Recognize",
+      title: "Discover",
       url: "/",
       icon: Mic,
     },

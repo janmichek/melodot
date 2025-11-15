@@ -4,7 +4,7 @@ import DiscoveryCard from "../components/DiscoveryCard";
 import {DonationForm} from "../components/DonationForm";
 import {DiscoveryResult} from "../types";
 
-export function Recognize() {
+export function Discover() {
   const [discoveryData, setDiscoveryData] = useState<DiscoveryResult | null>(null);
 
   const artistId = discoveryData?.spotifyInfo?.artists?.[0]?.id;
@@ -24,3 +24,4 @@ export function Recognize() {
     </div>
   );
 }
+

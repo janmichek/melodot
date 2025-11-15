@@ -52,11 +52,11 @@ async function assertReachable(url: string) {
 }
 
 // ============================================================================
-// Recognize API Tests
+// Discover API Tests
 // ============================================================================
 
-const API_RECOGNIZE_PATH = process.env.API_RECOGNIZE_PATH ?? "/api/recognize";
-const RECOGNIZE_API_URL = `${API_BASE_URL}${API_RECOGNIZE_PATH}`;
+const API_DISCOVER_PATH = process.env.API_DISCOVER_PATH ?? "/api/discover";
+const DISCOVER_API_URL = `${API_BASE_URL}${API_DISCOVER_PATH}`;
 
 const SILENT_WAV = new Uint8Array([
   0x52, 0x49, 0x46, 0x46, 0x24, 0xf0, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45,
@@ -65,21 +65,21 @@ const SILENT_WAV = new Uint8Array([
   0x64, 0x61, 0x74, 0x61, 0x00, 0xf0, 0x00, 0x00,
 ]);
 
-async function testRecognizeReachable() {
-  log.step("1. Checking if Recognize API is accessible...");
-  const reachable = await assertReachable(RECOGNIZE_API_URL);
+async function testDiscoverReachable() {
+  log.step("1. Checking if Discover API is accessible...");
+  const reachable = await assertReachable(DISCOVER_API_URL);
   if (reachable) {
-    log.ok("Recognize API is reachable");
+    log.ok("Discover API is reachable");
   } else {
-    log.fail("Failed to reach Recognize API");
+    log.fail("Failed to reach Discover API");
     console.error("Make sure to run: vercel dev");
     throw new Error("API not reachable");
   }
 }
 
-async function testRecognizeMissingFile() {
+async function testDiscoverMissingFile() {
   log.step("2. Testing POST request without file...");
-  const response = await fetch(RECOGNIZE_API_URL, { method: "POST" });
+  const response = await fetch(DISCOVER_API_URL, { method: "POST" });
   const body = await response.text();
   if (response.status === 400) {
     log.ok("Correctly returned 400 for missing file");
@@ -90,7 +90,7 @@ async function testRecognizeMissingFile() {
   }
 }
 
-async function testRecognizeWithFile() {
+async function testDiscoverWithFile() {
   log.step("3. Testing POST request with audio file...");
   const formData = new FormData();
   formData.append(
@@ -98,7 +98,7 @@ async function testRecognizeWithFile() {
     new File([SILENT_WAV], "test-audio.wav", { type: "audio/wav" })
   );
 
-  const response = await fetch(RECOGNIZE_API_URL, { method: "POST", body: formData });
+  const response = await fetch(DISCOVER_API_URL, { method: "POST", body: formData });
   const body = await response.text();
 
   if (response.ok) {
@@ -110,16 +110,16 @@ async function testRecognizeWithFile() {
   }
 }
 
-async function runRecognizeTests() {
-  log.section("Testing Recognize API");
-  log.step(`API URL: ${RECOGNIZE_API_URL}`);
+async function runDiscoverTests() {
+  log.section("Testing Discover API");
+  log.step(`API URL: ${DISCOVER_API_URL}`);
   console.log("");
   
-  await testRecognizeReachable();
+  await testDiscoverReachable();
   console.log("");
-  await testRecognizeMissingFile();
+  await testDiscoverMissingFile();
   console.log("");
-  await testRecognizeWithFile();
+  await testDiscoverWithFile();
 }
 
 
@@ -497,7 +497,7 @@ async function main() {
   log.banner("API Test Suite - All Endpoints");
 
   try {
-    await runRecognizeTests();
+    await runDiscoverTests();
     console.log("");
     await runTrackInfoTests();
     console.log("");

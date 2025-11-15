@@ -42,16 +42,16 @@ export function apiPlugin(): Plugin {
           // This properly handles TypeScript files in the dev server context
           // Extract the path after /api/ and map to the correct file
           const urlPath = req.url.split('?')[0]; // Remove query string
-          const apiRoute = urlPath.replace('/api/', ''); // e.g., 'recognize' or 'spotify/track/info'
+          const apiRoute = urlPath.replace('/api/', ''); // e.g., 'discover' or 'spotify/track/info'
 
           // Map route to file path (endpoints subdirectory)
-          // /api/recognize -> api/endpoints/recognize.ts
+          // /api/discover -> api/endpoints/discover.ts
           // /api/track -> api/endpoints/track.ts
           // /api/verify -> api/endpoints/verify.ts
           // /api/artist -> api/endpoints/artist.ts
           let apiFilePath: string;
-          if (apiRoute === 'recognize') {
-            apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'recognize.ts');
+          if (apiRoute === 'discover') {
+            apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'discover.ts');
           } else if (apiRoute === 'track') {
             apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'track.ts');
           } else if (apiRoute === 'verify') {

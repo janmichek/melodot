@@ -7,7 +7,7 @@ import {donateConfig} from "./generated";
 import {passetHub} from "./wagmi-config";
 import {AppSidebar} from "./components/AppSidebar";
 import {SidebarInset, SidebarProvider} from "@/components/ui/sidebar";
-import {Recognize} from "./pages/Recognize";
+import {Discover} from "./pages/Discover";
 import {Claim} from "./pages/Claim";
 import {Donations} from "./pages/Donations";
 import {Owner} from "./pages/Owner";
@@ -103,7 +103,7 @@ function App() {
           <div className="@container/main flex flex-1 flex-col gap-4 px-4 py-4 sm:px-6 sm:py-6 overflow-y-auto overflow-x-hidden scrollbar-hide min-h-0">
             <main className="flex flex-1 flex-col min-h-0">
               <Routes>
-                <Route path="/" element={<Recognize />} />
+                <Route path="/" element={<Discover />} />
                 <Route path="/donations" element={<Donations />} />
                 <Route path="/claim" element={<Claim />} />
                 <Route path="/owner" element={<Owner />} />

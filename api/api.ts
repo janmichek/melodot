@@ -8,21 +8,12 @@ import type { ErrorWithStatus, TokenResponse } from './types';
  * Gets RapidAPI key from environment variable
  * Throws error if not configured
  */
-export function getRapidApiKey(): string {
+function getRapidApiKey(): string {
   const apiKey = process.env.RAPIDAPI_KEY || process.env.VITE_RAPIDAPI_KEY;
   if (!apiKey) {
     throw new Error('RapidAPI key not configured');
   }
   return apiKey;
-}
-
-// Lazy-load apiKey to avoid throwing error at module load time
-let _apiKey: string | null = null;
-export function getApiKey(): string {
-  if (!_apiKey) {
-    _apiKey = getRapidApiKey();
-  }
-  return _apiKey;
 }
 
 /**
@@ -40,19 +31,6 @@ function getSpotifyCredentials(): { clientId: string; clientSecret: string } {
 
 const { clientId, clientSecret } = getSpotifyCredentials();
 export { clientId, clientSecret };
-
-/**
- * Safely fetches from a URL with error handling
- */
-async function safeFetch(url: string, options?: RequestInit): Promise<Response> {
-  const response = await fetch(url, options);
-  if (!response.ok) {
-    const error: ErrorWithStatus = new Error(`HTTP ${response.status}: ${response.statusText}`);
-    error.status = response.status;
-    throw error;
-  }
-  return response;
-}
 
 /**
  * Fetches and parses JSON response with error handling
@@ -107,13 +85,6 @@ export async function fetchSpotifyApi<T>(endpoint: string, accessToken: string, 
 }
 
 /**
- * Fetches user profile from Spotify API
- */
-export async function fetchSpotifyProfile(accessToken: string) {
-  return fetchSpotifyApi<import('./types').SpotifyProfile>('https://api.spotify.com/v1/me', accessToken);
-}
-
-/**
  * Fetches artist information from Spotify API
  */
 export async function fetchSpotifyArtist(artistId: string, accessToken: string) {
@@ -148,7 +119,7 @@ export async function fetchRapidApiBiography(artistId: string): Promise<any> {
       method: 'GET',
       headers: {
         'x-rapidapi-host': 'spotify-scraper.p.rapidapi.com',
-        'x-rapidapi-key': getApiKey(),
+        'x-rapidapi-key': getRapidApiKey(),
       },
     }
   );
@@ -164,7 +135,7 @@ export async function fetchShazamRecognition(fileBuffer: Buffer): Promise<any> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/octet-stream',
-        'X-RapidAPI-Key': getApiKey(),
+        'X-RapidAPI-Key': getRapidApiKey(),
         'X-RapidAPI-Host': 'shazam-song-recognition-api.p.rapidapi.com',
       },
       body: fileBuffer as any,

@@ -77,7 +77,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
       }
       formData.append("file", audioBlob, "recording.webm");
 
-      const response = await fetch("/api/recognize", { method: "POST", body: formData });
+      const response = await fetch("/api/discover", { method: "POST", body: formData });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
