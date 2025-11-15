@@ -42,21 +42,22 @@ export function apiPlugin(): Plugin {
           // This properly handles TypeScript files in the dev server context
           // Extract the path after /api/ and map to the correct file
           const urlPath = req.url.split('?')[0]; // Remove query string
-          const apiRoute = urlPath.replace('/api/', ''); // e.g., 'analyze-audio' or 'spotify/track/info'
+          const apiRoute = urlPath.replace('/api/', ''); // e.g., 'recognize' or 'spotify/track/info'
 
-          // Map route to file path (flat structure)
-          // /api/analyze-audio -> api/analyze-audio.ts
-          // /api/spotify-track-info -> api/spotify-track-info.ts
-          // /api/spotify-artist-biography -> api/spotify-artist-biography.ts
+          // Map route to file path (endpoints subdirectory)
+          // /api/recognize -> api/endpoints/recognize.ts
+          // /api/track -> api/endpoints/track.ts
+          // /api/bio -> api/endpoints/bio.ts
+          // /api/artist -> api/endpoints/artist.ts
           let apiFilePath: string;
-          if (apiRoute === 'analyze-audio') {
-            apiFilePath = resolve(process.cwd(), 'api', 'analyze-audio.ts');
-          } else if (apiRoute === 'spotify-track-info') {
-            apiFilePath = resolve(process.cwd(), 'api', 'spotify-track-info.ts');
-          } else if (apiRoute === 'spotify-profile') {
-            apiFilePath = resolve(process.cwd(), 'api', 'spotify-profile.ts');
-          } else if (apiRoute === 'spotify-artist-biography') {
-            apiFilePath = resolve(process.cwd(), 'api', 'spotify-artist-biography.ts');
+          if (apiRoute === 'recognize') {
+            apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'recognize.ts');
+          } else if (apiRoute === 'track') {
+            apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'track.ts');
+          } else if (apiRoute === 'bio') {
+            apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'bio.ts');
+          } else if (apiRoute === 'artist') {
+            apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'artist.ts');
           } else {
             // Unknown route
             res.writeHead(404, { 'Content-Type': 'application/json' });

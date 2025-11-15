@@ -82,3 +82,4 @@ export const formatAmountWithSymbol = (amount: string | number, symbol: string =
 };
 
 export const CURRENCY_SYMBOL = passetHub.nativeCurrency.symbol;
+export const EXPLORER_BASE_URL = passetHub.blockExplorers.default.url;

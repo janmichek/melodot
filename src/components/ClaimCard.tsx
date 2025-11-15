@@ -50,12 +50,12 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
 
   // Fetch artist biography when URL is pasted
   const { data: biographyData, isLoading: isLoadingBiography } = useQuery<{ biography?: string; status?: boolean; rawData?: any }>({
-    queryKey: ['artist-biography', artistUrl],
+    queryKey: ['artist-biography', parsedArtistId],
     queryFn: async () => {
-      if (!artistUrl.trim() || !artistUrl.includes('open.spotify.com/artist/')) {
+      if (!parsedArtistId) {
         return null;
       }
-      const response = await fetch(`/api/spotify-artist-biography?artistUrl=${encodeURIComponent(artistUrl.trim())}`);
+      const response = await fetch(`/api/bio?artistId=${encodeURIComponent(parsedArtistId)}`);
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Failed to fetch biography:', errorData);
@@ -65,7 +65,7 @@ export function ClaimCard({ contractAddress }: ClaimCardProps) {
       console.log('Artist Biography Data:', data);
       return data;
     },
-    enabled: !!artistUrl.trim() && artistUrl.includes('open.spotify.com/artist/'),
+    enabled: !!parsedArtistId,
     retry: 1,
   });
 

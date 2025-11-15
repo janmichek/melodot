@@ -31,29 +31,31 @@ export function DonationForm({ artistId, onSuccess }: DonationFormProps) {
     isSuccess: isConfirmed
   } = useWaitForTransactionReceipt({hash,});
 
+  // Helper function to invalidate balance queries
+  const invalidateBalance = (userAddress: string) => {
+    queryClient.invalidateQueries({
+      predicate: (query) => {
+        const queryKey = query.queryKey;
+        if (!Array.isArray(queryKey) || queryKey[0] !== 'balance') {
+          return false;
+        }
+        const params = queryKey[1];
+        if (typeof params !== 'object' || params === null || !('address' in params)) {
+          return false;
+        }
+        const queryAddress = params.address;
+        return (
+          typeof queryAddress === 'string' &&
+          queryAddress.toLowerCase() === userAddress.toLowerCase()
+        );
+      },
+    });
+  };
+
   // Call onSuccess callback and refetch balance when transaction is confirmed
   useEffect(() => {
     if (isConfirmed && address) {
-      // Invalidate balance queries to trigger refetch in UserMenu
-      // Wagmi uses query keys like ['balance', { address, chainId }]
-      // todo move to updateBalance funxtion
-      queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey;
-          if (!Array.isArray(queryKey) || queryKey[0] !== 'balance') {
-            return false;
-          }
-          const params = queryKey[1];
-          if (typeof params !== 'object' || params === null || !('address' in params)) {
-            return false;
-          }
-          const queryAddress = params.address;
-          return (
-            typeof queryAddress === 'string' &&
-            queryAddress.toLowerCase() === address.toLowerCase()
-          );
-        },
-      });
+      invalidateBalance(address);
       onSuccess?.();
     }
   }, [isConfirmed, onSuccess, queryClient, address]);

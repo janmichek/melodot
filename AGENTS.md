@@ -45,7 +45,7 @@ shaz/
 │   ├── hardhat.config.ts  # Hardhat configuration
 │   └── test/              # Contract tests
 ├── api/                   # Vercel serverless functions
-│   └── analyze-audio.ts   # Music recognition endpoint
+│   └── recognize.ts       # Music recognition endpoint
 ├── src/                   # React application
 │   ├── components/        # React components
 │   │   ├── AudioControls.tsx
@@ -203,7 +203,7 @@ Get your client ID from [Web3Auth Dashboard](https://dashboard.web3auth.io/)
 
 1. Request microphone permission
 2. Record audio using Web Audio API
-3. Send audio blob to `/api/analyze-audio`
+3. Send audio blob to `/api/recognize`
 4. Display song metadata and artist info
 5. Enable donation to identified artist
 
@@ -215,16 +215,16 @@ Get your client ID from [Web3Auth Dashboard](https://dashboard.web3auth.io/)
 
 ## API Endpoints
 
-### POST /api/analyze-audio
+### POST /api/recognize
 
-**Purpose**: Analyze audio and identify music
+**Purpose**: Recognize audio and identify music
 
 **Request:**
 ```typescript
 const formData = new FormData();
 formData.append('file', audioBlob, 'recording.webm');
 
-const response = await fetch('/api/analyze-audio', {
+const response = await fetch('/api/recognize', {
   method: 'POST',
   body: formData,
 });
@@ -434,7 +434,7 @@ bun run generate
 - `contracts/hardhat.config.ts` - Network configuration
 - `src/components/AudioControls.tsx` - Recording interface
 - `src/components/DiscoveryCard.tsx` - Song display
-- `api/analyze-audio.ts` - Music recognition API
+- `api/endpoints/recognize.ts` - Music recognition API
 - `package.json` - Scripts and dependencies
 
 ### Key URLs

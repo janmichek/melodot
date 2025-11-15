@@ -4,11 +4,27 @@
   "outputDirectory": "dist",
   "installCommand": "bun install",
   "functions": {
-    "api/**/*.ts": {
+    "api/endpoints/**/*.ts": {
       "runtime": "@vercel/node@3.2.29"
     }
   },
   "rewrites": [
+    {
+      "source": "/api/recognize",
+      "destination": "/api/endpoints/recognize"
+    },
+    {
+      "source": "/api/track",
+      "destination": "/api/endpoints/track"
+    },
+    {
+      "source": "/api/bio",
+      "destination": "/api/endpoints/bio"
+    },
+    {
+      "source": "/api/artist",
+      "destination": "/api/endpoints/artist"
+    },
     {
       "source": "/((?!api/).*)",
       "destination": "/index.html"

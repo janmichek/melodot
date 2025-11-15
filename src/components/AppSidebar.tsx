@@ -19,7 +19,7 @@ import {
 import {Coins, List, Mic, Wallet} from "lucide-react";
 import {Link, useLocation} from "react-router-dom";
 import {Spinner} from "@/components/ui/spinner";
-import {Logo} from "./Logo";
+import logoIcon from "../assets/icons/beatchain-logo.svg";
 import {donateConfig} from "../generated";
 
 export function AppSidebar() {
@@ -58,7 +58,7 @@ export function AppSidebar() {
 
   const menuItems = [
     {
-      title: "Analyze",
+      title: "Recognize",
       url: "/",
       icon: Mic,
     },
@@ -80,7 +80,6 @@ export function AppSidebar() {
   ];
 
   // Conditional "Withdraw Fees" item for owners
-  // move to menu items but make conditional, therfore cosnt to function
   const ownerMenuItems = isOwner
     ? [
         {
@@ -90,23 +89,6 @@ export function AppSidebar() {
         },
       ]
     : [];
-
-  // todo move directly to tempalte
-  const renderConnectArea = () => {
-    if (isConnected && address) {
-      return <UserMenu />;
-    }
-
-    return (
-      <Button
-        onClick={() => connect()}
-        disabled={connecting || !providerReady}
-        className="w-full"
-      >
-        {connecting || !providerReady ? <Spinner size="sm" className="inline" /> : "Connect"}
-      </Button>
-    );
-  };
 
   return (
     <Sidebar side="right" collapsible="offcanvas" className="border-l border-border/60">
@@ -118,7 +100,11 @@ export function AppSidebar() {
               className="h-11 px-2 hover:bg-transparent"
             >
               <Link to="/" className="flex items-center gap-2">
-                <Logo className="h-6 w-6 text-sidebar-foreground" />
+                <img 
+                  src={logoIcon} 
+                  alt="BeatChain Logo" 
+                  className="h-6 w-6 text-sidebar-foreground" 
+                />
                 <span className="text-base font-semibold">
                   BeatChain
                 </span>
@@ -130,7 +116,17 @@ export function AppSidebar() {
 
       <SidebarContent className="gap-6">
         <SidebarGroup>
-          {renderConnectArea()}
+          {isConnected && address ? (
+            <UserMenu />
+          ) : (
+            <Button
+              onClick={() => connect()}
+              disabled={connecting || !providerReady}
+              className="w-full"
+            >
+              {connecting || !providerReady ? <Spinner size="sm" className="inline" /> : "Connect"}
+            </Button>
+          )}
         </SidebarGroup>
 
         <SidebarGroup className="gap-3">

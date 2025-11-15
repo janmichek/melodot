@@ -140,16 +140,16 @@ Serverless functions live in `api/` and deploy automatically with Vercel.
 - Primary responsibility: accept recorded audio, return canonical track + artist metadata
 - Current mode: deterministic mock data while integrations are evaluated
 
-### POST `/api/analyze-audio`
+### POST `/api/recognize`
 
 **Request**
 - Method: `POST`
-- URL: `/api/analyze-audio`
+- URL: `/api/recognize`
 - Headers: `Content-Type: multipart/form-data`
 - Body: `file` field containing audio (≤50 MB)
 
 ```bash
-curl -X POST http://localhost:5173/api/analyze-audio \
+curl -X POST http://localhost:5173/api/recognize \
   -F "file=@path/to/audio.mp3"
 ```
 
@@ -205,7 +205,7 @@ The dev server proxies frontend + API at `http://localhost:5173`. Use the curl c
 
 ### Extending Audio Recognition
 
-Replace `generateMockDiscoveryResult()` in `api/analyze-audio.ts` with a real integration. Common choices:
+Replace `generateMockDiscoveryResult()` in `api/endpoints/recognize.ts` with a real integration. Common choices:
 
 - **Spotify Web API** – exchange client credentials, derive audio features, then search for the closest track.
 - **AcoustID / MusicBrainz** – generate an acoustic fingerprint and look up metadata.
@@ -222,7 +222,7 @@ Manual: `vercel deploy --prod`.
 Verify deployments with:
 
 ```bash
-curl -X POST https://<your-app>.vercel.app/api/analyze-audio \
+curl -X POST https://<your-app>.vercel.app/api/recognize \
   -F "file=@path/to/audio.mp3"
 ```
 
@@ -262,7 +262,7 @@ bun run deploy-contract
 - **Web3Auth login fails**: confirm `VITE_WEB3AUTH_CLIENT_ID` and that the selected network matches Paseo Asset Hub.
 - **Contract deployment rejected**: ensure `polkavm: true` in `contracts/hardhat.config.ts`, the private key lacks `0x`, and the account holds PAS.
 - **Type errors after contract updates**: run `bun run generate`.
-- **API returns 404/405**: confirm `api/analyze-audio.ts` exists and that requests use `POST` with `multipart/form-data`.
+- **API returns 404/405**: confirm `api/endpoints/recognize.ts` exists and that requests use `POST` with `multipart/form-data`.
 - **Uploads rejected**: check the form field name is `file` and payload size ≤50 MB.
 - **Request timeouts**: reduce audio length or offload heavy analysis to a queued worker.
 

@@ -52,11 +52,11 @@ async function assertReachable(url: string) {
 }
 
 // ============================================================================
-// Analyze Audio API Tests
+// Recognize API Tests
 // ============================================================================
 
-const API_ANALYZE_PATH = process.env.API_ANALYZE_PATH ?? "/api/analyze-audio";
-const ANALYZE_API_URL = `${API_BASE_URL}${API_ANALYZE_PATH}`;
+const API_RECOGNIZE_PATH = process.env.API_RECOGNIZE_PATH ?? "/api/recognize";
+const RECOGNIZE_API_URL = `${API_BASE_URL}${API_RECOGNIZE_PATH}`;
 
 const SILENT_WAV = new Uint8Array([
   0x52, 0x49, 0x46, 0x46, 0x24, 0xf0, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45,
@@ -65,21 +65,21 @@ const SILENT_WAV = new Uint8Array([
   0x64, 0x61, 0x74, 0x61, 0x00, 0xf0, 0x00, 0x00,
 ]);
 
-async function testAnalyzeAudioReachable() {
-  log.step("1. Checking if Analyze Audio API is accessible...");
-  const reachable = await assertReachable(ANALYZE_API_URL);
+async function testRecognizeReachable() {
+  log.step("1. Checking if Recognize API is accessible...");
+  const reachable = await assertReachable(RECOGNIZE_API_URL);
   if (reachable) {
-    log.ok("Analyze Audio API is reachable");
+    log.ok("Recognize API is reachable");
   } else {
-    log.fail("Failed to reach Analyze Audio API");
+    log.fail("Failed to reach Recognize API");
     console.error("Make sure to run: vercel dev");
     throw new Error("API not reachable");
   }
 }
 
-async function testAnalyzeAudioMissingFile() {
+async function testRecognizeMissingFile() {
   log.step("2. Testing POST request without file...");
-  const response = await fetch(ANALYZE_API_URL, { method: "POST" });
+  const response = await fetch(RECOGNIZE_API_URL, { method: "POST" });
   const body = await response.text();
   if (response.status === 400) {
     log.ok("Correctly returned 400 for missing file");
@@ -90,7 +90,7 @@ async function testAnalyzeAudioMissingFile() {
   }
 }
 
-async function testAnalyzeAudioWithFile() {
+async function testRecognizeWithFile() {
   log.step("3. Testing POST request with audio file...");
   const formData = new FormData();
   formData.append(
@@ -98,7 +98,7 @@ async function testAnalyzeAudioWithFile() {
     new File([SILENT_WAV], "test-audio.wav", { type: "audio/wav" })
   );
 
-  const response = await fetch(ANALYZE_API_URL, { method: "POST", body: formData });
+  const response = await fetch(RECOGNIZE_API_URL, { method: "POST", body: formData });
   const body = await response.text();
 
   if (response.ok) {
@@ -110,197 +110,33 @@ async function testAnalyzeAudioWithFile() {
   }
 }
 
-async function runAnalyzeAudioTests() {
-  log.section("Testing Analyze Audio API");
-  log.step(`API URL: ${ANALYZE_API_URL}`);
+async function runRecognizeTests() {
+  log.section("Testing Recognize API");
+  log.step(`API URL: ${RECOGNIZE_API_URL}`);
   console.log("");
   
-  await testAnalyzeAudioReachable();
+  await testRecognizeReachable();
   console.log("");
-  await testAnalyzeAudioMissingFile();
+  await testRecognizeMissingFile();
   console.log("");
-  await testAnalyzeAudioWithFile();
+  await testRecognizeWithFile();
 }
+
 
 // ============================================================================
-// Spotify Profile API Tests
+// Spotify Track API Tests
 // ============================================================================
 
-const API_PROFILE_PATH = process.env.API_PROFILE_PATH ?? "/api/spotify-profile";
-const PROFILE_API_URL = `${API_BASE_URL}${API_PROFILE_PATH}`;
-
-async function testProfileReachable() {
-  log.step("1. Checking if Spotify Profile API is accessible...");
-  const reachable = await assertReachable(PROFILE_API_URL);
-  if (reachable) {
-    log.ok("Spotify Profile API is reachable");
-  } else {
-    log.fail("Failed to reach Spotify Profile API");
-    console.error("Make sure to run: vercel dev");
-    throw new Error("API not reachable");
-  }
-}
-
-async function testProfileWrongMethod() {
-  log.step("2. Testing POST request (should only accept GET)...");
-  const response = await fetch(PROFILE_API_URL, { method: "POST" });
-  const body = await response.text();
-  if (response.status === 405) {
-    log.ok("Correctly returned 405 for wrong method");
-    console.log(formatBody(body));
-  } else {
-    log.fail(`Expected 405, got ${response.status}`);
-    console.log(formatBody(body));
-  }
-}
-
-async function testProfileMissingAccessToken() {
-  log.step("3. Testing GET request without accessToken parameter...");
-  const response = await fetch(PROFILE_API_URL, { method: "GET" });
-  const body = await response.text();
-  if (response.status === 400) {
-    log.ok("Correctly returned 400 for missing access token");
-    console.log(formatBody(body));
-  } else {
-    log.fail(`Expected 400, got ${response.status}`);
-    console.log(formatBody(body));
-  }
-}
-
-async function testProfileInvalidAccessToken() {
-  log.step("4. Testing GET request with invalid access token...");
-  const invalidToken = "invalid-token-12345";
-  const response = await fetch(`${PROFILE_API_URL}?accessToken=${encodeURIComponent(invalidToken)}`, {
-    method: "GET"
-  });
-  const body = await response.text();
-  if (response.status === 401) {
-    log.ok("Correctly returned 401 for invalid access token");
-    console.log(formatBody(body));
-  } else {
-    log.fail(`Expected 401, got ${response.status}`);
-    console.log(formatBody(body));
-  }
-}
-
-async function testProfileExpiredAccessToken() {
-  log.step("5. Testing GET request with expired access token...");
-  const expiredToken = "BQDExpiredTokenExample123456789";
-  const response = await fetch(`${PROFILE_API_URL}?accessToken=${encodeURIComponent(expiredToken)}`, {
-    method: "GET"
-  });
-  const body = await response.text();
-  if (response.status === 401) {
-    log.ok("Correctly returned 401 for expired access token");
-    console.log(formatBody(body));
-  } else {
-    log.fail(`Expected 401, got ${response.status}`);
-    console.log(formatBody(body));
-  }
-}
-
-async function testProfileEmptyAccessToken() {
-  log.step("6. Testing GET request with empty access token...");
-  const response = await fetch(`${PROFILE_API_URL}?accessToken=`, {
-    method: "GET"
-  });
-  const body = await response.text();
-  if (response.status === 400) {
-    log.ok("Correctly returned 400 for empty access token");
-    console.log(formatBody(body));
-  } else {
-    log.fail(`Expected 400, got ${response.status}`);
-    console.log(formatBody(body));
-  }
-}
-
-async function testProfileAccessTokenAsArray() {
-  log.step("7. Testing GET request with accessToken as array (edge case)...");
-  const response = await fetch(`${PROFILE_API_URL}?accessToken=token1&accessToken=token2`, {
-    method: "GET"
-  });
-  const body = await response.text();
-  if (response.status === 400 || response.status === 401) {
-    log.ok("Correctly handled array parameter");
-    console.log(formatBody(body));
-  } else {
-    log.fail(`Expected 400 or 401, got ${response.status}`);
-    console.log(formatBody(body));
-  }
-}
-
-async function testProfileWithValidAccessToken() {
-  log.step("8. Testing GET request with valid access token...");
-  const testToken = process.env.SPOTIFY_TEST_ACCESS_TOKEN;
-
-  if (!testToken) {
-    log.ok("Skipping valid token test - no SPOTIFY_TEST_ACCESS_TOKEN set");
-    console.log(`${COLORS.yellow}Note: Set SPOTIFY_TEST_ACCESS_TOKEN environment variable to test with a valid token${COLORS.reset}`);
-    console.log(`${COLORS.yellow}You can get a token from: https://developer.spotify.com/console/get-current-user/${COLORS.reset}`);
-    return;
-  }
-
-  const response = await fetch(`${PROFILE_API_URL}?accessToken=${encodeURIComponent(testToken)}`, {
-    method: "GET"
-  });
-  const body = await response.text();
-
-  if (response.ok) {
-    log.ok("API successfully fetched profile with valid token");
-    const data = JSON.parse(body);
-    console.log(formatBody(body));
-
-    if (data.id && data.displayName !== undefined) {
-      log.ok("Response has expected structure");
-    } else {
-      log.fail("Response missing expected fields");
-    }
-  } else if (response.status === 401) {
-    log.fail("Token might be expired or invalid");
-    console.log(formatBody(body));
-    console.log(`${COLORS.yellow}Get a fresh token from: https://developer.spotify.com/console/get-current-user/${COLORS.reset}`);
-  } else {
-    log.fail(`Expected 200, got ${response.status}`);
-    console.log(formatBody(body));
-  }
-}
-
-async function runProfileTests() {
-  log.section("Testing Spotify Profile API");
-  log.step(`API URL: ${PROFILE_API_URL}`);
-  console.log("");
-  
-  await testProfileReachable();
-  console.log("");
-  await testProfileWrongMethod();
-  console.log("");
-  await testProfileMissingAccessToken();
-  console.log("");
-  await testProfileInvalidAccessToken();
-  console.log("");
-  await testProfileExpiredAccessToken();
-  console.log("");
-  await testProfileEmptyAccessToken();
-  console.log("");
-  await testProfileAccessTokenAsArray();
-  console.log("");
-  await testProfileWithValidAccessToken();
-}
-
-// ============================================================================
-// Spotify Track Info API Tests
-// ============================================================================
-
-const API_TRACK_INFO_PATH = process.env.API_TRACK_INFO_PATH ?? "/api/spotify-track-info";
-const TRACK_INFO_API_URL = `${API_BASE_URL}${API_TRACK_INFO_PATH}`;
+const API_TRACK_PATH = process.env.API_TRACK_PATH ?? "/api/track";
+const TRACK_API_URL = `${API_BASE_URL}${API_TRACK_PATH}`;
 
 async function testTrackInfoReachable() {
-  log.step("1. Checking if Spotify Track Info API is accessible...");
-  const reachable = await assertReachable(TRACK_INFO_API_URL);
+  log.step("1. Checking if Spotify Track API is accessible...");
+  const reachable = await assertReachable(TRACK_API_URL);
   if (reachable) {
-    log.ok("Spotify Track Info API is reachable");
+    log.ok("Spotify Track API is reachable");
   } else {
-    log.fail("Failed to reach Spotify Track Info API");
+    log.fail("Failed to reach Spotify Track API");
     console.error("Make sure to run: vercel dev");
     throw new Error("API not reachable");
   }
@@ -308,7 +144,7 @@ async function testTrackInfoReachable() {
 
 async function testTrackInfoWrongMethod() {
   log.step("2. Testing POST request (should only accept GET)...");
-  const response = await fetch(TRACK_INFO_API_URL, { method: "POST" });
+  const response = await fetch(TRACK_API_URL, { method: "POST" });
   const body = await response.text();
   if (response.status === 405) {
     log.ok("Correctly returned 405 for wrong method");
@@ -321,7 +157,7 @@ async function testTrackInfoWrongMethod() {
 
 async function testTrackInfoMissingUri() {
   log.step("3. Testing GET request without URI parameter...");
-  const response = await fetch(TRACK_INFO_API_URL, { method: "GET" });
+  const response = await fetch(TRACK_API_URL, { method: "GET" });
   const body = await response.text();
   if (response.status === 400) {
     log.ok("Correctly returned 400 for missing URI");
@@ -335,7 +171,7 @@ async function testTrackInfoMissingUri() {
 async function testTrackInfoInvalidUriFormat() {
   log.step("4. Testing GET request with invalid URI format...");
   const invalidUri = "invalid-uri-format";
-  const response = await fetch(`${TRACK_INFO_API_URL}?uri=${encodeURIComponent(invalidUri)}`, {
+  const response = await fetch(`${TRACK_API_URL}?uri=${encodeURIComponent(invalidUri)}`, {
     method: "GET"
   });
   const body = await response.text();
@@ -351,7 +187,7 @@ async function testTrackInfoInvalidUriFormat() {
 async function testTrackInfoSpotifyTrackUri() {
   log.step("5. Testing GET request with valid Spotify track URI...");
   const trackUri = "spotify:track:3n3Ppam7vgaVa1iaRUc9Lp"; // Mr. Brightside by The Killers
-  const response = await fetch(`${TRACK_INFO_API_URL}?uri=${encodeURIComponent(trackUri)}`, {
+  const response = await fetch(`${TRACK_API_URL}?uri=${encodeURIComponent(trackUri)}`, {
     method: "GET"
   });
   const body = await response.text();
@@ -385,7 +221,7 @@ async function testTrackInfoSpotifyTrackUri() {
 async function testTrackInfoSpotifyUrl() {
   log.step("6. Testing GET request with Spotify URL format...");
   const trackUrl = "https://open.spotify.com/track/3n3Ppam7vgaVa1iaRUc9Lp";
-  const response = await fetch(`${TRACK_INFO_API_URL}?uri=${encodeURIComponent(trackUrl)}`, {
+  const response = await fetch(`${TRACK_API_URL}?uri=${encodeURIComponent(trackUrl)}`, {
     method: "GET"
   });
   const body = await response.text();
@@ -411,7 +247,7 @@ async function testTrackInfoSpotifyUrl() {
 async function testTrackInfoSpotifySearchUri() {
   log.step("7. Testing GET request with Spotify search URI...");
   const searchUri = "spotify:search:Mr. Brightside The Killers";
-  const response = await fetch(`${TRACK_INFO_API_URL}?uri=${encodeURIComponent(searchUri)}`, {
+  const response = await fetch(`${TRACK_API_URL}?uri=${encodeURIComponent(searchUri)}`, {
     method: "GET"
   });
   const body = await response.text();
@@ -440,7 +276,7 @@ async function testTrackInfoSpotifySearchUri() {
 async function testTrackInfoNonExistentTrack() {
   log.step("8. Testing GET request with non-existent track ID...");
   const fakeTrackUri = "spotify:track:00000000000000000000XX";
-  const response = await fetch(`${TRACK_INFO_API_URL}?uri=${encodeURIComponent(fakeTrackUri)}`, {
+  const response = await fetch(`${TRACK_API_URL}?uri=${encodeURIComponent(fakeTrackUri)}`, {
     method: "GET"
   });
   const body = await response.text();
@@ -464,8 +300,8 @@ async function testTrackInfoNonExistentTrack() {
 }
 
 async function runTrackInfoTests() {
-  log.section("Testing Spotify Track Info API");
-  log.step(`API URL: ${TRACK_INFO_API_URL}`);
+  log.section("Testing Spotify Track API");
+  log.step(`API URL: ${TRACK_API_URL}`);
   console.log("");
   
   await testTrackInfoReachable();
@@ -486,19 +322,19 @@ async function runTrackInfoTests() {
 }
 
 // ============================================================================
-// Spotify Artist Biography API Tests
+// Artist Biography API Tests
 // ============================================================================
 
-const API_ARTIST_BIO_PATH = process.env.API_ARTIST_BIO_PATH ?? "/api/spotify-artist-biography";
-const ARTIST_BIO_API_URL = `${API_BASE_URL}${API_ARTIST_BIO_PATH}`;
+const API_BIO_PATH = process.env.API_BIO_PATH ?? "/api/bio";
+const BIO_API_URL = `${API_BASE_URL}${API_BIO_PATH}`;
 
 async function testArtistBioReachable() {
-  log.step("1. Checking if Spotify Artist Biography API is accessible...");
-  const reachable = await assertReachable(ARTIST_BIO_API_URL);
+  log.step("1. Checking if Artist Biography API is accessible...");
+  const reachable = await assertReachable(BIO_API_URL);
   if (reachable) {
-    log.ok("Spotify Artist Biography API is reachable");
+    log.ok("Artist Biography API is reachable");
   } else {
-    log.fail("Failed to reach Spotify Artist Biography API");
+    log.fail("Failed to reach Artist Biography API");
     console.error("Make sure to run: vercel dev");
     throw new Error("API not reachable");
   }
@@ -506,7 +342,7 @@ async function testArtistBioReachable() {
 
 async function testArtistBioWrongMethod() {
   log.step("2. Testing POST request (should only accept GET)...");
-  const response = await fetch(ARTIST_BIO_API_URL, { method: "POST" });
+  const response = await fetch(BIO_API_URL, { method: "POST" });
   const body = await response.text();
   if (response.status === 405) {
     log.ok("Correctly returned 405 for wrong method");
@@ -519,7 +355,7 @@ async function testArtistBioWrongMethod() {
 
 async function testArtistBioMissingUrl() {
   log.step("3. Testing GET request without artistUrl parameter...");
-  const response = await fetch(ARTIST_BIO_API_URL, { method: "GET" });
+  const response = await fetch(BIO_API_URL, { method: "GET" });
   const body = await response.text();
   if (response.status === 400) {
     log.ok("Correctly returned 400 for missing artist URL");
@@ -533,7 +369,7 @@ async function testArtistBioMissingUrl() {
 async function testArtistBioInvalidUrl() {
   log.step("4. Testing GET request with invalid artist URL...");
   const invalidUrl = "not-a-spotify-url";
-  const response = await fetch(`${ARTIST_BIO_API_URL}?artistUrl=${encodeURIComponent(invalidUrl)}`, {
+  const response = await fetch(`${BIO_API_URL}?artistUrl=${encodeURIComponent(invalidUrl)}`, {
     method: "GET"
   });
   const body = await response.text();
@@ -549,7 +385,7 @@ async function testArtistBioInvalidUrl() {
 async function testArtistBioValidArtistUrl() {
   log.step("5. Testing GET request with valid artist URL...");
   const artistUrl = "https://open.spotify.com/artist/6nS5roXSAGhTGr34W6n7Et"; // The Killers
-  const response = await fetch(`${ARTIST_BIO_API_URL}?artistUrl=${encodeURIComponent(artistUrl)}`, {
+  const response = await fetch(`${BIO_API_URL}?artistUrl=${encodeURIComponent(artistUrl)}`, {
     method: "GET"
   });
   const body = await response.text();
@@ -559,7 +395,7 @@ async function testArtistBioValidArtistUrl() {
     if (bodyJson.error === 'RapidAPI key not configured') {
       log.ok("API correctly reports missing RapidAPI credentials");
       console.log(formatBody(body));
-      console.log(`${COLORS.yellow}Note: Set RAPIDAPI_KEY or VITE_RAPIDAPI_KEY to test actual API calls${COLORS.reset}`);
+      console.log(`${COLORS.yellow}Note: Set RAPIDAPI_KEY to test actual API calls${COLORS.reset}`);
       return;
     }
   }
@@ -583,7 +419,7 @@ async function testArtistBioValidArtistUrl() {
 async function testArtistBioJustArtistId() {
   log.step("6. Testing GET request with just artist ID (no full URL)...");
   const artistId = "6nS5roXSAGhTGr34W6n7Et"; // The Killers artist ID
-  const response = await fetch(`${ARTIST_BIO_API_URL}?artistUrl=${encodeURIComponent(artistId)}`, {
+  const response = await fetch(`${BIO_API_URL}?artistUrl=${encodeURIComponent(artistId)}`, {
     method: "GET"
   });
   const body = await response.text();
@@ -609,7 +445,7 @@ async function testArtistBioJustArtistId() {
 async function testArtistBioNonExistentArtist() {
   log.step("7. Testing GET request with non-existent artist ID...");
   const fakeArtistUrl = "https://open.spotify.com/artist/00000000000000000000XX";
-  const response = await fetch(`${ARTIST_BIO_API_URL}?artistUrl=${encodeURIComponent(fakeArtistUrl)}`, {
+  const response = await fetch(`${BIO_API_URL}?artistUrl=${encodeURIComponent(fakeArtistUrl)}`, {
     method: "GET"
   });
   const body = await response.text();
@@ -634,8 +470,8 @@ async function testArtistBioNonExistentArtist() {
 }
 
 async function runArtistBioTests() {
-  log.section("Testing Spotify Artist Biography API");
-  log.step(`API URL: ${ARTIST_BIO_API_URL}`);
+  log.section("Testing Artist Biography API");
+  log.step(`API URL: ${BIO_API_URL}`);
   console.log("");
 
   await testArtistBioReachable();
@@ -661,9 +497,7 @@ async function main() {
   log.banner("API Test Suite - All Endpoints");
 
   try {
-    await runAnalyzeAudioTests();
-    console.log("");
-    await runProfileTests();
+    await runRecognizeTests();
     console.log("");
     await runTrackInfoTests();
     console.log("");
@@ -682,5 +516,3 @@ main().catch((error) => {
   console.error(error);
   process.exit(1);
 });
-
-// todo make sure tests are up to date

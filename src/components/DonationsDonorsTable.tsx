@@ -1,4 +1,4 @@
-import {formatAddress, passetHub} from "../wagmi-config";
+import {formatAddress, EXPLORER_BASE_URL} from "../wagmi-config";
 import {BalanceDisplay} from "./ui/balance-display";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "./ui/table";
 import {Donation} from "./RecentDonationTransactions";
@@ -13,11 +13,6 @@ interface DonationsDonorsTableProps {
   donations: Donation[];
   limit?: number;
 }
-
-// todo simplify reuse from wagmi
-const EXPLORER_BASE_URL =
-  passetHub?.blockExplorers?.default?.url ??
-  "https://blockscout-passet-hub.parity-testnet.parity.io";
 
 export function DonationsDonorsTable({ donations, limit = 10 }: DonationsDonorsTableProps) {
   // Group donations by donor and calculate totals

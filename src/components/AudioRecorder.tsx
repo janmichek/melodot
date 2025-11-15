@@ -77,7 +77,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
       }
       formData.append("file", audioBlob, "recording.webm");
 
-      const response = await fetch("/api/analyze-audio", { method: "POST", body: formData });
+      const response = await fetch("/api/recognize", { method: "POST", body: formData });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -96,7 +96,7 @@ export default function AudioRecorder({ onAnalysisComplete }: AudioRecorderProps
         if (spotifyDeeplink) {
           try {
             const spotifyResponse = await fetch(
-              `/api/spotify-track-info?uri=${encodeURIComponent(spotifyDeeplink)}`
+              `/api/track?uri=${encodeURIComponent(spotifyDeeplink)}`
             );
             if (spotifyResponse.ok) {
               const spotifyInfo = await spotifyResponse.json();
