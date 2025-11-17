@@ -1,0 +1,41 @@
+{
+  "framework": null,
+  "buildCommand": "bun install && bun run build",
+  "outputDirectory": "dist",
+  "installCommand": "bun install",
+  "functions": {
+    "api/endpoints/**/*.ts": {
+      "runtime": "@vercel/node@3.2.29"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/discover",
+      "destination": "/api/endpoints/discover"
+    },
+    {
+      "source": "/api/track",
+      "destination": "/api/endpoints/track"
+    },
+    {
+      "source": "/api/bio",
+      "destination": "/api/endpoints/bio"
+    },
+    {
+      "source": "/api/artist",
+      "destination": "/api/endpoints/artist"
+    },
+    {
+      "source": "/api/artists",
+      "destination": "/api/endpoints/artists"
+    },
+    {
+      "source": "/api/verify",
+      "destination": "/api/endpoints/verify"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

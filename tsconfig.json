@@ -1,0 +1,32 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@types": ["./types"],
+      "@fixtures/*": ["tests/fixtures/*"],
+      "@helpers/*": ["tests/helpers/*"],
+      "@page-objects/*": ["tests/page-objects/*"]
+    }
+  },
+  "include": [
+    "src",
+    "types.ts",
+    "vite.config.ts",
+    "tests/**/*",
+    "playwright.config.js"
+  ],
+  "exclude": ["src/**/*.test.*", "src/**/*.spec.*", "src/test/**/*"]
+}
