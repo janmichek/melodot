@@ -45,7 +45,7 @@ export function useDonationTransactions(
         const feeBps = Number(platformFeeInfo[1])
 
         // Fetch transactions from Blockscout
-        const explorerUrl = `https://blockscout-passet-hub.parity-testnet.parity.io/api?module=account&action=txlist&address=${contractAddress}&startblock=${startBlock.toString()}&endblock=99999999&sort=desc`
+        const explorerUrl = `https://blockscout-testnet.polkadot.io/api?module=account&action=txlist&address=${contractAddress}&startblock=${startBlock.toString()}&endblock=99999999&sort=desc`
         const response = await fetch(explorerUrl)
 
         // Check HTTP status before parsing

@@ -91,7 +91,7 @@ shaz/
 **Network Details:**
 - Chain ID: `420420422` (0x1911f0a6)
 - RPC: `https://testnet-passet-hub-eth-rpc.polkadot.io`
-- Explorer: `https://blockscout-passet-hub.parity-testnet.parity.io`
+- Explorer: `https://blockscout-testnet.polkadot.io`
 - Faucet: `https://faucet.polkadot.io/?parachain=1111`
 - Currency: PAS
 
@@ -590,7 +590,7 @@ bun run generate
 
 ### Key URLs
 - Local dev: `http://localhost:5173`
-- Block explorer: `https://blockscout-passet-hub.parity-testnet.parity.io`
+- Block explorer: `https://blockscout-testnet.polkadot.io`
 - Faucet: `https://faucet.polkadot.io/?parachain=1111`
 - Web3Auth dashboard: `https://dashboard.web3auth.io`
 

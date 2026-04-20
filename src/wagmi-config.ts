@@ -17,7 +17,7 @@ export const passetHub = {
   blockExplorers: {
     default: {
       name: "Blockscout",
-      url: "https://blockscout-passet-hub.parity-testnet.parity.io",
+      url: "https://blockscout-testnet.polkadot.io",
     },
   },
   faucetUrl: "https://faucet.polkadot.io/?parachain=1111",
