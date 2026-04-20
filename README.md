@@ -66,7 +66,7 @@ Contract is already deployed, but if you want your own deployment, paste your pr
 
 ```bash
 # Frontend dev server (http://localhost:5173)
-bun vercel dev
+bun start
 
 # Testing
 bun run test:e2e          # End-to-end tests (Playwright)
@@ -85,7 +85,7 @@ bun run deploy-contract  # Deploy to Paseo + generate types
 - Network: Paseo Asset Hub testnet
   - Chain ID: `420420422` (0x1911f0a6)
   - RPC: `https://testnet-passet-hub-eth-rpc.polkadot.io`
-  - Explorer: `https://blockscout-passet-hub.parity-testnet.parity.io`
+  - Explorer: `https://blockscout-testnet.polkadot.io`
   - Currency: PAS
 
 
