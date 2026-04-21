@@ -27,7 +27,7 @@ export async function mockWeb3AuthConnection(page: Page, address?: string) {
           return [(window as any).mockWalletAddress]
         }
         if (method === 'eth_chainId') {
-          return '0x1911f0a6' // Passet Hub chain ID
+          return '0x190f1b41' // Polkadot Hub Testnet chain ID
         }
         if (method === 'personal_sign') {
           return '0x' + 'a'.repeat(130) // Mock signature

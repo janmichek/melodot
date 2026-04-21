@@ -4,7 +4,7 @@
   "type": "commonjs",
   "scripts": {
     "test": "npx hardhat test",
-    "deploy-contract": "yes | npx hardhat ignition deploy ignition/modules/Donate.js --network passetHub",
+    "deploy-contract": "yes | npx hardhat ignition deploy ignition/modules/Donate.js --network polkadotTestnet",
     "clean": "npx hardhat clean && rm -rf artifacts && rm -rf artifacts-pvm && rm -rf cache && rm -rf cache-pvm && rm -rf typechain-types && rm -rf ignition/deployments"
   },
   "devDependencies": {

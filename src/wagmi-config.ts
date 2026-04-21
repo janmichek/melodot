@@ -1,8 +1,8 @@
 import {createConfig, http} from "wagmi"
 import {mainnet} from "wagmi/chains"
 
-export const passetHub = {
-  id: 420420422,
+export const polkadotTestnet = {
+  id: 420420417,
   name: "Passet Hub",
   nativeCurrency: {
     name: "PAS",
@@ -11,7 +11,7 @@ export const passetHub = {
   },
   rpcUrls: {
     default: {
-      http: ["https://testnet-passet-hub-eth-rpc.polkadot.io"],
+      http: ["https://services.polkadothub-rpc.com/testnet"],
     },
   },
   blockExplorers: {
@@ -20,13 +20,13 @@ export const passetHub = {
       url: "https://blockscout-testnet.polkadot.io",
     },
   },
-  faucetUrl: "https://faucet.polkadot.io/?parachain=1111",
+  faucetUrl: "https://faucet.polkadot.io/",
 } as const
 
 export const wagmiConfig = createConfig({
-  chains: [passetHub, mainnet],
+  chains: [polkadotTestnet, mainnet],
   transports: {
-    [passetHub.id]: http(passetHub.rpcUrls.default.http[0]),
+    [polkadotTestnet.id]: http(polkadotTestnet.rpcUrls.default.http[0]),
     [mainnet.id]: http(),
   },
 })
@@ -37,7 +37,7 @@ export const wagmiConfig = createConfig({
  * @returns Formatted balance as string (e.g., "1.23")
  */
 export const formatPasBalance = (balance: bigint | number | string): string => {
-  const decimals = passetHub.nativeCurrency.decimals
+  const decimals = polkadotTestnet.nativeCurrency.decimals
   const numBalance = typeof balance === 'bigint' ? Number(balance) : typeof balance === 'string' ? Number(balance) : balance
   return (numBalance / 10 ** decimals).toFixed(2)
 }
@@ -56,5 +56,5 @@ export const formatAddress = (address: string, startChars: number = 4, endChars:
   return `${address.slice(0, startChars)}...${address.slice(-endChars)}`
 }
 
-export const CURRENCY_SYMBOL = passetHub.nativeCurrency.symbol
-export const EXPLORER_BASE_URL = passetHub.blockExplorers.default.url
+export const CURRENCY_SYMBOL = polkadotTestnet.nativeCurrency.symbol
+export const EXPLORER_BASE_URL = polkadotTestnet.blockExplorers.default.url

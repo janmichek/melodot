@@ -237,7 +237,7 @@ export const donateAbi = [
  *
  */
 export const donateAddress = {
-  420420422: '0x4a52d7e06D83eb0f320EC80b3ccd3828899bF02B',
+  420420417: '0x031002Cc82cce5172BdbC8c9Ca4E1731f17BbEC1',
 } as const
 
 /**

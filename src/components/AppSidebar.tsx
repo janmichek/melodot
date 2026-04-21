@@ -22,7 +22,7 @@ import {Link, useLocation} from "react-router-dom"
 import {Spinner} from "@/components/ui/spinner"
 import {Logo} from "@/components/ui/logo"
 import {donateConfig} from "@/generated"
-import {passetHub} from "@/wagmi-config"
+import {polkadotTestnet} from "@/wagmi-config"
 
 export function AppSidebar() {
   const {
@@ -42,7 +42,7 @@ export function AppSidebar() {
   // Check balance for zero balance detection
   const {data: balance, isLoading: balanceLoading} = useBalance({
     address: address,
-    chainId: passetHub.id,
+    chainId: polkadotTestnet.id,
     query: {
       enabled: isConnected && !!address,
     },
@@ -157,7 +157,7 @@ export function AppSidebar() {
             <SidebarMenuButton
               asChild>
               <a
-                href={passetHub.faucetUrl}
+                href={polkadotTestnet.faucetUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex w-full items-center gap-2">

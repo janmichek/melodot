@@ -7,7 +7,7 @@ import {useWeb3AuthContext} from "@/hooks/useWeb3AuthContext"
 import {donateConfig} from "@/generated"
 import {BalanceLabel} from "@/components/ui/balance-label"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
-import {formatAddress, passetHub} from "@/wagmi-config"
+import {formatAddress, polkadotTestnet} from "@/wagmi-config"
 
 export function StatisticsDashboard() {
   const {contractAddress} = useWeb3AuthContext()
@@ -193,7 +193,7 @@ export function StatisticsDashboard() {
               <span className="text-muted-foreground">—</span>
             ) : (
               <a
-                href={`${passetHub.blockExplorers.default.url}/address/${platformFeeRecipient}`}
+                href={`${polkadotTestnet.blockExplorers.default.url}/address/${platformFeeRecipient}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block truncate rounded-md bg-muted/30 px-3 py-2 font-mono text-sm text-primary hover:underline">
@@ -295,7 +295,7 @@ export function StatisticsDashboard() {
           <CardContent>
             {contractAddress ? (
               <a
-                href={`${passetHub.blockExplorers.default.url}/address/${contractAddress}`}
+                href={`${polkadotTestnet.blockExplorers.default.url}/address/${contractAddress}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block truncate rounded-md bg-muted/30 px-3 py-2 font-mono text-sm text-primary hover:underline">
@@ -324,7 +324,7 @@ export function StatisticsDashboard() {
           </CardHeader>
           <CardContent>
             <p className="text-lg font-semibold text-foreground">
-              {passetHub.name}
+              {polkadotTestnet.name}
             </p>
           </CardContent>
         </Card>

@@ -36,7 +36,7 @@ export function About() {
             <span className="font-medium text-foreground">Get test funds</span>
             — Visit the{' '}
             <a
-              href="https://faucet.polkadot.io/?parachain=1111"
+              href="https://faucet.polkadot.io/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline">

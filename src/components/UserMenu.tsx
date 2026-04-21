@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from "react"
 import {useNavigate} from "react-router-dom"
 import {useBalance} from "wagmi"
-import {CURRENCY_SYMBOL, formatAddress, formatPasBalance, passetHub} from "@/wagmi-config"
+import {CURRENCY_SYMBOL, formatAddress, formatPasBalance, polkadotTestnet} from "@/wagmi-config"
 import {useWeb3AuthContext} from "@/hooks/useWeb3AuthContext"
 import {Spinner} from "@/components/ui/spinner"
 import Jazzicon from "@metamask/jazzicon"
@@ -20,14 +20,14 @@ export function UserMenu() {
 
   const {data: balance, isLoading: balanceLoading} = useBalance({
     address: address,
-    chainId: passetHub.id,
+    chainId: polkadotTestnet.id,
   })
 
   const formattedBalance =
     balance && balance.value
       ? `${formatPasBalance(balance.value)} ${CURRENCY_SYMBOL}`
       : `0 ${CURRENCY_SYMBOL}`
-  
+
   const handleCopyAddress = async (e: React.MouseEvent) => {
     e.stopPropagation()
     if (address) {
@@ -85,7 +85,7 @@ export function UserMenu() {
           )}
           {isCopied ? "Copied" : "Copy Address"}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => window.open(passetHub.faucetUrl, '_blank')}>
+        <DropdownMenuItem onClick={() => window.open(polkadotTestnet.faucetUrl, '_blank')}>
           <ExternalLink className="mr-2 h-4 w-4"/>
           Faucet
         </DropdownMenuItem>
