@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from "react"
 import {useBalance, usePublicClient, useWriteContract} from "wagmi"
 import {donateConfig} from "@/generated"
-import {CURRENCY_SYMBOL, EXPLORER_BASE_URL, passetHub} from "@/wagmi-config"
+import {CURRENCY_SYMBOL, EXPLORER_BASE_URL, polkadotTestnet} from "@/wagmi-config"
 import {Button} from "@/components/ui/button"
 import {TxNotification} from "@/components/ui/tx-notification"
 import type {Abi} from "viem"
@@ -29,7 +29,7 @@ export function DonationForm({artists, onSuccess, onDiscoverAgain}: DonationForm
   const publicClient = usePublicClient()
   const {data: balanceData, refetch: refetchBalance} = useBalance({
     address: address as `0x${string}` | undefined,
-    chainId: passetHub.id,
+    chainId: polkadotTestnet.id,
     query: {
       enabled: Boolean(address),
     }
@@ -122,7 +122,7 @@ export function DonationForm({artists, onSuccess, onDiscoverAgain}: DonationForm
         try {
           // Write contract and get hash
           const hash = await writeContractAsync({
-            chainId: passetHub.id,
+            chainId: polkadotTestnet.id,
             account: address as `0x${string}` | undefined,
             address: contractAddress,
             abi: donateConfig.abi as Abi,

@@ -89,10 +89,10 @@ shaz/
 ### Paseo Asset Hub Testnet
 
 **Network Details:**
-- Chain ID: `420420422` (0x1911f0a6)
-- RPC: `https://testnet-passet-hub-eth-rpc.polkadot.io`
-- Explorer: `https://blockscout-passet-hub.parity-testnet.parity.io`
-- Faucet: `https://faucet.polkadot.io/?parachain=1111`
+- Chain ID: `420420417` (0x190f1b41)
+- RPC: `https://services.polkadothub-rpc.com/testnet`
+- Explorer: `https://blockscout-testnet.polkadot.io`
+- Faucet: `https://faucet.polkadot.io/`
 - Currency: PAS
 
 **Hardhat Configuration:**
@@ -110,7 +110,7 @@ const config: HardhatUserConfig = {
   networks: {
     passetHub: {
       polkavm: true, // REQUIRED for Polkadot
-      url: "https://testnet-passet-hub-eth-rpc.polkadot.io",
+      url: "https://services.polkadothub-rpc.com/testnet",
       accounts: [process.env.PRIVATE_KEY],
     },
   },
@@ -153,7 +153,7 @@ PRIVATE_KEY=your_private_key_without_0x_prefix
 ```
 
 ### Get Testnet Tokens
-1. Visit [Polkadot Faucet](https://faucet.polkadot.io/?parachain=1111)
+1. Visit [Polkadot Faucet](https://faucet.polkadot.io/)
 2. Enter your wallet address
 3. Receive PAS tokens for testing
 
@@ -590,8 +590,8 @@ bun run generate
 
 ### Key URLs
 - Local dev: `http://localhost:5173`
-- Block explorer: `https://blockscout-passet-hub.parity-testnet.parity.io`
-- Faucet: `https://faucet.polkadot.io/?parachain=1111`
+- Block explorer: `https://blockscout-testnet.polkadot.io`
+- Faucet: `https://faucet.polkadot.io/`
 - Web3Auth dashboard: `https://dashboard.web3auth.io`
 
 ### Package Manager: Bun

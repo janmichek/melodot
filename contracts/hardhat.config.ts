@@ -1,7 +1,5 @@
 import {HardhatUserConfig} from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
-import "@nomicfoundation/hardhat-viem";
-import "@parity/hardhat-polkadot";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -20,12 +18,11 @@ const config: HardhatUserConfig = {
     settings: {},
   },
   networks: {
-    passetHub: {
-      polkavm: true,
-      url: "https://testnet-passet-hub-eth-rpc.polkadot.io",
+    polkadotTestnet: {
+      url: "https://services.polkadothub-rpc.com/testnet",
+      chainId: 420420417,
       accounts: privateKey ? [privateKey] : [],
     },
-
   },
 };
 

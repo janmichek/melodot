@@ -6,7 +6,7 @@ import {CheckCircle2, Clock, ExternalLink, X, XCircle} from 'lucide-react'
 import {Spinner} from '@/components/ui/spinner'
 import type {TxNotificationProps} from '@types'
 
-const BLOCK_EXPLORER_BASE = 'https://blockscout-passet-hub.parity-testnet.parity.io'
+const BLOCK_EXPLORER_BASE = 'https://blockscout-testnet.polkadot.io'
 
 /**
  * TxNotification Component

@@ -2,7 +2,7 @@ import {useEffect, useState} from "react"
 import {useWeb3Auth, useWeb3AuthConnect, useWeb3AuthDisconnect} from "@web3auth/modal/react"
 import {useAccount} from "wagmi"
 import {donateConfig} from "@/generated"
-import {passetHub} from "@/wagmi-config"
+import {polkadotTestnet} from "@/wagmi-config"
 
 export function useWeb3AuthContext() {
   const {
@@ -63,7 +63,7 @@ export function useWeb3AuthContext() {
     }
   }, [web3Auth, connecting, disconnecting])
 
-  const contractAddress = donateConfig.address[passetHub.id]
+  const contractAddress = donateConfig.address[polkadotTestnet.id]
 
   return {
     isConnected,
