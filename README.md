@@ -82,10 +82,10 @@ bun run deploy-contract  # Deploy to Paseo + generate types
 ## Smart Contracts
 
 - Location: `contracts/contracts/Donate.sol`
-- Network: Paseo Asset Hub testnet
-  - Chain ID: `420420422` (0x1911f0a6)
-  - RPC: `https://testnet-passet-hub-eth-rpc.polkadot.io`
-  - Explorer: `https://blockscout-passet-hub.parity-testnet.parity.io`
+- Network: Polkadot Hub TestNet (successor of the retired Passet Hub)
+  - Chain ID: `420420417` (0x190f1b41)
+  - RPC: `https://eth-rpc-testnet.polkadot.io/` (fallback: `https://services.polkadothub-rpc.com/testnet`)
+  - Explorer: `https://blockscout-testnet.polkadot.io`
   - Currency: PAS
 
 

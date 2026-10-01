@@ -1,17 +1,18 @@
 import {useMemo} from "react"
-import {useBlockNumber, usePublicClient, useReadContract} from "wagmi"
+import {useBlockNumber, useReadContract} from "wagmi"
 import type {Abi} from "viem"
 import {formatEther} from "viem"
 import {useQuery} from "@tanstack/react-query"
 import {useWeb3AuthContext} from "@/hooks/useWeb3AuthContext"
 import {donateConfig} from "@/generated"
+import {fetchDonationMadeLogs} from "@/lib/donationLogs"
+import {proxyPublicClient} from "@/lib/rpcClient"
 import {BalanceLabel} from "@/components/ui/balance-label"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import {formatAddress, passetHub} from "@/wagmi-config"
 
 export function StatisticsDashboard() {
   const {contractAddress} = useWeb3AuthContext()
-  const publicClient = usePublicClient()
 
   const {data: platformFeeBalance, isLoading: isLoadingFeeBalance} =
     useReadContract({
@@ -46,26 +47,18 @@ export function StatisticsDashboard() {
   const {data: donationLogs, isLoading: isLoadingLogs} = useQuery({
     queryKey: ["donationLogs", contractAddress, blockNumber?.toString()],
     queryFn: async () => {
-      if (!publicClient || !contractAddress) {return []}
-      const logs = await publicClient.getLogs({
-        address: contractAddress as `0x${string}`,
-        event: {
-          type: "event",
-          name: "DonationMade",
-          inputs: [
-            {indexed: true, name: "donor", type: "address"},
-            {indexed: true, name: "artistId", type: "string"},
-            {indexed: false, name: "donatedAmount", type: "uint256"},
-            {indexed: false, name: "artistFee", type: "uint256"},
-            {indexed: false, name: "platformFee", type: "uint256"},
-          ],
-        },
-        fromBlock: 0n,
-        toBlock: "latest",
+      if (!contractAddress) {return []}
+      // Bounded chunked scan via the RPC proxy — a single 0→latest
+      // eth_getLogs is rejected by the RPC, and its host is unreachable
+      // straight from browsers.
+      return fetchDonationMadeLogs(proxyPublicClient, contractAddress as `0x${string}`, {
+        windowBlocks: 100_000n,
+        chunkBlocks: 5_000n,
+        expectedChainId: passetHub.id,
       })
-      return logs
     },
-    enabled: !!publicClient && !!contractAddress,
+    enabled: !!contractAddress,
+    staleTime: 60_000,
   })
 
   const totalDonationsCount = donationLogs?.length ?? 0

@@ -426,7 +426,9 @@ export const donateAbi = [
  *
  */
 export const donateAddress = {
-  420420422: '0x4a52d7e06D83eb0f320EC80b3ccd3828899bF02B',
+  // TODO(chain-migration): placeholder — replaced by `bun run generate`
+  // after deploying Donate to Polkadot Hub TestNet (420420417).
+  420420417: '0x0000000000000000000000000000000000000000',
 } as const
 
 /**

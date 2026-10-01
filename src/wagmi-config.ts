@@ -1,9 +1,17 @@
-import {createConfig, http} from "wagmi"
+import {createConfig, fallback, http} from "wagmi"
 import {mainnet} from "wagmi/chains"
 
+const POLKADOT_HUB_TESTNET_RPCS = [
+  "https://eth-rpc-testnet.polkadot.io/",
+  "https://services.polkadothub-rpc.com/testnet",
+]
+
+// NOTE: export keeps the legacy `passetHub` name so existing imports keep
+// working — it now describes Polkadot Hub TestNet (chain 420420417), the
+// successor of the retired Passet Hub (420420422).
 export const passetHub = {
-  id: 420420422,
-  name: "Passet Hub",
+  id: 420420417,
+  name: "Polkadot Hub TestNet",
   nativeCurrency: {
     name: "PAS",
     symbol: "PAS",
@@ -11,13 +19,13 @@ export const passetHub = {
   },
   rpcUrls: {
     default: {
-      http: ["https://testnet-passet-hub-eth-rpc.polkadot.io"],
+      http: POLKADOT_HUB_TESTNET_RPCS,
     },
   },
   blockExplorers: {
     default: {
       name: "Blockscout",
-      url: "https://blockscout-passet-hub.parity-testnet.parity.io",
+      url: "https://blockscout-testnet.polkadot.io",
     },
   },
   faucetUrl: "https://faucet.polkadot.io/?parachain=1111",
@@ -26,7 +34,18 @@ export const passetHub = {
 export const wagmiConfig = createConfig({
   chains: [passetHub, mainnet],
   transports: {
-    [passetHub.id]: http(passetHub.rpcUrls.default.http[0]),
+    [passetHub.id]: fallback(
+      POLKADOT_HUB_TESTNET_RPCS.map(
+        (url) =>
+          http(url, {
+            batch: true,
+            retryCount: 3,
+            retryDelay: 1000,
+            timeout: 15_000,
+          }),
+      ),
+      {retryCount: 3, retryDelay: 1000},
+    ),
     [mainnet.id]: http(),
   },
 })

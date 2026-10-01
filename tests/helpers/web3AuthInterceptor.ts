@@ -49,7 +49,7 @@ export async function setupMockWallet(page: Page, address: string = '0x742d35Cc6
             return [mockAddress]
 
           case 'eth_chainId':
-            return '0x1911f0a6' // 420420422 in hex (Passet Hub)
+            return '0x190f1b41' // 420420417 in hex (Polkadot Hub TestNet)
 
           case 'eth_getBalance':
             return '0xde0b6b3a7640000' // 1 ETH in wei
@@ -85,8 +85,8 @@ export async function setupMockWallet(page: Page, address: string = '0x742d35Cc6
         // Mock event listener removal
       },
       selectedAddress: mockAddress,
-      chainId: '0x1911f0a6',
-      networkVersion: '420420422',
+      chainId: '0x190f1b41',
+      networkVersion: '420420417',
       isConnected: () => true,
     }
 

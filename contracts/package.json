@@ -13,6 +13,6 @@
     "lint": "forge lint",
     "clean": "forge clean",
     "install:libs": "forge install foundry-rs/forge-std --no-git --shallow && forge install OpenZeppelin/openzeppelin-contracts@v5.4.0 --no-git --shallow",
-    "deploy": "forge script script/Deploy.s.sol:Deploy --rpc-url https://testnet-passet-hub-eth-rpc.polkadot.io --broadcast"
+    "deploy": "forge script script/Deploy.s.sol:Deploy --rpc-url https://eth-rpc-testnet.polkadot.io --broadcast"
   }
 }

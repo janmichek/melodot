@@ -18,7 +18,7 @@
     "test:contract:ci": "cd contracts && forge test --profile ci -vvv",
     "test:contract:coverage": "cd contracts && forge coverage",
     "reinstall": "rm -rf node_modules/ && bun pm cache rm && bun install",
-    "contract:deploy": "cd contracts && forge script script/Deploy.s.sol:Deploy --rpc-url https://testnet-passet-hub-eth-rpc.polkadot.io --broadcast && cd .. && bun run generate",
+    "contract:deploy": "cd contracts && forge script script/Deploy.s.sol:Deploy --rpc-url https://eth-rpc-testnet.polkadot.io --broadcast && cd .. && bun run generate",
     "contract:redeploy": "bun contract:clean && bun contract:deploy",
     "contract:clean": "cd contracts && forge clean"
   },

@@ -17,7 +17,7 @@ export class WalletPage extends BasePage {
     this.userMenuTrigger = page.locator('[data-slot="trigger"]').filter({has: page.locator('div[class*="jazzicon"]')}).or(page.locator('button').filter({has: page.locator('div[class*="rounded"]')}))
     this.userAddress = page.locator('.truncate.font-medium')
     this.userBalance = page.locator('.truncate.text-xs.text-muted-foreground')
-    this.networkInfo = page.getByText(/Passet Hub|Ethereum|Unknown/)
+    this.networkInfo = page.getByText(/Polkadot Hub|Passet Hub|Ethereum|Unknown/)
     this.faucetLink = page.getByRole('menuitem', {name: /get test tokens/i})
   }
 
