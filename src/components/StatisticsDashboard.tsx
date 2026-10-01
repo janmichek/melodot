@@ -1,5 +1,5 @@
 import {useMemo} from "react"
-import {useBlockNumber, useReadContract} from "wagmi"
+import {useReadContract} from "wagmi"
 import type {Abi} from "viem"
 import {formatEther} from "viem"
 import {useQuery} from "@tanstack/react-query"
@@ -42,10 +42,11 @@ export function StatisticsDashboard() {
       functionName: "getPlatformFeeInfo",
     })
 
-  const {data: blockNumber} = useBlockNumber()
-
   const {data: donationLogs, isLoading: isLoadingLogs} = useQuery({
-    queryKey: ["donationLogs", contractAddress, blockNumber?.toString()],
+    // NOTE: intentionally NOT keyed on block number — the chunked scan is
+    // ~20 RPC calls, so refetching every block would keep the network busy
+    // non-stop. Refresh on a fixed interval instead.
+    queryKey: ["donationLogs", contractAddress],
     queryFn: async () => {
       if (!contractAddress) {return []}
       // Bounded chunked scan via the RPC proxy — a single 0→latest
@@ -59,6 +60,7 @@ export function StatisticsDashboard() {
     },
     enabled: !!contractAddress,
     staleTime: 60_000,
+    refetchInterval: 120_000,
   })
 
   const totalDonationsCount = donationLogs?.length ?? 0
