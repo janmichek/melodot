@@ -3,11 +3,6 @@
   "buildCommand": "bun install && bun run build",
   "outputDirectory": "dist",
   "installCommand": "bun install",
-  "functions": {
-    "api/endpoints/**/*.ts": {
-      "runtime": "@vercel/node@3.2.29"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/discover",
