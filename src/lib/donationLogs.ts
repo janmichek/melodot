@@ -74,25 +74,32 @@ export async function fetchDonationMadeLogs(
   let start = opts?.fromBlock ?? latest - windowBlocks
   if (start < 0n) {start = 0n}
 
-  const logs: DonationMadeLog[] = []
+  const ranges: Array<{from: bigint; to: bigint}> = []
   for (let from = start; from <= latest; from += chunkBlocks) {
     let to = from + chunkBlocks - 1n
     if (to > latest) {to = latest}
-    try {
-      const chunk = (await client.getLogs({
-        address: contractAddress,
-        event: DONATION_MADE_EVENT,
-        fromBlock: from,
-        toBlock: to,
-      })) as unknown as DonationMadeLog[]
-      logs.push(...chunk)
-    } catch (err) {
-      throw new Error(
-        `eth_getLogs failed for blocks ${from}–${to}: ${
-          err instanceof Error ? err.message : String(err)
-        }`,
-      )
-    }
+    ranges.push({from, to})
   }
-  return logs
+
+  // Fetch chunks concurrently — sequentially they keep the network busy
+  // long enough to break `networkidle`-based loading states.
+  const chunks = await Promise.all(
+    ranges.map(async ({from, to}) => {
+      try {
+        return (await client.getLogs({
+          address: contractAddress,
+          event: DONATION_MADE_EVENT,
+          fromBlock: from,
+          toBlock: to,
+        })) as unknown as DonationMadeLog[]
+      } catch (err) {
+        throw new Error(
+          `eth_getLogs failed for blocks ${from}–${to}: ${
+            err instanceof Error ? err.message : String(err)
+          }`,
+        )
+      }
+    }),
+  )
+  return chunks.flat()
 }
