@@ -1,25 +1,18 @@
 {
-  "main": "index.js",
-  "license": "ISC",
-  "type": "commonjs",
+  "name": "melodot-contracts",
+  "private": true,
+  "license": "MIT",
   "scripts": {
-    "test": "npx hardhat test",
-    "deploy-contract": "yes | npx hardhat ignition deploy ignition/modules/Donate.js --network passetHub",
-    "clean": "npx hardhat clean && rm -rf artifacts && rm -rf artifacts-pvm && rm -rf cache && rm -rf cache-pvm && rm -rf typechain-types && rm -rf ignition/deployments"
-  },
-  "devDependencies": {
-    "@nomicfoundation/hardhat-ignition": "^0.15.12",
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "@nomicfoundation/hardhat-viem": "^2.0.6",
-    "@parity/hardhat-polkadot": "^0.1.8",
-    "@types/chai-as-promised": "^7.1.8",
-    "chai": "^4.5.0",
-    "hardhat": "2.24.1",
-    "solc": "0.8.19",
-    "typescript": "~5.0.4",
-    "viem": "^2.31.7"
-  },
-  "dependencies": {
-    "dotenv": "^17.2.2"
+    "test": "forge test",
+    "test:ci": "forge test --profile ci -vvv",
+    "test:gas": "forge test --gas-report",
+    "coverage": "forge coverage",
+    "build": "forge build --sizes",
+    "fmt": "forge fmt",
+    "fmt:check": "forge fmt --check",
+    "lint": "forge lint",
+    "clean": "forge clean",
+    "install:libs": "forge install foundry-rs/forge-std --no-git --shallow && forge install OpenZeppelin/openzeppelin-contracts@v5.4.0 --no-git --shallow",
+    "deploy": "forge script script/Deploy.s.sol:Deploy --rpc-url https://testnet-passet-hub-eth-rpc.polkadot.io --broadcast"
   }
 }

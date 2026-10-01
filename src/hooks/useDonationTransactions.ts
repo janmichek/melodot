@@ -79,8 +79,8 @@ export function useDonationTransactions(
             if (decoded.functionName !== "donateToArtist" || !decoded.args?.[0]) {continue}
 
             const artistId = decoded.args[0] as string
-            const platformFee = (value * BigInt(feeBps)) / 10000n
-            const artistReward = value - platformFee
+            const artistReward = (value * BigInt(10_000 - feeBps)) / 10_000n
+            const platformFee = value - artistReward
 
             donationTxs.push({
               txHash: tx.hash as `0x${string}`,

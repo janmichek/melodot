@@ -1,4 +1,4 @@
-import {useEffect} from "react"
+import {useEffect, useRef} from "react"
 import {useWaitForTransactionReceipt, useWriteContract} from "wagmi"
 import {donateConfig} from "@/generated"
 import {BalanceLabel} from "@/components/ui/balance-label"
@@ -19,47 +19,70 @@ export function OwnerWithdrawForm({
 }: OwnerWithdrawFormProps & {onSuccess?: () => void}) {
   const queryClient = useQueryClient()
   const {address} = useWeb3AuthContext()
+  const withdrewAfterSettle = useRef(false)
+
   const {
-    data: hash,
-    writeContract,
-    isPending: isWithdrawing,
-    error: writeError,
+    data: settleHash,
+    writeContract: writeSettle,
+    isPending: isSettling,
+    error: settleWriteError,
   } = useWriteContract()
 
   const {
-    isLoading: isConfirming,
-    isSuccess: isConfirmed,
-  } = useWaitForTransactionReceipt({hash})
+    isLoading: isSettleConfirming,
+    isSuccess: isSettleConfirmed,
+  } = useWaitForTransactionReceipt({hash: settleHash})
 
-  // Refetch balances and call onSuccess when withdrawal is confirmed
+  const {
+    data: withdrawHash,
+    writeContract: writeWithdraw,
+    isPending: isWithdrawing,
+    error: withdrawWriteError,
+  } = useWriteContract()
+
+  const {
+    isLoading: isWithdrawConfirming,
+    isSuccess: isConfirmed,
+  } = useWaitForTransactionReceipt({hash: withdrawHash})
+
+  const writeError = settleWriteError || withdrawWriteError
+  const hash = withdrawHash ?? settleHash
+  const isBusy = isSettling || isSettleConfirming || isWithdrawing || isWithdrawConfirming
+
   useEffect(() => {
     if (isConfirmed && address) {
-      // Invalidate platform fee balance query (refetches automatically)
       queryClient.invalidateQueries({
         queryKey: ['readContract', {
           functionName: 'getPlatformFeeBalance',
         }],
       })
-
-      // Invalidate user wallet balance
       queryClient.invalidateQueries({
         queryKey: ['balance', {address}],
       })
-
-      // Call parent callback
       onSuccess?.()
     }
   }, [isConfirmed, address, queryClient, onSuccess])
 
-  const withdrawPlatformFees = () => {
-    if (isWithdrawing || isConfirming) {return}
-
-    // writeContract is synchronous - errors come via writeError state
-    writeContract({
+  useEffect(() => {
+    if (!isSettleConfirmed || withdrewAfterSettle.current) {
+      return
+    }
+    withdrewAfterSettle.current = true
+    writeWithdraw({
       address: contractAddress,
       abi: donateConfig.abi as Abi,
-      functionName: "withdrawPlatformFees",
+      functionName: "withdraw",
       args: [ownerAddress],
+    })
+  }, [isSettleConfirmed, contractAddress, ownerAddress, writeWithdraw])
+
+  const settleThenWithdraw = () => {
+    if (isBusy) {return}
+    withdrewAfterSettle.current = false
+    writeSettle({
+      address: contractAddress,
+      abi: donateConfig.abi as Abi,
+      functionName: "settlePlatformFees",
     })
   }
 
@@ -91,9 +114,9 @@ export function OwnerWithdrawForm({
         </div>
       </CardContent>
       <CardFooter className="flex flex-col gap-4">
-        {!isWithdrawing && !isConfirming && !isConfirmed && (
+        {!isBusy && !isConfirmed && (
           <Button
-            onClick={withdrawPlatformFees}
+            onClick={settleThenWithdraw}
             disabled={platformFeeBalance === 0n}
             className="w-full sm:w-auto">
             Withdraw {formatPasBalance(platformFeeBalance)} {CURRENCY_SYMBOL}
@@ -101,7 +124,7 @@ export function OwnerWithdrawForm({
         )}
         <TxNotification
           hash={hash}
-          isProcessing={isWithdrawing || isConfirming}
+          isProcessing={isBusy}
           isSuccess={isConfirmed}
           isError={!!writeError}
           error={writeError?.message}

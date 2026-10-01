@@ -8,6 +8,9 @@ contracts/artifacts
 contracts/artifacts-pvm
 contracts/cache
 contracts/cache-pvm
+contracts/out
+contracts/broadcast
+contracts/lib
 contracts/ignition/deployments
 contracts/typechain-types
 .env

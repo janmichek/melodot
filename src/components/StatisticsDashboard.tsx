@@ -24,7 +24,7 @@ export function StatisticsDashboard() {
     useReadContract({
       address: contractAddress as `0x${string}`,
       abi: donateConfig.abi as Abi,
-      functionName: "balance",
+      functionName: "totalBalance",
     })
 
   const {data: artistsCount, isLoading: isLoadingArtistsCount} =

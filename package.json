@@ -1,24 +1,26 @@
 {
   "name": "melodot",
   "version": "1.0.0",
-  "description": "Decentralized music discovery and donation platform on blockchain",
+  "description": "Award-winning - decentralized music discovery and tipping platform on Polkadot. Record audio, identify songs, and directly tip artists via smart contracts.",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "start": "vercel dev",
     "build": "tsc && vite build",
-    "generate": "wagmi generate",
+    "generate": "cd contracts && forge build && cd .. && wagmi generate",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test:all": "bun run test:contract && bun run test:api && bun run test:e2e",
     "test:api": "bun run api/test.ts",
     "test:e2e": "playwright test",
-    "test:contract": "cd contracts && bun install && bun run test",
+    "test:contract": "cd contracts && forge test -vvv",
+    "test:contract:ci": "cd contracts && forge test --profile ci -vvv",
+    "test:contract:coverage": "cd contracts && forge coverage",
     "reinstall": "rm -rf node_modules/ && bun pm cache rm && bun install",
-    "contract:deploy": "cd contracts && bun install && bun run deploy-contract && cd .. && bun run generate",
+    "contract:deploy": "cd contracts && forge script script/Deploy.s.sol:Deploy --rpc-url https://testnet-passet-hub-eth-rpc.polkadot.io --broadcast && cd .. && bun run generate",
     "contract:redeploy": "bun contract:clean && bun contract:deploy",
-    "contract:clean": "cd contracts && bun run clean"
+    "contract:clean": "cd contracts && forge clean"
   },
   "dependencies": {
     "@metamask/jazzicon": "^2.0.0",
@@ -40,6 +42,7 @@
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6",
     "tailwind-merge": "^3.4.0",
+    "vercel": "^58.7.1",
     "viem": "^2.39.0",
     "wagmi": "^2.19.4"
   },

@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react"
+import {useEffect, useRef, useState} from "react"
 import {useAccount, useWaitForTransactionReceipt, useWriteContract} from "wagmi"
 import {donateConfig} from "@/generated"
 import {AddressInput} from "@/components/ui/address-input"
@@ -18,24 +18,39 @@ export function ArtistPayoutForm({
   const [payoutAddress, setPayoutAddress] = useState('')
   const [userError, setUserError] = useState<string | null>(null)
   const {isConnected} = useAccount()
+  const withdrewAfterSettle = useRef(false)
 
   const {
-    writeContract,
-    isPending: isPayoutPending,
-    data: payoutHash,
-    error: writeError,
+    writeContract: writeSettle,
+    isPending: isSettlePending,
+    data: settleHash,
+    error: settleWriteError,
   } = useWriteContract()
 
-  const txHash = payoutHash
+  const {
+    isLoading: isSettleConfirming,
+    isSuccess: isSettleConfirmed,
+    error: settleConfirmError,
+  } = useWaitForTransactionReceipt({hash: settleHash})
 
   const {
-    isLoading: isConfirming,
-    isSuccess: isConfirmed,
-    error: confirmError,
-  } = useWaitForTransactionReceipt({hash: txHash as `0x${string}` | undefined})
+    writeContract: writeWithdraw,
+    isPending: isWithdrawPending,
+    data: withdrawHash,
+    error: withdrawWriteError,
+  } = useWriteContract()
 
-  // Derive error from writeError, confirmError, or userError
+  const {
+    isLoading: isWithdrawConfirming,
+    isSuccess: isWithdrawConfirmed,
+    error: withdrawConfirmError,
+  } = useWaitForTransactionReceipt({hash: withdrawHash})
+
+  const writeError = settleWriteError || withdrawWriteError
+  const confirmError = settleConfirmError || withdrawConfirmError
   const payoutError = writeError?.message || confirmError?.message || userError
+  const isBusy = isSettlePending || isSettleConfirming || isWithdrawPending || isWithdrawConfirming
+  const txHash = withdrawHash ?? settleHash
 
   const handlePayout = () => {
     if (!payoutAddress || !isAddress(payoutAddress as `0x${string}`)) {
@@ -44,24 +59,38 @@ export function ArtistPayoutForm({
     }
 
     setUserError(null)
+    withdrewAfterSettle.current = false
 
-    // writeContract is synchronous - errors come via writeError state
-    writeContract({
+    writeSettle({
       address: contractAddress,
       abi: donateConfig.abi as Abi,
-      functionName: 'payoutDonations',
-      args: [artistId, payoutAddress as `0x${string}`],
+      functionName: "settleDonations",
+      args: [artistId],
     })
   }
 
-  // Handle successful confirmation
   useEffect(() => {
-    if (isConfirmed) {
+    if (!isSettleConfirmed || withdrewAfterSettle.current) {
+      return
+    }
+    if (!payoutAddress || !isAddress(payoutAddress as `0x${string}`)) {
+      return
+    }
+    withdrewAfterSettle.current = true
+    writeWithdraw({
+      address: contractAddress,
+      abi: donateConfig.abi as Abi,
+      functionName: "withdraw",
+      args: [payoutAddress as `0x${string}`],
+    })
+  }, [isSettleConfirmed, payoutAddress, contractAddress, writeWithdraw])
+
+  useEffect(() => {
+    if (isWithdrawConfirmed) {
       onPayoutSuccess?.()
     }
-  }, [isConfirmed, onPayoutSuccess])
+  }, [isWithdrawConfirmed, onPayoutSuccess])
 
-  // Log errors when they occur
   useEffect(() => {
     if (writeError) {
       console.error('Write error:', writeError)
@@ -82,16 +111,16 @@ export function ArtistPayoutForm({
         placeholder="Enter recipient address (0x...)"
         label="Recipient Address"
         error={payoutError}
-        isDisabled={!isConnected || isPayoutPending || isConfirming}
+        isDisabled={!isConnected || isBusy}
         showValidation={true}/>
       <Button
         onClick={handlePayout}
-        disabled={!isConnected || !isAddress(payoutAddress as `0x${string}`) || isPayoutPending || isConfirming}
+        disabled={!isConnected || !isAddress(payoutAddress as `0x${string}`) || isBusy}
         className="w-full sm:w-auto">
-        {isPayoutPending
-            ? "Sending transaction..."
-            : isConfirming
-            ? "Confirming..."
+        {isSettlePending || isSettleConfirming
+            ? "Settling..."
+            : isWithdrawPending || isWithdrawConfirming
+            ? "Withdrawing..."
             : artistBalance !== null
             ? `Payout ${formatPasBalance(artistBalance)} ${CURRENCY_SYMBOL}`
             : "Payout All"}
@@ -99,8 +128,8 @@ export function ArtistPayoutForm({
 
       <TxNotification
         hash={txHash}
-        isLoading={isConfirming}
-        isSuccess={isConfirmed}
+        isLoading={isSettleConfirming || isWithdrawConfirming}
+        isSuccess={isWithdrawConfirmed}
         isError={!!writeError || !!confirmError}
         error={writeError?.message || confirmError?.message}
         title="Payout Status"
@@ -109,7 +138,7 @@ export function ArtistPayoutForm({
         errorMessage="❌ Payout failed"
         autoHideSuccess={false}
         onDismiss={() => {
-            if (isConfirmed) {
+            if (isWithdrawConfirmed) {
               setPayoutAddress('')
               setUserError(null)
             }
