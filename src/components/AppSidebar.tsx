@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import {ChartBarIcon, Coins, ExternalLink, Info, List, Mic, Wallet} from "lucide-react"
+import {BarChart3, Coins, ExternalLink, Info, Mic, Wallet} from "lucide-react"
 import {Link, useLocation} from "react-router-dom"
 import {Spinner} from "@/components/ui/spinner"
 import {Logo} from "@/components/ui/logo"
@@ -80,22 +80,22 @@ export function AppSidebar() {
       {
         title: "Donations",
         url: "/donations",
-        icon: List,
+        icon: Coins,
       },
       {
-        title: "Claim",
+        title: "Payout",
         url: "/claim",
-        icon: Coins,
+        icon: Wallet,
+      },
+      {
+        title: "Statistics",
+        url: "/statistics",
+        icon: BarChart3,
       },
       {
         title: "About",
         url: "/about",
         icon: Info,
-      },
-      {
-        title: "Statistics",
-        url: "/statistics",
-        icon: ChartBarIcon,
       },
     ]
 
