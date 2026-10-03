@@ -5,7 +5,7 @@
   "installCommand": "bun install",
   "functions": {
     "api/endpoints/**/*.ts": {
-      "runtime": "@vercel/node@3.2.29"
+      "runtime": "@vercel/node@5.5.6"
     }
   },
   "rewrites": [

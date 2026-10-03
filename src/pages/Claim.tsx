@@ -10,7 +10,7 @@ export function Claim() {
   return (
     <section className="space-y-6 pb-6">
       <PageHeader
-        title="Claim Artist Payout"
+        title="Payout"
         description={
           !isConnected
             ? "Please sign in to claim."

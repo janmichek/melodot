@@ -4,6 +4,7 @@ import type {Abi} from "viem"
 import {decodeFunctionData, encodeFunctionData} from "viem"
 import {donateConfig} from "@/generated"
 import type {DonationTransaction} from "@types"
+import {polkadotTestnet} from "@/wagmi-config"
 
 export function useDonationTransactions(
   contractAddress: `0x${string}` | undefined,
@@ -12,7 +13,7 @@ export function useDonationTransactions(
   const [donations, setDonations] = useState<DonationTransaction[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
-  const publicClient = usePublicClient()
+  const publicClient = usePublicClient({chainId: polkadotTestnet.id})
 
   useEffect(() => {
     if (!publicClient || !contractAddress) {
@@ -32,17 +33,31 @@ export function useDonationTransactions(
           args: [""],
         }).slice(0, 10) as `0x${string}`
 
-        // Get start block
-        const currentBlock = await publicClient.getBlockNumber()
-        const startBlock = fromBlock || currentBlock - BigInt(10000)
+        // Explorer history does not require the RPC block height. If the RPC is
+        // temporarily unavailable, start from the beginning rather than hiding
+        // donations behind a provider error.
+        let startBlock = fromBlock || 0n
+        try {
+          const currentBlock = await publicClient.getBlockNumber()
+          startBlock = fromBlock || (currentBlock > 10000n ? currentBlock - 10000n : 0n)
+        } catch {
+          startBlock = fromBlock || 0n
+        }
 
-        // Fetch platform fee info once
-        const platformFeeInfo = await publicClient.readContract({
-          address: contractAddress,
-          abi: donateConfig.abi as Abi,
-          functionName: "getPlatformFeeInfo",
-        }) as readonly [`0x${string}`, number]
-        const feeBps = Number(platformFeeInfo[1])
+        // Older deployments may not expose the fee view, but donation history can
+        // still be loaded from the explorer. Treat the fee as unknown in that case
+        // instead of failing the entire donations request.
+        let feeBps = 0
+        try {
+          const platformFeeInfo = await publicClient.readContract({
+            address: contractAddress,
+            abi: donateConfig.abi as Abi,
+            functionName: "getPlatformFeeInfo",
+          }) as readonly [`0x${string}`, number]
+          feeBps = Number(platformFeeInfo[1])
+        } catch {
+          feeBps = 0
+        }
 
         // Fetch transactions from Blockscout
         const explorerUrl = `https://blockscout-testnet.polkadot.io/api?module=account&action=txlist&address=${contractAddress}&startblock=${startBlock.toString()}&endblock=99999999&sort=desc`
