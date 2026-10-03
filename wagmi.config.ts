@@ -5,7 +5,7 @@ import {react} from '@wagmi/cli/plugins'
 import donateArtifact from './contracts/out/Donate.sol/Donate.json'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - JSON import for CLI config
-import deployedAddresses from './contracts/deployments/passetHub.json'
+import deployedAddresses from './contracts/deployments/polkadotHubTestnet.json'
 
 const donateDeployedAddress =
   (deployedAddresses as { Donate: string }).Donate as `0x${string}`
@@ -17,7 +17,7 @@ export default defineConfig({
       name: 'donate',
       abi: (donateArtifact as { abi: unknown }).abi as any,
       address: {
-        420420422: donateDeployedAddress,
+        420420417: donateDeployedAddress,
       },
     },
   ],

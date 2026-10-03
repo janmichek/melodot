@@ -61,6 +61,8 @@ export function apiPlugin(): Plugin {
             apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'artist.ts')
           } else if (apiRoute === 'artists') {
             apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'artists.ts')
+          } else if (apiRoute === 'rpc') {
+            apiFilePath = resolve(process.cwd(), 'api', 'endpoints', 'rpc.ts')
           } else {
             // Unknown route
             res.writeHead(404, {'Content-Type': 'application/json'})
