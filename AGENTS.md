@@ -592,7 +592,7 @@ bun run generate
 
 ### API Security
 - **Add CORS headers** - Restrict API access to your domain; the RPC proxy allows only Donalyze origins
-- **Rate limit endpoints** - Per-instance burst guards are in `api/rateLimit.ts`; use Vercel WAF/Upstash for a hard global quota
+- **Rate limit endpoints** - Per-instance burst guards are in `api/_lib/rateLimit.ts`; use Vercel WAF/Upstash for a hard global quota
 - **Implement rate limiting** - Prevent API abuse and quota exhaustion
 - **Validate all inputs** - Check format, length, and type of all parameters
 - **Don't expose internal errors** - Log server-side, return generic messages to clients
@@ -680,7 +680,7 @@ bun run generate
 - `src/pages/Donations.tsx` - Donations history
 - `src/pages/Owner.tsx` - Owner dashboard
 - `api/endpoints/discover.ts` - Music discovery API
-- `api/api.ts` - Centralized API utilities
+- `api/_lib/api.ts` - Centralized API utilities
 - `src/generated.ts` - Auto-generated Wagmi contract types
 - `package.json` - Scripts and dependencies
 

@@ -1,8 +1,8 @@
 import type {VercelRequest, VercelResponse} from '@vercel/node'
-import {fetchSpotifySearch, fetchSpotifyToken, fetchTrack, handleApiError, handleApiSuccess} from '../api.js'
+import {fetchSpotifySearch, fetchSpotifyToken, fetchTrack, handleApiError, handleApiSuccess} from '../_lib/api.js'
 import type {SpotifySearchResponse, SpotifyTrackResponse} from '../../types'
-import {extractTrackId, formatTrackResponse} from '../utils.js'
-import {rateLimit} from '../rateLimit.js'
+import {extractTrackId, formatTrackResponse} from '../_lib/utils.js'
+import {rateLimit} from '../_lib/rateLimit.js'
 
 /**
  * Fetches track information from Spotify API

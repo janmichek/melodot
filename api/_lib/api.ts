@@ -3,7 +3,7 @@
  */
 
 import type {VercelResponse} from '@vercel/node'
-import type {BioResponse, DiscoveryResult, ErrorWithStatus, SpotifyTrackResponse, TokenResponse} from '../types'
+import type {BioResponse, DiscoveryResult, ErrorWithStatus, SpotifyTrackResponse, TokenResponse} from '../../types'
 import {extractTrackId, formatTrackResponse} from './utils.js'
 
 /**

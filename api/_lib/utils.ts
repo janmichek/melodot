@@ -1,5 +1,5 @@
 import fs from 'fs'
-import type {SpotifyTrackResponse, TrackInfoResponse} from '../types'
+import type {SpotifyTrackResponse, TrackInfoResponse} from '../../types'
 
 /**
  * Validates that a string is a valid Spotify ID format

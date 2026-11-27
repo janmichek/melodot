@@ -2,9 +2,9 @@ import type {VercelRequest, VercelResponse} from '@vercel/node'
 import type {DiscoveryResult} from '../../types'
 import formidable from 'formidable'
 import fs from 'fs'
-import {fetchDiscovery, fetchSpotifyToken, fetchTrackFromUri, handleApiError, handleApiSuccess} from '../api.js'
-import {cleanupFile} from '../utils.js'
-import {rateLimit} from '../rateLimit.js'
+import {fetchDiscovery, fetchSpotifyToken, fetchTrackFromUri, handleApiError, handleApiSuccess} from '../_lib/api.js'
+import {cleanupFile} from '../_lib/utils.js'
+import {rateLimit} from '../_lib/rateLimit.js'
 
 export default async function handler(
   req: VercelRequest,

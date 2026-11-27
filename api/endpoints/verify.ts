@@ -1,10 +1,10 @@
 import type {VercelRequest, VercelResponse} from '@vercel/node'
 import {isAddress} from 'viem'
 import {privateKeyToAccount} from 'viem/accounts'
-import {fetchBio, handleApiError, handleApiSuccess} from '../api.js'
-import {rateLimit} from '../rateLimit.js'
-import {isValidSpotifyId} from '../utils.js'
-import {createChallenge, newChallengeCode, readChallenge} from '../verifyToken.js'
+import {fetchBio, handleApiError, handleApiSuccess} from '../_lib/api.js'
+import {rateLimit} from '../_lib/rateLimit.js'
+import {isValidSpotifyId} from '../_lib/utils.js'
+import {createChallenge, newChallengeCode, readChallenge} from '../_lib/verifyToken.js'
 import type {BioResponse, VerifyResponse} from '../../types'
 
 /**

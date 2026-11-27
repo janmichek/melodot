@@ -27,7 +27,7 @@ export default defineConfig({
         'src/shared/config/generated.ts',
         'src/app/main.tsx',
         'src/vite-env.d.ts',
-        'api/test.ts',
+        'scripts/api-test.ts',
         'api/endpoints/**',
       ],
       thresholds: coverageFloors,

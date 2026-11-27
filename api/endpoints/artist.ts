@@ -1,8 +1,8 @@
 import type {VercelRequest, VercelResponse} from '@vercel/node'
-import {fetchArtist, fetchSpotifyToken, handleApiError, handleApiSuccess} from '../api.js'
+import {fetchArtist, fetchSpotifyToken, handleApiError, handleApiSuccess} from '../_lib/api.js'
 import type {SpotifyArtistResponse} from '../../types'
-import {extractArtistId} from '../utils.js'
-import {rateLimit} from '../rateLimit.js'
+import {extractArtistId} from '../_lib/utils.js'
+import {rateLimit} from '../_lib/rateLimit.js'
 
 /**
  * Fetches artist information from Spotify API

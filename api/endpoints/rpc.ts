@@ -46,7 +46,7 @@ const ALLOWED_METHODS = new Set([
   'eth_getTransactionReceipt',
 ])
 
-import {rateLimit} from '../rateLimit.js'
+import {rateLimit} from '../_lib/rateLimit.js'
 
 const DEFAULT_ALLOWED_ORIGINS = ['https://donalyze.vercel.app']
 const ALLOWED_ORIGINS = new Set([

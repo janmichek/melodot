@@ -16,7 +16,7 @@
     "test:all": "bun run test:unit && bun run test:contract && bun run test:api && bun run test:e2e",
     "test:unit": "vitest run --config config/vitest.config.ts",
     "test:coverage": "vitest run --config config/vitest.config.ts --coverage",
-    "test:api": "bun run api/test.ts",
+    "test:api": "bun run scripts/api-test.ts",
     "test:e2e": "playwright test --config config/playwright.config.ts",
     "test:contract": "cd contracts && forge test -vvv",
     "test:contract:ci": "cd contracts && forge test --profile ci -vvv",
