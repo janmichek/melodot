@@ -4,7 +4,7 @@
 
 import type {VercelResponse} from '@vercel/node'
 import type {BioResponse, DiscoveryResult, ErrorWithStatus, SpotifyTrackResponse, TokenResponse} from '../types'
-import {formatTrackResponse} from './utils.js'
+import {extractTrackId, formatTrackResponse} from './utils.js'
 
 /**
  * API endpoint URLs
@@ -18,10 +18,18 @@ const API_URLS = {
 
 
 
+let spotifyTokenCache: {token: string; expiresAt: number} | null = null
+
 /**
- * Fetches Spotify access token using client credentials
+ * Fetches a Spotify access token using client credentials.
+ * Tokens are cached per serverless instance so a burst of API requests does
+ * not mint a new token for every call.
  */
 export async function fetchSpotifyToken(): Promise<string> {
+  if (spotifyTokenCache && Date.now() < spotifyTokenCache.expiresAt) {
+    return spotifyTokenCache.token
+  }
+
   const {clientId, clientSecret} = getSpotifyCredentials()
   const tokenData = await fetchJson<TokenResponse>(
     API_URLS.SPOTIFY_TOKEN, {
@@ -33,6 +41,12 @@ export async function fetchSpotifyToken(): Promise<string> {
       body: 'grant_type=client_credentials',
     }
   )
+
+  const ttlSeconds = Math.max(60, (tokenData.expires_in ?? 3600) - 60)
+  spotifyTokenCache = {
+    token: tokenData.access_token,
+    expiresAt: Date.now() + ttlSeconds * 1000,
+  }
   return tokenData.access_token
 }
 
@@ -126,11 +140,11 @@ export async function fetchDiscovery(fileBuffer: Buffer): Promise<DiscoveryResul
  */
 export async function fetchTrackFromUri(spotifyUri: string, accessToken: string): Promise<DiscoveryResult['spotifyInfo']> {
   try {
-    if (!spotifyUri.startsWith('spotify:track:')) {
+    const trackId = extractTrackId(spotifyUri)
+    if (!trackId) {
       return null
     }
 
-    const trackId = spotifyUri.replace('spotify:track:', '')
     const trackData = await fetchTrack(trackId, accessToken) as SpotifyTrackResponse
     const trackInfo = formatTrackResponse(trackData)
 
@@ -150,8 +164,11 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   try {
     const response = await fetch(url, options)
     if (!response.ok) {
+      // Log the upstream body for debugging, but never forward it to the
+      // browser: provider errors can contain account and quota details.
       const text = await response.text()
-      const error: ErrorWithStatus = new Error(`${response.statusText}: ${text}`)
+      console.error(`Upstream request to ${url} failed (${response.status}): ${text.slice(0, 500)}`)
+      const error: ErrorWithStatus = new Error(`Upstream request failed (${response.status})`)
       error.status = response.status
       throw error
     }
@@ -177,8 +194,10 @@ export function handleApiSuccess(res: VercelResponse, data: unknown): VercelResp
  * Extracts status code from error if available, defaults to 500
  */
 export function handleApiError(res: VercelResponse, error: unknown, context: string): VercelResponse {
-  const status = (error && typeof error === 'object' && 'status' in error) 
-    ? (error as ErrorWithStatus).status ?? 500 
+  const status = (error && typeof error === 'object')
+    ? (error as ErrorWithStatus & {httpCode?: number}).status
+      ?? (error as {httpCode?: number}).httpCode
+      ?? 500
     : 500
   return res.status(status).json({
     error: `${context}: ${error instanceof Error ? error.message : 'Unknown error'}`,

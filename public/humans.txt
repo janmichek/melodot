@@ -1,0 +1,9 @@
+/* TEAM */
+Donalyze — music discovery and direct artist tipping on Polkadot.
+Site: https://donalyze.vercel.app
+GitHub: https://github.com/janmichek/melodot
+
+/* SITE */
+Standards: HTML5, CSS3, TypeScript
+Components: React 19, Vite, Wagmi, Viem, Web3Auth
+Contracts: Solidity 0.8.24, Foundry, OpenZeppelin

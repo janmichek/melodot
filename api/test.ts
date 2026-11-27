@@ -751,12 +751,33 @@ async function testVerifyMissingArtistId() {
   }
 }
 
-async function testVerifyValidArtistId() {
-  log.step("4. Testing GET request with valid artist ID...")
-  const artistId = "6nS5roXSAGhTGr34W6n7Et" // The Killers
+async function testVerifyMissingClaimant() {
+  log.step("4. Testing GET request without claimant address...")
+  const artistId = "6nS5roXSAGhTGr34W6n7Et"
   const response = await fetch(`${VERIFY_API_URL}?artistId=${encodeURIComponent(artistId)}`, {
     method: "GET"
   })
+  const body = await response.text()
+  if (response.status === 400) {
+    log.ok("Correctly returned 400 for missing claimant")
+    console.log(formatBody(body))
+    trackResult("Verify API - Missing Claimant", true)
+    return true
+  }
+  log.fail(`Expected 400, got ${response.status}`)
+  console.log(formatBody(body))
+  trackResult("Verify API - Missing Claimant", false, `Expected 400, got ${response.status}`)
+  return false
+}
+
+async function testVerifyValidArtistId() {
+  log.step("5. Testing GET request with valid artist ID and claimant...")
+  const artistId = "6nS5roXSAGhTGr34W6n7Et" // The Killers
+  const claimant = "0x0000000000000000000000000000000000000001"
+  const response = await fetch(
+    `${VERIFY_API_URL}?artistId=${encodeURIComponent(artistId)}&claimant=${encodeURIComponent(claimant)}`,
+    {method: "GET"}
+  )
   const body = await response.text()
 
   if (response.status === 500) {
@@ -799,6 +820,8 @@ async function runVerifyTests() {
   await testVerifyWrongMethod()
   console.log("")
   await testVerifyMissingArtistId()
+  console.log("")
+  await testVerifyMissingClaimant()
   console.log("")
   await testVerifyValidArtistId()
 }

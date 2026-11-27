@@ -1,5 +1,6 @@
 import type {VercelRequest, VercelResponse} from '@vercel/node'
 import {fetchArtists, fetchSpotifyToken, handleApiError, handleApiSuccess} from '../api.js'
+import {isValidSpotifyId} from '../utils.js'
 import type {ArtistsMap, SpotifyArtistResponse} from '../../types'
 
 /**
@@ -24,9 +25,17 @@ export default async function handler(
     return res.status(400).json({error: 'Artist IDs are required (comma-separated)'})
   }
 
+  const artistIds = ids.split(',').map((id) => id.trim()).filter(Boolean)
+  if (artistIds.length === 0 || artistIds.length > 50) {
+    return res.status(400).json({error: 'Provide between 1 and 50 artist IDs'})
+  }
+  if (artistIds.some((id) => !isValidSpotifyId(id))) {
+    return res.status(400).json({error: 'Invalid Spotify artist ID format'})
+  }
+
   try {
     const accessToken = await fetchSpotifyToken()
-    const artistsData = await fetchArtists(ids, accessToken) as { artists: (SpotifyArtistResponse | null)[] }
+    const artistsData = await fetchArtists(artistIds.join(','), accessToken) as { artists: (SpotifyArtistResponse | null)[] }
 
     // Return formatted artist info map
     // Create a map for easy lookup: { artistId: { id, name, ... } }

@@ -14,6 +14,7 @@ export interface ErrorWithStatus extends Error {
 // API types
 export interface TokenResponse {
   access_token: string;
+  expires_in?: number;
 }
 
 export interface BioResponse {
@@ -48,6 +49,8 @@ export interface TrackInfoResponse {
 
 export interface VerifyResponse {
   verified: boolean;
+  signature?: `0x${string}`;
+  deadline?: number;
 }
 
 // Spotify API types
@@ -86,6 +89,15 @@ export interface DiscoveryResult {
       coverart?: string;
     };
     hub?: {
+      // Shazam returns Spotify/Apple actions under `providers`; older payloads
+      // used `actions` directly, so support both shapes.
+      providers?: Array<{
+        type: string;
+        actions?: Array<{
+          type: string;
+          uri?: string;
+        }>;
+      }>;
       actions?: Array<{
         type: string;
         uri?: string;

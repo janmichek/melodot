@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-and-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - run: bun run lint
+      - run: bun run build
+      - run: bun run test:coverage
+
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Start the dev server
+        run: |
+          bun run dev > /tmp/donalyze-dev.log 2>&1 &
+          echo $! > /tmp/donalyze-dev.pid
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:5173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/donalyze-dev.log
+          exit 1
+      - run: bun run test:api
+
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: foundry-rs/foundry-toolchain@v1
+      - run: cd contracts && bun run install:libs
+      - run: bun run test:contract:ci
+      - name: Foundry coverage must stay at 100%
+        run: |
+          cd contracts
+          forge coverage --report summary | tee /tmp/coverage.txt
+          grep -q "100.00%" /tmp/coverage.txt
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install slither-analyzer
+      - run: bun run slither
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
+      - run: PLAYWRIGHT_CPU_THROTTLE=85 bun run test:e2e

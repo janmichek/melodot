@@ -28,7 +28,7 @@ test.describe('Error Handling and Edge Cases', () => {
     await walletPage.verifyWalletDisconnected();
 
     const buttonText = await walletPage.connectButton.textContent();
-    expect(buttonText).toContain('Sign In');
+    expect(buttonText?.toLowerCase()).toContain('sign in');
   });
 
   test('should handle network errors in donation form', async ({ donationPage }) => {
@@ -144,8 +144,8 @@ test.describe('Error Handling and Edge Cases', () => {
     await page.reload();
     await page.waitForLoadState('networkidle');
 
-    // Page should reload correctly
-    const signInButton = page.locator('button:has-text("Sign In")');
-    await expect(signInButton).toBeVisible({ timeout: 10000 });
+    // Page should reload correctly; Web3Auth may take a few seconds to settle.
+    const signInButton = page.getByRole('button', {name: /sign in/i}).first();
+    await expect(signInButton).toBeVisible({timeout: 30000});
   });
 });

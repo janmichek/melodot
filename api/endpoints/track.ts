@@ -29,9 +29,13 @@ export default async function handler(
   try {
     const accessToken = await fetchSpotifyToken()
 
-    // Handle search queries
+    // Handle search queries. `req.query` is already URL-decoded by Vercel, so
+    // decoding again would turn a literal "%" into a URIError.
     if (uri.startsWith('spotify:search:')) {
-      const searchQuery = decodeURIComponent(uri.replace('spotify:search:', ''))
+      const searchQuery = uri.slice('spotify:search:'.length).trim()
+      if (!searchQuery || searchQuery.length > 200) {
+        return res.status(400).json({error: 'Search query must be between 1 and 200 characters'})
+      }
       const searchData = await fetchSpotifySearch(searchQuery, accessToken) as SpotifySearchResponse
       const trackData = searchData.tracks?.items?.[0]
 
