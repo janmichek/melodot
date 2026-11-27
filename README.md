@@ -11,7 +11,7 @@ authorisation, and withdraw directly.
 - Frontend: React 19, TypeScript, Vite 8, Wagmi, Viem, Tailwind CSS 4
 - Auth: Web3Auth Modal
 - API: Vercel serverless functions (Bun-compatible)
-- Contracts: Solidity 0.8.24, Foundry, OpenZeppelin
+- Contracts: Solidity 0.8.28, Foundry, OpenZeppelin
 - Tests: Vitest, Playwright, Foundry (unit, fuzz, invariant)
 - Tooling: Bun, ESLint, Slither, Lighthouse CI, GitHub Actions
 
@@ -58,11 +58,12 @@ VITE_WEB3AUTH_CLIENT_ID=
 RAPIDAPI_KEY=
 SPOTIFY_CLIENT_ID=
 SPOTIFY_CLIENT_SECRET=
-VITE_VERIFICATION_CODE=
 
 VITE_CONTRACT_ADDRESS=
 CLAIM_SIGNER_PRIVATE_KEY=
 CLAIM_CONTRACT_ADDRESS=
+VERIFICATION_SECRET=
+APP_ORIGINS=https://donalyze.vercel.app
 ```
 
 `CLAIM_SIGNER_PRIVATE_KEY` must correspond to the on-chain `CLAIM_SIGNER`; `CLAIM_CONTRACT_ADDRESS`
@@ -124,6 +125,9 @@ Donation flow:
 4. `settleDonations` moves the balance to `pendingWithdrawals`.
 5. `withdraw` pays PAS to the chosen recipient.
 
+The owner can pause donations, claims and settlements in an emergency. `withdraw` remains open so
+users can always exit.
+
 Slither runs with `contracts/slither.config.json` and must stay clean for first-party code. Foundry
 coverage is enforced at 100% in CI.
 
@@ -142,6 +146,7 @@ copies the address into `contracts/deployments/polkadotHubTestnet.json`, and reg
 
 - `/robots.txt`, `/sitemap.xml`, `/llms.txt`, `/humans.txt`
 - `/.well-known/security.txt`, `/.well-known/agent.json`
+- Server-only `VERIFICATION_SECRET` and one-time challenges; the RPC proxy allows only Donalyze origins
 - Open Graph, Twitter cards, canonical URLs, and `WebApplication` + `FAQPage` JSON-LD in `index.html`
 - Per-route title/description/canonical via `usePageMeta`
 

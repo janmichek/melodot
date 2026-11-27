@@ -16,7 +16,7 @@ _Comprehensive instructions for AI agents helping develop Donalyze_
 ## Tech Stack
 
 ### Core Technologies
-- **Smart Contracts**: Solidity 0.8.24, Foundry (Forge), Polkadot Hub TestNet
+- **Smart Contracts**: Solidity 0.8.28, Foundry (Forge), Polkadot Hub TestNet
 - **Frontend**: React 19, TypeScript, Vite
 - **Web3**: Wagmi, Viem, Web3Auth Modal
 - **Styling**: TailwindCSS 4, Radix UI, Lucide icons
@@ -116,7 +116,7 @@ out = "out"
 libs = ["lib"]
 test = "test"
 script = "script"
-solc = "0.8.24"
+solc = "0.8.28"
 optimizer = true
 optimizer_runs = 200
 
@@ -200,8 +200,9 @@ forge script script/Deploy.s.sol:Deploy --rpc-url polkadotHubTestnet --broadcast
 
 **Contract Features:**
 - Artist donation tracking by ID (Spotify artist ID)
-- Platform fee: 1% default (100 basis points, configurable up to 10_000)
+- Platform fee: 1% default (100 basis points, configurable up to 2,000 (20%))
 - EIP-712 signed artist claims with a deadline
+- Pausable emergency shutdown; withdrawals stay open
 - Pull-payment withdrawals for artists, platform fees, and the owner
 
 **Key Functions:**
@@ -224,6 +225,8 @@ withdraw(address recipient) external nonReentrant
 // Owner-only administration
 setPlatformFeeInfo(address recipient, uint256 feeBps) external onlyOwner
 setClaimSigner(address claimSigner) external onlyOwner
+pause() external onlyOwner
+unpause() external onlyOwner
 
 // View functions
 getArtistInfo(string calldata artistId) external view
@@ -438,7 +441,7 @@ const response = await fetch('/api/verify?artistId=ARTIST_ID');
 }
 ```
 
-**Requires**: `RAPIDAPI_KEY`, `VITE_VERIFICATION_CODE`
+**Requires**: `RAPIDAPI_KEY`, `VERIFICATION_SECRET`
 
 ## Environment Variables
 
@@ -457,10 +460,10 @@ PRIVATE_KEY=                    # Optional; prefer a Foundry keystore
 ### Optional (for music APIs)
 
 ```bash
-VITE_RAPIDAPI_KEY=             # RapidAPI key for Shazam/Spotify scraper
+RAPIDAPI_KEY=             # RapidAPI key for Shazam/Spotify scraper
 SPOTIFY_CLIENT_ID=             # Spotify API client ID
 SPOTIFY_CLIENT_SECRET=         # Spotify API client secret
-VITE_VERIFICATION_CODE=        # Code artists must include in bio to verify
+VERIFICATION_SECRET=        # Server-only HMAC secret for one-time challenges
 ```
 
 ## Deployment
@@ -588,7 +591,8 @@ bun run generate
 - **Use type-safe patterns** - Create type guards for contract data instead of `as` casts
 
 ### API Security
-- **Add CORS headers** - Restrict API access to your domain
+- **Add CORS headers** - Restrict API access to your domain; the RPC proxy allows only Donalyze origins
+- **Rate limit endpoints** - Per-instance burst guards are in `api/rateLimit.ts`; use Vercel WAF/Upstash for a hard global quota
 - **Implement rate limiting** - Prevent API abuse and quota exhaustion
 - **Validate all inputs** - Check format, length, and type of all parameters
 - **Don't expose internal errors** - Log server-side, return generic messages to clients
@@ -619,7 +623,7 @@ bun run generate
 
 ### Contract Development
 
-- **Solidity Version**: 0.8.24
+- **Solidity Version**: 0.8.28
 - **Formatting**: `forge fmt` (120 char lines, 4-space tabs)
 - **Gas Optimization**: Use custom errors instead of require strings
 - **Security**: Follow checks-effects-interactions pattern

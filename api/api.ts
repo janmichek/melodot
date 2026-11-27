@@ -210,7 +210,7 @@ export function handleApiError(res: VercelResponse, error: unknown, context: str
  * Throws error if not configured
  */
 function getRapidApiKey(): string {
-  const apiKey = process.env.RAPIDAPI_KEY || process.env.VITE_RAPIDAPI_KEY
+  const apiKey = process.env.RAPIDAPI_KEY
   if (!apiKey) {
     throw new Error('RapidAPI key not configured')
   }

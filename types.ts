@@ -51,6 +51,9 @@ export interface VerifyResponse {
   verified: boolean;
   signature?: `0x${string}`;
   deadline?: number;
+  challenge?: string;
+  token?: string;
+  expiresAt?: number;
 }
 
 // Spotify API types

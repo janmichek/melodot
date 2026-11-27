@@ -46,6 +46,24 @@ const ALLOWED_METHODS = new Set([
   'eth_getTransactionReceipt',
 ])
 
+import {rateLimit} from '../rateLimit.js'
+
+const DEFAULT_ALLOWED_ORIGINS = ['https://donalyze.vercel.app']
+const ALLOWED_ORIGINS = new Set([
+  ...DEFAULT_ALLOWED_ORIGINS,
+  ...(process.env.APP_ORIGINS ?? process.env.APP_ORIGIN ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+])
+
+function isAllowedOrigin(origin: string): boolean {
+  if (ALLOWED_ORIGINS.has(origin)) {return true}
+  if (/^http:\/\/(localhost|127\.0\.0\.1):(3000|5173)$/.test(origin)) {return true}
+  // Vercel preview deployments for this project.
+  return /^https:\/\/melodot-[a-z0-9-]+-jan-micheks-projects\.vercel\.app$/.test(origin)
+}
+
 const UPSTREAM_TIMEOUT_MS = 15_000
 const MAX_BODY_BYTES = 1_000_000
 
@@ -92,12 +110,14 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<VercelResponse> {
-  // The app calls this proxy same-origin. Do not advertise a wildcard CORS
-  // policy: it turns the endpoint into a free relay for any website. If a
-  // separate frontend origin is ever needed, set APP_ORIGIN explicitly.
-  const allowedOrigin = process.env.APP_ORIGIN
-  if (allowedOrigin && req.headers.origin === allowedOrigin) {
-    res.setHeader('Access-Control-Allow-Origin', allowedOrigin)
+  // The proxy is for the Donalyze frontend only. CORS is a browser boundary,
+  // not authentication, but it stops arbitrary sites using the relay.
+  const origin = req.headers.origin
+  if (origin && !isAllowedOrigin(origin)) {
+    return res.status(403).json({error: 'Origin not allowed'})
+  }
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
     res.setHeader('Vary', 'Origin')
   }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -109,6 +129,9 @@ export default async function handler(
 
   if (req.method !== 'POST') {
     return res.status(405).json({error: 'Method not allowed'})
+  }
+  if (!rateLimit(req, res, {key: 'rpc', limit: 120, windowMs: 60_000})) {
+    return res
   }
 
   try {

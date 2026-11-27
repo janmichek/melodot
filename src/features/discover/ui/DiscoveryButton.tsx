@@ -1,4 +1,3 @@
-import {clsx} from "clsx"
 import {Button} from "@/shared/ui/button"
 import type {AudioControlsProps} from "@types"
 import {Logo} from "@/shared/ui/logo"
@@ -26,6 +25,8 @@ export default function DiscoveryButton({
         <Button
           onClick={handleClick}
           aria-label={isProcessing ? "Stop recording" : "Start recording with Donalyze"}
+          data-recording={isRecording}
+          data-discovering={isDiscovering}
           className="audio-player-button">
           {isProcessing && (
             <>
@@ -34,11 +35,8 @@ export default function DiscoveryButton({
               <div className="audio-player-recording-pulse-3"></div>
             </>
           )}
-          <div className={clsx(
-            "audio-player-button-inner",
-            isProcessing ? "audio-player-recording-bg" : "audio-player-start-bg"
-          )}>
-            {/* Show spinner while recording or recognizing; keep button actionable to stop */}
+          <div className="audio-player-button-inner">
+            <span className="audio-player-grooves" aria-hidden="true" />
             <Logo className="audio-player-icon" animated={isProcessing} />
           </div>
         </Button>

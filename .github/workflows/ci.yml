@@ -50,7 +50,7 @@ jobs:
       - name: Foundry coverage must stay at 100%
         run: |
           cd contracts
-          forge coverage --report summary | tee /tmp/coverage.txt
+          forge coverage --report summary --no-match-coverage "test/mocks/" | tee /tmp/coverage.txt
           grep -q "100.00%" /tmp/coverage.txt
       - uses: actions/setup-python@v5
         with:

@@ -6,7 +6,7 @@
     "test": "forge test",
     "test:ci": "forge test --profile ci -vvv",
     "test:gas": "forge test --gas-report",
-    "coverage": "forge coverage",
+    "coverage": "forge coverage --report summary --no-match-coverage \"test/mocks/\"",
     "build": "forge build --sizes",
     "fmt": "forge fmt",
     "fmt:check": "forge fmt --check",

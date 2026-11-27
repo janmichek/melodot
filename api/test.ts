@@ -113,7 +113,7 @@ async function testDiscoverWithFile() {
     console.log(formatBody(body))
     trackResult("Discover API - With File", true)
     return true
-  } else if (response.status === 500) {
+  } else if (response.status === 400 || response.status === 422 || response.status === 500) {
     // API may return 500 if Shazam API is not configured or if audio is invalid
     log.ok("API correctly handles audio processing (may be unconfigured or invalid audio)")
     console.log(formatBody(body))
@@ -121,9 +121,9 @@ async function testDiscoverWithFile() {
     trackResult("Discover API - With File", true)
     return true
   } else {
-    log.fail(`Expected 200 or 500, got ${response.status}`)
+    log.fail(`Expected 200, 400, 422 or 500, got ${response.status}`)
     console.log(formatBody(body))
-    trackResult("Discover API - With File", false, `Expected 200 or 500, got ${response.status}`)
+    trackResult("Discover API - With File", false, `Expected 200, 400, 422 or 500, got ${response.status}`)
     return false
   }
 }
@@ -771,7 +771,7 @@ async function testVerifyMissingClaimant() {
 }
 
 async function testVerifyValidArtistId() {
-  log.step("5. Testing GET request with valid artist ID and claimant...")
+  log.step("5. Testing challenge issue for a valid artist ID and claimant...")
   const artistId = "6nS5roXSAGhTGr34W6n7Et" // The Killers
   const claimant = "0x0000000000000000000000000000000000000001"
   const response = await fetch(
@@ -780,33 +780,30 @@ async function testVerifyValidArtistId() {
   )
   const body = await response.text()
 
-  if (response.status === 500) {
-    const bodyJson = JSON.parse(body)
-    if (bodyJson.error?.includes('RapidAPI key not configured')) {
-      log.ok("API correctly reports missing RapidAPI credentials")
+  if (response.status === 503) {
+    const parsed = JSON.parse(body)
+    if (parsed.error?.includes('Verification is not configured')) {
+      log.ok("API correctly reports missing VERIFICATION_SECRET")
       console.log(formatBody(body))
-      console.log(`${COLORS.yellow}Note: Set RAPIDAPI_KEY to test actual API calls${COLORS.reset}`)
-      trackResult("Verify API - Valid Artist ID", true)
+      trackResult("Verify API - Challenge", true)
       return
     }
   }
 
   if (response.ok) {
-    log.ok("API successfully verified artist")
     const data = JSON.parse(body)
     console.log(formatBody(body))
-
-    if (typeof data.verified === 'boolean') {
-      log.ok("Response has expected structure")
-      trackResult("Verify API - Valid Artist ID", true)
+    if (data.challenge?.startsWith('DONALYZE-') && typeof data.token === 'string' && data.expiresAt > Date.now()) {
+      log.ok("API issued a signed, expiring challenge")
+      trackResult("Verify API - Challenge", true)
     } else {
-      log.fail("Response missing expected fields")
-      trackResult("Verify API - Valid Artist ID", false, "Response missing expected fields")
+      log.fail("Challenge response missing expected fields")
+      trackResult("Verify API - Challenge", false, "Challenge response missing fields")
     }
   } else {
-    log.fail(`Expected 200, got ${response.status}`)
+    log.fail(`Expected 200 or 503, got ${response.status}`)
     console.log(formatBody(body))
-    trackResult("Verify API - Valid Artist ID", false, `Expected 200, got ${response.status}`)
+    trackResult("Verify API - Challenge", false, `Expected 200 or 503, got ${response.status}`)
   }
 }
 

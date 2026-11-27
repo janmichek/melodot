@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.24;
+pragma solidity 0.8.28;
 
 import { Test } from "forge-std/Test.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 import { Donate } from "../src/Donate.sol";
 import { ReenterWithdraw } from "./mocks/ReenterWithdraw.sol";
 import { RevertOnReceive } from "./mocks/RevertOnReceive.sol";
@@ -37,6 +38,8 @@ contract DonateTest is Test {
     );
 
     event ClaimSignerUpdated(address indexed oldSigner, address indexed newSigner);
+
+    event Paused(address account);
 
     function setUp() public {
         owner = makeAddr("owner");
@@ -519,6 +522,13 @@ contract DonateTest is Test {
         assertGt(donate.pendingWithdrawals(address(attackerContract)), 0);
     }
 
+    function test_revertOnReceive_rejectsEther() public {
+        RevertOnReceive sink = new RevertOnReceive();
+        vm.deal(address(this), 1);
+        (bool success,) = address(sink).call{ value: 1 }("");
+        assertFalse(success);
+    }
+
     function test_withdraw_revertingRecipient_doesNotBrickOtherUsers() public {
         RevertOnReceive badSink = new RevertOnReceive();
 
@@ -591,20 +601,20 @@ contract DonateTest is Test {
 
     function test_setPlatformFeeInfo_feeBpsOverMax_revertsFeeBpsTooHigh() public {
         vm.prank(owner);
-        vm.expectRevert(abi.encodeWithSelector(Donate.FeeBpsTooHigh.selector, 10_000, 10_001));
-        donate.setPlatformFeeInfo(owner, 10_001);
+        vm.expectRevert(abi.encodeWithSelector(Donate.FeeBpsTooHigh.selector, 2000, 2001));
+        donate.setPlatformFeeInfo(owner, 2001);
     }
 
     function test_setPlatformFeeInfo_maxBps_succeeds() public {
         vm.prank(owner);
-        donate.setPlatformFeeInfo(owner, 10_000);
+        donate.setPlatformFeeInfo(owner, 2000);
         (, uint16 feeBps) = donate.getPlatformFeeInfo();
-        assertEq(feeBps, 10_000);
+        assertEq(feeBps, 2000);
 
         _donate(alice, ARTIST_A, 1 ether);
         (uint256 artistBalance,) = donate.getArtistInfo(ARTIST_A);
-        assertEq(artistBalance, 0);
-        assertEq(donate.getPlatformFeeBalance(), 1 ether);
+        assertEq(artistBalance, 0.8 ether);
+        assertEq(donate.getPlatformFeeBalance(), 0.2 ether);
     }
 
     function test_setPlatformFeeInfo_zeroBps_creditsArtistInFull() public {
@@ -614,6 +624,81 @@ contract DonateTest is Test {
         (uint256 artistBalance,) = donate.getArtistInfo(ARTIST_A);
         assertEq(artistBalance, 1 ether);
         assertEq(donate.getPlatformFeeBalance(), 0);
+    }
+
+    // -------------------------------------------------------------------------
+    // Pausable
+    // -------------------------------------------------------------------------
+
+    function test_pause_owner_blocksDonationsAndEmits() public {
+        vm.expectEmit(false, false, false, true, address(donate));
+        emit Paused(owner);
+        vm.prank(owner);
+        donate.pause();
+        assertTrue(donate.paused());
+
+        vm.prank(alice);
+        vm.expectRevert(Pausable.EnforcedPause.selector);
+        donate.donateToArtist{ value: 1 ether }(ARTIST_A);
+    }
+
+    function test_pause_callerNotOwner_reverts() public {
+        vm.prank(attacker);
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, attacker));
+        donate.pause();
+    }
+
+    function test_unpause_owner_restoresDonations() public {
+        vm.prank(owner);
+        donate.pause();
+        vm.prank(owner);
+        donate.unpause();
+        assertFalse(donate.paused());
+
+        _donate(alice, ARTIST_A, 1 ether);
+        (uint256 balance,) = donate.getArtistInfo(ARTIST_A);
+        assertGt(balance, 0);
+    }
+
+    function test_pause_blocksClaims() public {
+        vm.prank(owner);
+        donate.pause();
+        vm.prank(alice);
+        vm.expectRevert(Pausable.EnforcedPause.selector);
+        donate.claimArtist(ARTIST_A, block.timestamp + 1 hours, "");
+    }
+
+    function test_pause_blocksSettles() public {
+        _donate(alice, ARTIST_A, 1 ether);
+        _claimAs(bob, ARTIST_A);
+        vm.prank(owner);
+        donate.pause();
+        vm.prank(bob);
+        vm.expectRevert(Pausable.EnforcedPause.selector);
+        donate.settleDonations(ARTIST_A);
+    }
+
+    function test_pause_blocksPlatformFeeSettlement() public {
+        _donate(alice, ARTIST_A, 1 ether);
+        vm.prank(owner);
+        donate.pause();
+        vm.prank(owner);
+        vm.expectRevert(Pausable.EnforcedPause.selector);
+        donate.settlePlatformFees();
+    }
+
+    function test_pause_allowsWithdrawals() public {
+        _donate(alice, ARTIST_A, 1 ether);
+        _claimAs(bob, ARTIST_A);
+        _settleAs(bob, ARTIST_A);
+        vm.prank(owner);
+        donate.pause();
+
+        uint256 before = bob.balance;
+        uint256 pending = donate.pendingWithdrawals(bob);
+        vm.prank(bob);
+        donate.withdraw(bob);
+        assertEq(bob.balance, before + pending);
     }
 
     // -------------------------------------------------------------------------

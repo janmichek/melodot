@@ -23,21 +23,6 @@ function ConfigBanner() {
   )
 }
 
-function Marquee() {
-  return (
-    <div className="marquee" aria-hidden="true">
-      <div className="marquee__track">
-        <span>No middlemen</span> · Direct to artists · <span>1% platform fee</span> · Polkadot Hub
-        TestNet · <span>Hear it. Tip it. On-chain.</span> · Built for the moment the song hits ·
-      </div>
-      <div className="marquee__track">
-        <span>No middlemen</span> · Direct to artists · <span>1% platform fee</span> · Polkadot Hub
-        TestNet · <span>Hear it. Tip it. On-chain.</span> · Built for the moment the song hits ·
-      </div>
-    </div>
-  )
-}
-
 function AppFooter() {
   return (
     <footer className="mt-32 border-t border-border/70 pt-8 pb-4">
@@ -89,7 +74,6 @@ function App() {
           </a>
           <AppHeader />
           <ConfigBanner />
-          <Marquee />
           <div id="main" className="app-main">
             <Routes>
               <Route path="/" element={<Discover />} />

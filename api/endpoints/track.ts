@@ -2,6 +2,7 @@ import type {VercelRequest, VercelResponse} from '@vercel/node'
 import {fetchSpotifySearch, fetchSpotifyToken, fetchTrack, handleApiError, handleApiSuccess} from '../api.js'
 import type {SpotifySearchResponse, SpotifyTrackResponse} from '../../types'
 import {extractTrackId, formatTrackResponse} from '../utils.js'
+import {rateLimit} from '../rateLimit.js'
 
 /**
  * Fetches track information from Spotify API
@@ -18,6 +19,9 @@ export default async function handler(
 ): Promise<VercelResponse> {
   if (req.method !== 'GET') {
     return res.status(405).json({error: 'Method not allowed'})
+  }
+  if (!rateLimit(req, res, {key: 'track', limit: 60, windowMs: 60_000})) {
+    return res
   }
 
   const {uri} = req.query

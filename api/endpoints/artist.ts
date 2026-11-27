@@ -2,6 +2,7 @@ import type {VercelRequest, VercelResponse} from '@vercel/node'
 import {fetchArtist, fetchSpotifyToken, handleApiError, handleApiSuccess} from '../api.js'
 import type {SpotifyArtistResponse} from '../../types'
 import {extractArtistId} from '../utils.js'
+import {rateLimit} from '../rateLimit.js'
 
 /**
  * Fetches artist information from Spotify API
@@ -15,6 +16,9 @@ export default async function handler(
 ): Promise<VercelResponse> {
   if (req.method !== 'GET') {
     return res.status(405).json({error: 'Method not allowed'})
+  }
+  if (!rateLimit(req, res, {key: 'artist', limit: 60, windowMs: 60_000})) {
+    return res
   }
 
   const {artistUrl} = req.query

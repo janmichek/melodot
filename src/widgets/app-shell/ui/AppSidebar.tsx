@@ -22,11 +22,11 @@ import {Logo} from "@/shared/ui/logo"
 import {donateConfig, passetHub} from "@/shared/config"
 
 const NAV = [
-  {title: "Discover", url: "/", icon: Mic, number: "01"},
-  {title: "Donations", url: "/donations", icon: List, number: "02"},
-  {title: "Claim", url: "/claim", icon: Coins, number: "03"},
-  {title: "Statistics", url: "/statistics", icon: ChartBarIcon, number: "04"},
-  {title: "About", url: "/about", icon: Info, number: "05"},
+  {title: "Discover", url: "/", icon: Mic},
+  {title: "Donations", url: "/donations", icon: List},
+  {title: "Claim", url: "/claim", icon: Coins},
+  {title: "Statistics", url: "/statistics", icon: ChartBarIcon},
+  {title: "About", url: "/about", icon: Info},
 ] as const
 
 export function AppSidebar() {
@@ -75,7 +75,7 @@ export function AppSidebar() {
   const menuItems = useMemo(
     () =>
       isOwner
-        ? [...NAV, {title: "Owner", url: "/owner", icon: Wallet, number: "06"}]
+        ? [...NAV, {title: "Owner", url: "/owner", icon: Wallet}]
         : NAV,
     [isOwner],
   )
@@ -87,7 +87,6 @@ export function AppSidebar() {
           <Logo size="md" className="brand-lockup__mark" />
           <span className="brand-lockup__word">Donalyze</span>
         </Link>
-        <p className="site-index__label mt-2">Index / 2026</p>
       </SidebarHeader>
 
       <SidebarContent className="gap-0 px-4">
@@ -125,7 +124,6 @@ export function AppSidebar() {
         <Separator className="my-2 opacity-60" />
 
         <nav aria-label="Primary" className="py-2">
-          <p className="site-index__label mb-3">Navigate</p>
           <ul>
             {menuItems.map((item) => (
               <li key={item.title}>
@@ -134,7 +132,7 @@ export function AppSidebar() {
                   className="site-index__link"
                   data-active={location.pathname === item.url}>
                   <span>{item.title}</span>
-                  <span className="site-index__number">{item.number}</span>
+                  <item.icon className="h-4 w-4 opacity-50" />
                 </Link>
               </li>
             ))}
@@ -143,13 +141,8 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="site-index__footer px-4 py-5">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="site-index__label">Network</p>
-            <p className="mt-1 text-xs text-foreground/80">Polkadot Hub TestNet</p>
-          </div>
-          <span className="font-mono text-[10px] text-muted-foreground">v1.0</span>
-        </div>
+        <p className="site-index__label">Built on</p>
+        <p className="mt-1 text-xs text-foreground/80">Polkadot Hub TestNet</p>
       </SidebarFooter>
     </Sidebar>
   )

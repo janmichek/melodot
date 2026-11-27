@@ -4,6 +4,7 @@ import formidable from 'formidable'
 import fs from 'fs'
 import {fetchDiscovery, fetchSpotifyToken, fetchTrackFromUri, handleApiError, handleApiSuccess} from '../api.js'
 import {cleanupFile} from '../utils.js'
+import {rateLimit} from '../rateLimit.js'
 
 export default async function handler(
   req: VercelRequest,
@@ -11,6 +12,9 @@ export default async function handler(
 ): Promise<VercelResponse> {
   if (req.method !== 'POST') {
     return res.status(405).json({error: 'Method not allowed'})
+  }
+  if (!rateLimit(req, res, {key: 'discover', limit: 10, windowMs: 60_000})) {
+    return res
   }
 
   try {

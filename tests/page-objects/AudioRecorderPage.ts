@@ -15,10 +15,10 @@ export class AudioRecorderPage extends BasePage {
   constructor(page: Page) {
     super(page)
     this.recorderContainer = page.locator('.shazam-container')
-    // Record button: button with start-bg class (not recording)
-    this.recordButton = page.locator('button.audio-player-button:has(.audio-player-start-bg)').first()
-    // Stop button: same button but with recording-bg class (when recording)
-    this.stopButton = page.locator('button.audio-player-button:has(.audio-player-recording-bg)').first()
+    // Record button: data-recording is the stable state flag
+    this.recordButton = page.locator('button.audio-player-button:not([data-recording="true"])').first()
+    // Stop button: the same control while recording
+    this.stopButton = page.locator('button.audio-player-button[data-recording="true"]').first()
     this.recordingIndicator = page.locator('.audio-player-recording-pulse').first()
     this.analyzingText = page.locator('text=/analyzing|processing|identifying/i')
     this.discoveryCard = page.locator('.discovery-card, [class*="discovery"]')
@@ -67,8 +67,8 @@ export class AudioRecorderPage extends BasePage {
     const indicatorVisible = await this.isElementVisible(this.recordingIndicator, 3000)
     if (indicatorVisible) {return true}
 
-    // Also check if the button has recording state (recording-bg class)
-    const recordingButton = this.page.locator('button.audio-player-button:has(.audio-player-recording-bg)').first()
+    // Also check the stable data-recording state
+    const recordingButton = this.page.locator('button.audio-player-button[data-recording="true"]').first()
     const stopVisible = await this.isElementVisible(recordingButton, 3000)
     return stopVisible
   }

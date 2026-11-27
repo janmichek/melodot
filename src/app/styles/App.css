@@ -191,21 +191,37 @@ code {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: min(62vw, 52vh, 300px);
-  height: min(62vw, 52vh, 300px);
+  width: min(58vw, 46vh, 300px);
+  height: min(58vw, 46vh, 300px);
+}
+
+.audio-player-button-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(215, 255, 95, 0.1), transparent 66%);
+  opacity: 0.55;
+  transition: opacity 400ms ease;
+  pointer-events: none;
+}
+
+.audio-player-button-wrapper:has(.audio-player-button[data-recording="true"])::before {
+  opacity: 1;
+  animation: record-halo 2.8s ease-in-out infinite;
 }
 
 @media (min-width: 640px) {
   .audio-player-button-wrapper {
-    width: min(46vw, 46vh, 340px);
-    height: min(46vw, 46vh, 340px);
+    width: min(44vw, 44vh, 340px);
+    height: min(44vw, 44vh, 340px);
   }
 }
 
 @media (min-width: 1024px) {
   .audio-player-button-wrapper {
-    width: min(32vw, 38vh, 350px);
-    height: min(32vw, 38vh, 350px);
+    width: min(30vw, 36vh, 350px);
+    height: min(30vw, 36vh, 350px);
   }
 }
 
@@ -220,11 +236,11 @@ code {
   border-radius: 9999px;
   background: transparent;
   padding: 0;
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .audio-player-button:hover {
-  transform: translate(-50%, -50%) scale(1.025);
+  transform: translate(-50%, -50%) scale(1.02);
 }
 
 .audio-player-button:active {
@@ -241,14 +257,23 @@ code {
   border-radius: 9999px;
   overflow: hidden;
   border: 1px solid rgba(244, 238, 227, 0.16);
-  background:
-    radial-gradient(circle at 50% 50%, rgba(215, 255, 95, 0.98) 0 17%, transparent 17.5%),
-    repeating-radial-gradient(circle at 50% 50%, rgba(244, 238, 227, 0.18) 0 1px, transparent 1px 6px),
-    conic-gradient(from 200deg, #1a1712, #0c0b09 28%, #201b15 52%, #0b0a08 78%, #1a1712);
+  background: radial-gradient(circle at 50% 50%, var(--acid) 0 17%, #0b0a08 17.5%);
   box-shadow:
     inset 0 0 0 1px rgba(244, 238, 227, 0.08),
     0 30px 70px rgba(0, 0, 0, 0.6);
-  transition: background 0.4s ease, box-shadow 0.4s ease;
+  animation: record-breathe 5s ease-in-out infinite;
+  transition: box-shadow 400ms ease;
+  will-change: transform;
+}
+
+.audio-player-grooves {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle at 50% 50%, var(--acid) 0 17%, transparent 17.5%),
+    repeating-radial-gradient(circle at 50% 50%, rgba(244, 238, 227, 0.18) 0 1px, transparent 1px 6px),
+    conic-gradient(from 200deg, #1a1712, #0c0b09 28%, #201b15 52%, #0b0a08 78%, #1a1712);
 }
 
 .audio-player-button-inner::before {
@@ -260,31 +285,56 @@ code {
   pointer-events: none;
 }
 
+.audio-player-button-inner::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  border-radius: 9999px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0 62%,
+    rgba(215, 255, 95, 0.18) 76%,
+    rgba(255, 107, 74, 0.14) 86%,
+    transparent 96%
+  );
+  opacity: 0.22;
+  animation: record-sheen 14s linear infinite;
+  transition: opacity 400ms ease;
+  pointer-events: none;
+}
+
 .audio-player-button:hover .audio-player-button-inner {
   box-shadow:
-    inset 0 0 0 1px rgba(244, 238, 227, 0.14),
-    0 36px 90px rgba(0, 0, 0, 0.7),
-    0 0 0 6px rgba(215, 255, 95, 0.06);
+    inset 0 0 0 1px rgba(244, 238, 227, 0.16),
+    0 36px 90px rgba(0, 0, 0, 0.72),
+    0 0 0 8px rgba(215, 255, 95, 0.05);
 }
 
-.audio-player-start-bg,
-.audio-player-recording-bg {
-  background:
-    radial-gradient(circle at 50% 50%, var(--acid) 0 17%, transparent 17.5%),
-    repeating-radial-gradient(circle at 50% 50%, rgba(244, 238, 227, 0.18) 0 1px, transparent 1px 6px),
-    conic-gradient(from 200deg, #1a1712, #0c0b09 28%, #201b15 52%, #0b0a08 78%, #1a1712);
+.audio-player-button[data-recording="true"] .audio-player-button-inner {
+  animation: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(215, 255, 95, 0.28),
+    0 0 0 10px rgba(215, 255, 95, 0.04),
+    0 0 60px rgba(215, 255, 95, 0.12),
+    0 36px 90px rgba(0, 0, 0, 0.72);
 }
 
-.audio-player-recording-bg {
-  animation: spin-disc 3.4s linear infinite;
+.audio-player-button[data-recording="true"] .audio-player-button-inner::after {
+  opacity: 0.8;
+  animation-duration: 3.2s;
 }
 
 .audio-player-icon {
-  width: 22%;
-  height: 22%;
+  width: 20%;
+  height: 20%;
   color: var(--ink);
   position: relative;
   z-index: 2;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+
+.audio-player-button[data-recording="true"] .audio-player-icon {
+  animation: record-label 1.4s ease-in-out infinite;
 }
 
 .audio-player-recording-pulse,
@@ -297,46 +347,80 @@ code {
 }
 
 .audio-player-recording-pulse::before,
-.audio-player-recording-pulse::after,
 .audio-player-recording-pulse-2::before,
 .audio-player-recording-pulse-3::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  border: 2px solid var(--coral);
-  animation: ripple 3s cubic-bezier(0, 0.2, 0.8, 1) infinite;
-  box-shadow: 0 0 24px rgba(255, 107, 74, 0.28);
+  border: 1px solid var(--coral);
+  opacity: 0;
+  transform: scale(0.9);
 }
 
-.audio-player-recording-pulse::after {
-  animation-delay: 1s;
+.audio-player-button[data-recording="true"] .audio-player-recording-pulse::before {
+  animation: record-pulse 2.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
-.audio-player-recording-pulse-2::before {
-  animation-delay: 0.5s;
-  border-color: rgba(255, 107, 74, 0.7);
+.audio-player-button[data-recording="true"] .audio-player-recording-pulse-2::before {
+  animation: record-pulse 2.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s infinite;
+  border-color: rgba(255, 107, 74, 0.65);
 }
 
-.audio-player-recording-pulse-3::before {
-  animation-delay: 1.5s;
-  border-color: rgba(255, 107, 74, 0.45);
+.audio-player-button[data-recording="true"] .audio-player-recording-pulse-3::before {
+  animation: record-pulse 2.8s cubic-bezier(0.16, 1, 0.3, 1) 0.7s infinite;
+  border-color: rgba(215, 255, 95, 0.55);
 }
 
-@keyframes ripple {
+@keyframes record-pulse {
   0% {
-    transform: scale(0.86);
-    opacity: 1;
+    transform: scale(0.92);
+    opacity: 0.85;
+  }
+  55% {
+    opacity: 0.35;
   }
   100% {
-    transform: scale(1.55);
+    transform: scale(1.42);
     opacity: 0;
   }
 }
 
-@keyframes spin-disc {
+@keyframes record-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.018);
+  }
+}
+
+@keyframes record-sheen {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes record-label {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes record-halo {
+  0%,
+  100% {
+    transform: scale(0.96);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.9;
   }
 }
 

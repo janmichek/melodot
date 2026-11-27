@@ -27,8 +27,6 @@ function isArtistInfoTuple(data: unknown): data is [bigint, boolean] {
 }
 
 export function ClaimCard({contractAddress}: ClaimCardProps) {
-  const verificationCode = import.meta.env.VITE_VERIFICATION_CODE as string | undefined
-  
   // Artist identification
   const [artistUrl, setArtistUrl] = useState('')
   const [artistData, setArtistData] = useState<ArtistData | null>(null)
@@ -39,6 +37,9 @@ export function ClaimCard({contractAddress}: ClaimCardProps) {
   const [error, setError] = useState<string | null>(null)
   const [isCodeCopied, setIsCodeCopied] = useState(false)
   const [txHash, setTxHash] = useState<string | undefined>()
+  const [challenge, setChallenge] = useState<{code: string; token: string; expiresAt: number} | null>(null)
+  const [isLoadingChallenge, setIsLoadingChallenge] = useState(false)
+  const [challengeError, setChallengeError] = useState<string | null>(null)
 
   // Parse artist ID from URL
   const parsedArtistId = useMemo(() => parseArtistIdFromUrl(artistUrl), [artistUrl])
@@ -70,6 +71,39 @@ export function ClaimCard({contractAddress}: ClaimCardProps) {
       })
       .finally(() => setIsLoadingArtist(false))
   }, [parsedArtistId, artistUrl])
+
+  // Issue a one-time challenge bound to this artist and claimant. The server
+  // secret never ships in the frontend bundle.
+  useEffect(() => {
+    if (!parsedArtistId || !address) {
+      setChallenge(null)
+      return
+    }
+
+    let cancelled = false
+    setIsLoadingChallenge(true)
+    setChallengeError(null)
+
+    fetch(`/api/verify?artistId=${encodeURIComponent(parsedArtistId)}&claimant=${encodeURIComponent(address)}`)
+      .then(async (res) => {
+        const data = await res.json() as VerifyResponse | {error: string}
+        if (!res.ok || !('challenge' in data) || !data.challenge || !data.token || data.expiresAt === undefined) {
+          throw new Error('error' in data ? data.error : 'Failed to issue a verification challenge')
+        }
+        return {code: data.challenge, token: data.token, expiresAt: data.expiresAt}
+      })
+      .then((value) => {
+        if (!cancelled) {setChallenge(value)}
+      })
+      .catch((err) => {
+        if (!cancelled) {setChallengeError(err instanceof Error ? err.message : 'Verification is unavailable')}
+      })
+      .finally(() => {
+        if (!cancelled) {setIsLoadingChallenge(false)}
+      })
+
+    return () => {cancelled = true}
+  }, [parsedArtistId, address])
 
   // Auto-hide copy confirmation
   useEffect(() => {
@@ -103,12 +137,12 @@ export function ClaimCard({contractAddress}: ClaimCardProps) {
 
   // Handlers
   const handleCopyCode = async () => {
-    if (!verificationCode) {
-      setError('Verification is not configured. Contact the platform operator.')
+    if (!challenge) {
+      setError('Request a verification challenge first.')
       return
     }
     try {
-      await navigator.clipboard.writeText(verificationCode)
+      await navigator.clipboard.writeText(challenge.code)
       setIsCodeCopied(true)
     } catch (err) {
       console.error('Failed to copy:', err)
@@ -120,6 +154,8 @@ export function ClaimCard({contractAddress}: ClaimCardProps) {
     setArtistData(null)
     setError(null)
     setTxHash(undefined)
+    setChallenge(null)
+    setChallengeError(null)
   }
 
   const handleVerify = async (): Promise<{signature: `0x${string}`; deadline: number} | null> => {
@@ -128,8 +164,12 @@ export function ClaimCard({contractAddress}: ClaimCardProps) {
       setError('Connect your wallet before claiming.')
       return null
     }
-    if (!verificationCode) {
-      setError('Verification is not configured. Contact the platform operator.')
+    if (!challenge) {
+      setError('Request a verification challenge before claiming.')
+      return null
+    }
+    if (challenge.expiresAt < Date.now()) {
+      setError('The verification challenge expired. Refresh it and update your bio.')
       return null
     }
 
@@ -138,12 +178,12 @@ export function ClaimCard({contractAddress}: ClaimCardProps) {
 
     try {
       const res = await fetch(
-        `/api/verify?artistId=${encodeURIComponent(parsedArtistId)}&claimant=${encodeURIComponent(address)}`,
+        `/api/verify?artistId=${encodeURIComponent(parsedArtistId)}&claimant=${encodeURIComponent(address)}&token=${encodeURIComponent(challenge.token)}`,
       )
       const data = await res.json() as VerifyResponse | {error: string}
 
       if (!res.ok || !('verified' in data) || !data.verified) {
-        setError('error' in data ? data.error : `Add ${verificationCode} to your Spotify bio and try again`)
+        setError('error' in data ? data.error : `Add ${challenge.code} to your Spotify bio and try again`)
         return null
       }
       if (!data.signature || data.deadline === undefined) {
@@ -256,10 +296,18 @@ export function ClaimCard({contractAddress}: ClaimCardProps) {
                 <h4 className="text-sm font-semibold text-foreground">Verification Instructions</h4>
                 <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
                   <li>
-                    Copy this code:{' '}
-                    <code className="px-2 py-1 rounded bg-background border border-border font-mono text-foreground">
-                      {verificationCode || 'Not configured'}
-                    </code>
+                    Copy this one-time challenge:{' '}
+                    {isLoadingChallenge ? (
+                      <span className="inline-flex items-center gap-2 text-muted-foreground">
+                        <Spinner size="sm" /> Issuing challenge…
+                      </span>
+                    ) : challenge ? (
+                      <code className="px-2 py-1 rounded bg-background border border-border font-mono text-foreground">
+                        {challenge.code}
+                      </code>
+                    ) : (
+                      <span className="text-destructive">{challengeError || 'Challenge unavailable'}</span>
+                    )}
                     {' '}
                     <button
                       onClick={handleCopyCode}
@@ -278,7 +326,7 @@ export function ClaimCard({contractAddress}: ClaimCardProps) {
                       <ExternalLink className="h-3.5 w-3.5" />
                     </a>
                   </li>
-                  <li>Paste the code to your artist bio's about section</li>
+                  <li>Paste the challenge into your artist bio's about section</li>
                   <li>Come back and click 'Claim' below</li>
                 </ol>
               </div>

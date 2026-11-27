@@ -20,7 +20,7 @@
     "test:e2e": "playwright test --config config/playwright.config.ts",
     "test:contract": "cd contracts && forge test -vvv",
     "test:contract:ci": "cd contracts && forge test --profile ci -vvv",
-    "test:contract:coverage": "cd contracts && forge coverage",
+    "test:contract:coverage": "cd contracts && forge coverage --report summary --no-match-coverage \"test/mocks/\"",
     "check:static": "bun run typecheck && bun run lint && bun run build",
     "validate": "bun run check:static && bun run test:unit && bun run test:contract",
     "audit": "bun audit --production",

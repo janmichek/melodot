@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.24;
+pragma solidity 0.8.28;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 
 /// @title Donate – Artist donation and tipping contract
 /// @author Donalyze
@@ -16,7 +17,7 @@ import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 ///      a short-lived EIP-712 authorisation binding the artist ID to the claimant.
 ///      Direct ETH transfers are rejected. Forced ETH (e.g. `selfdestruct`) is not
 ///      credited to accounting; `address(this).balance` may exceed `totalBalance`.
-contract Donate is Ownable2Step, ReentrancyGuard, EIP712 {
+contract Donate is Ownable2Step, ReentrancyGuard, EIP712, Pausable {
     // -------------------------------------------------------------------------
     // Type declarations
     // -------------------------------------------------------------------------
@@ -37,8 +38,8 @@ contract Donate is Ownable2Step, ReentrancyGuard, EIP712 {
     /// @notice Denominator for basis-point math (100% = 10_000).
     uint256 public constant BPS_DENOMINATOR = 10_000;
 
-    /// @notice Maximum platform fee in basis points (100%).
-    uint16 public constant MAX_FEE_BPS = 10_000;
+    /// @notice Maximum platform fee in basis points (20%).
+    uint16 public constant MAX_FEE_BPS = 2000;
 
     /// @notice Default platform fee in basis points (1%).
     uint16 public constant DEFAULT_PLATFORM_FEE_BPS = 100;
@@ -47,8 +48,7 @@ contract Donate is Ownable2Step, ReentrancyGuard, EIP712 {
     uint256 public constant MAX_ARTIST_ID_LENGTH = 22;
 
     /// @notice EIP-712 type hash for an artist claim authorisation.
-    bytes32 public constant CLAIM_TYPEHASH =
-        keccak256("Claim(string artistId,address claimant,uint256 deadline)");
+    bytes32 public constant CLAIM_TYPEHASH = keccak256("Claim(string artistId,address claimant,uint256 deadline)");
 
     // -------------------------------------------------------------------------
     // State Variables
@@ -218,7 +218,7 @@ contract Donate is Ownable2Step, ReentrancyGuard, EIP712 {
     ///      (rounds down). Remainder goes to the platform (protocol-favouring).
     ///      Multiply then divide. First donation for an ID increments `artistsCount`.
     /// @param artistId Spotify artist ID (1–22 bytes).
-    function donateToArtist(string calldata artistId) external payable {
+    function donateToArtist(string calldata artistId) external payable whenNotPaused {
         _validateArtistId(artistId);
 
         uint256 donatedAmount = msg.value;
@@ -254,7 +254,7 @@ contract Donate is Ownable2Step, ReentrancyGuard, EIP712 {
     /// @param artistId Spotify artist ID (1–22 bytes).
     /// @param deadline Unix timestamp after which the authorisation is invalid.
     /// @param signature EIP-712 signature from `claimSigner`.
-    function claimArtist(string calldata artistId, uint256 deadline, bytes calldata signature) external {
+    function claimArtist(string calldata artistId, uint256 deadline, bytes calldata signature) external whenNotPaused {
         _validateArtistId(artistId);
         // slither-disable-next-line timestamp
         if (block.timestamp > deadline) {
@@ -280,7 +280,7 @@ contract Donate is Ownable2Step, ReentrancyGuard, EIP712 {
     /// @dev Emits `DonationsSettled`. Only the bound claimant. Does not send ETH;
     ///      the claimant must call `withdraw`.
     /// @param artistId Spotify artist ID (1–22 bytes).
-    function settleDonations(string calldata artistId) external {
+    function settleDonations(string calldata artistId) external whenNotPaused {
         _validateArtistId(artistId);
 
         ArtistData storage artist = _artists[artistId];
@@ -306,7 +306,7 @@ contract Donate is Ownable2Step, ReentrancyGuard, EIP712 {
     /// @notice Move accrued platform fees to `pendingWithdrawals[msg.sender]`.
     /// @dev Emits `PlatformFeesSettled`. Owner only. Does not send ETH;
     ///      the owner must call `withdraw`.
-    function settlePlatformFees() external onlyOwner {
+    function settlePlatformFees() external onlyOwner whenNotPaused {
         uint256 amount = _platformFeeAccrued;
         if (amount == 0) {
             revert ZeroAmount();
@@ -356,6 +356,18 @@ contract Donate is Ownable2Step, ReentrancyGuard, EIP712 {
     /// @param claimSigner_ New signer address; must be non-zero.
     function setClaimSigner(address claimSigner_) external onlyOwner {
         _setClaimSigner(claimSigner_);
+    }
+
+    /// @notice Pause donations, claims and settlement. Withdrawals stay open.
+    /// @dev Emits `Paused`. Owner only.
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /// @notice Resume donations, claims and settlement.
+    /// @dev Emits `Unpaused`. Owner only.
+    function unpause() external onlyOwner {
+        _unpause();
     }
 
     // -------------------------------------------------------------------------
@@ -413,9 +425,7 @@ contract Donate is Ownable2Step, ReentrancyGuard, EIP712 {
         view
         returns (bytes32 digest)
     {
-        return _hashTypedDataV4(
-            keccak256(abi.encode(CLAIM_TYPEHASH, keccak256(bytes(artistId)), claimant, deadline))
-        );
+        return _hashTypedDataV4(keccak256(abi.encode(CLAIM_TYPEHASH, keccak256(bytes(artistId)), claimant, deadline)));
     }
 
     // -------------------------------------------------------------------------
@@ -444,7 +454,7 @@ contract Donate is Ownable2Step, ReentrancyGuard, EIP712 {
 
         address oldRecipient = _platformFeeRecipient;
         uint16 oldFeeBps = _platformFeeBps;
-        // casting to 'uint16' is safe because feeBps_ <= MAX_FEE_BPS (10_000)
+        // casting to 'uint16' is safe because feeBps_ <= MAX_FEE_BPS (2_000)
         // forge-lint: disable-next-line(unsafe-typecast)
         uint16 newFeeBps = uint16(feeBps_);
 
