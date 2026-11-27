@@ -1,6 +1,10 @@
 import {defineConfig, devices} from '@playwright/test'
 
-// Optional CPU throttle for recording runs. CDP rate 1.176 ~= 85% CPU.
+// Keep the browser suite deterministic; the live Web3Auth modal is a manual
+// smoke test, not a CI dependency.
+process.env.VITE_E2E ??= '1'
+
+// Optional CPU throttle for local recording runs. CDP rate 1.176 ~= 85% CPU.
 const throttle = Number(process.env.PLAYWRIGHT_CPU_THROTTLE ?? 0)
 
 export default defineConfig({
@@ -36,7 +40,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'bun run dev',
+    // Deterministic Web3Auth mock: CI has no dashboard project config.
+    command: 'VITE_E2E=1 bun run dev',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

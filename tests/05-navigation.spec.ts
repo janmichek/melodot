@@ -4,7 +4,7 @@ test.describe('Navigation and Routing', () => {
 
   test('should display the home page with correct title', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const title = await page.title();
     expect(title).toBeTruthy();
@@ -12,7 +12,7 @@ test.describe('Navigation and Routing', () => {
 
   test('should navigate to discover page by default', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const url = page.url();
     expect(url).toContain('/');

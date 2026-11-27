@@ -5,6 +5,7 @@ import {donateConfig} from "@/shared/config"
 import {fetchDonationMadeLogs} from "@/entities/donation"
 import {proxyPublicClient} from "@/shared/lib/rpcClient"
 import {passetHub} from "@/shared/config"
+import {isConfiguredAddress} from "@/shared/lib/constants"
 import type {DonationTransaction} from "@types"
 
 export function useDonationTransactions(
@@ -19,8 +20,9 @@ export function useDonationTransactions(
   const publicClient = proxyPublicClient
 
   useEffect(() => {
-    if (!contractAddress) {
+    if (!isConfiguredAddress(contractAddress)) {
       setDonations([])
+      setIsLoading(false)
       return
     }
 

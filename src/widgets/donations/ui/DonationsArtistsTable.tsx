@@ -1,6 +1,7 @@
 import {useEffect, useMemo, useState} from "react"
 import type {Abi} from "viem"
 import {proxyPublicClient} from "@/shared/lib/rpcClient"
+import {isConfiguredAddress} from "@/shared/lib/constants"
 import {BalanceLabel} from "@/shared/ui/balance-label"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/shared/ui/table"
 import {useArtistNames} from "@/entities/artist"
@@ -52,7 +53,7 @@ export function DonationsArtistsTable({
   // Fetch claim status for all artists
   useEffect(() => {
     const fetchClaimStatus = async () => {
-      if (!publicClient || !contractAddress || artistIds.length === 0) {
+      if (!publicClient || !isConfiguredAddress(contractAddress) || artistIds.length === 0) {
         return
       }
 

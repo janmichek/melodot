@@ -5,6 +5,7 @@ import {useQuery} from "@tanstack/react-query"
 import {useWeb3AuthContext} from "@/entities/contract"
 import {fetchDonationMadeLogs} from "@/entities/donation"
 import {proxyPublicClient} from "@/shared/lib/rpcClient"
+import {isConfiguredAddress} from "@/shared/lib/constants"
 import {
   CURRENCY_SYMBOL,
   donateConfig,
@@ -37,14 +38,14 @@ export function StatisticsDashboard() {
   const {data: donationLogs, isLoading: isLoadingLogs} = useQuery({
     queryKey: ["donationLogs", contractAddress],
     queryFn: async () => {
-      if (!contractAddress) {return []}
-      return fetchDonationMadeLogs(proxyPublicClient, contractAddress as `0x${string}`, {
+      if (!isConfiguredAddress(contractAddress)) {return []}
+      return fetchDonationMadeLogs(proxyPublicClient, contractAddress, {
         windowBlocks: 100_000n,
         chunkBlocks: 5_000n,
         expectedChainId: passetHub.id,
       })
     },
-    enabled: !!contractAddress,
+    enabled: isConfiguredAddress(contractAddress),
     staleTime: 60_000,
     refetchInterval: 120_000,
   })

@@ -4,7 +4,7 @@ test.describe('Error Handling and Edge Cases', () => {
 
   test('should handle invalid routes gracefully', async ({ page }) => {
     await page.goto('/invalid-route-that-does-not-exist');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Should either show 404 or redirect to home
     const url = page.url();
@@ -95,15 +95,15 @@ test.describe('Error Handling and Edge Cases', () => {
 
   test('should handle browser back/forward navigation', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Navigate to another page
     await page.goto('/donations');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Go back
     await page.goBack();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Should be back on home page
     const url = page.url();
@@ -138,11 +138,11 @@ test.describe('Error Handling and Edge Cases', () => {
 
   test('should handle page refresh during operations', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Refresh the page
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Page should reload correctly; Web3Auth may take a few seconds to settle.
     const signInButton = page.getByRole('button', {name: /sign in/i}).first();

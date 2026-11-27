@@ -36,7 +36,6 @@ export function AppSidebar() {
     connect,
     connecting,
     disconnecting,
-    providerReady,
     contractAddress,
   } = useWeb3AuthContext()
   const {address: connectedAddress} = useAccount()
@@ -94,11 +93,7 @@ export function AppSidebar() {
       <SidebarContent className="gap-0 px-4">
         <SidebarGroup className="py-4">
           <SidebarMenuItem>
-            {!providerReady && !isConnected && !disconnecting ? (
-              <div className="flex h-12 w-full items-center justify-center">
-                <Spinner size="md" />
-              </div>
-            ) : isConnected && address && !disconnecting ? (
+            {isConnected && address && !disconnecting ? (
               <UserMenu />
             ) : (
               <SidebarMenuButton asChild>

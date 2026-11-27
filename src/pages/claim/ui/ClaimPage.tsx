@@ -12,7 +12,7 @@ export function Claim() {
     description: "Verify your Spotify artist profile and withdraw listener tips from the Donate contract.",
     path: "/claim",
   })
-  const {contractAddress, isConnected, connect, connecting, providerReady} = useWeb3AuthContext()
+  const {contractAddress, isConnected, connect, connecting} = useWeb3AuthContext()
 
   return (
     <section className="space-y-6 pb-6">
@@ -24,7 +24,7 @@ export function Claim() {
             : "Claim your artist identity to pay donations out."
         }/>
       {!isConnected ? (
-        connecting || !providerReady ? (
+        connecting ? (
           <div className="flex items-center justify-center min-h-[400px]">
             <Spinner size="lg" />
           </div>

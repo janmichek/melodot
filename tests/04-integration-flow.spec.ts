@@ -29,13 +29,13 @@ test.describe('End-to-End Integration Flow', () => {
 
   test('should maintain state across page reloads', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const connectButton = page.locator('button:has-text("Sign In")');
     await expect(connectButton).toBeVisible({ timeout: 10000 });
 
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     await expect(connectButton).toBeVisible({ timeout: 10000 });
   });

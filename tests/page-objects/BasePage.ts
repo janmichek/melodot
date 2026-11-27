@@ -9,7 +9,7 @@ export class BasePage {
 
   async goto(path: string = '/') {
     await this.page.goto(path)
-    await this.page.waitForLoadState('networkidle')
+    await this.page.waitForLoadState('domcontentloaded')
   }
 
   async waitForElement(selector: string, options?: { timeout?: number }) {
@@ -17,7 +17,7 @@ export class BasePage {
   }
 
   async waitForNavigation() {
-    await this.page.waitForLoadState('networkidle')
+    await this.page.waitForLoadState('domcontentloaded')
   }
 
   async isElementVisible(locator: Locator, timeout: number = 5000): Promise<boolean> {
