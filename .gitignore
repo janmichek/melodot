@@ -4,10 +4,21 @@ node_modules
 dist
 playwright-report
 test-results
+coverage
+shots
+.taste-skill
+.fallow
+
+# Foundry
 contracts/artifacts
-contracts/artifacts-pvm
+contracts/out
+contracts/broadcast
 contracts/cache
-contracts/cache-pvm
 contracts/ignition/deployments
 contracts/typechain-types
+contracts/lib
+
+# Environment
 .env
+.env.*
+!.env.example

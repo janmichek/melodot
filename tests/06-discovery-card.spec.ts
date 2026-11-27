@@ -4,7 +4,7 @@ test.describe('Discovery Card Display and Interactions', () => {
 
   test('should not display discovery card on initial load', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const discoveryCard = page.locator('[class*="card"]').filter({ hasText: 'Track Discovered' });
     const isVisible = await discoveryCard.isVisible({ timeout: 2000 }).catch(() => false);

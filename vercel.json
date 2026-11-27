@@ -3,6 +3,29 @@
   "buildCommand": "bun install && bun run build",
   "outputDirectory": "dist",
   "installCommand": "bun install",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), geolocation=(), microphone=(self)"
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/discover",
@@ -27,6 +50,10 @@
     {
       "source": "/api/verify",
       "destination": "/api/endpoints/verify"
+    },
+    {
+      "source": "/api/rpc",
+      "destination": "/api/endpoints/rpc"
     },
     {
       "source": "/((?!api/).*)",

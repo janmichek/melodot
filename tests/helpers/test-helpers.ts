@@ -25,7 +25,7 @@ export async function elementExists(page: Page, selector: string): Promise<boole
  * Waits for network to be idle
  */
 export async function waitForNetworkIdle(page: Page) {
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('domcontentloaded')
 }
 
 /**

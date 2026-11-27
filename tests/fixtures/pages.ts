@@ -12,6 +12,16 @@ type PageFixtures = {
   claimPage: ClaimPage;
 };
 
+// Throttle the browser only while recording/measuring e2e. 85 means "run at
+// 85% CPU", which maps to CDP rate 100/85 ≈ 1.176 (higher = slower).
+base.beforeEach(async ({page}) => {
+  const percent = Number(process.env.PLAYWRIGHT_CPU_THROTTLE ?? 0)
+  if (percent > 0 && percent < 100) {
+    const session = await page.context().newCDPSession(page)
+    await session.send('Emulation.setCPUThrottlingRate', {rate: 100 / percent})
+  }
+})
+
 export const test = base.extend<PageFixtures>({
   walletPage: async ({page}, use) => {
     const walletPage = new WalletPage(page)

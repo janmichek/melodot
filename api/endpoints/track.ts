@@ -1,7 +1,8 @@
 import type {VercelRequest, VercelResponse} from '@vercel/node'
-import {fetchSpotifySearch, fetchSpotifyToken, fetchTrack, handleApiError, handleApiSuccess} from '../api.js'
+import {fetchSpotifySearch, fetchSpotifyToken, fetchTrack, handleApiError, handleApiSuccess} from '../_lib/api.js'
 import type {SpotifySearchResponse, SpotifyTrackResponse} from '../../types'
-import {extractTrackId, formatTrackResponse} from '../utils.js'
+import {extractTrackId, formatTrackResponse} from '../_lib/utils.js'
+import {rateLimit} from '../_lib/rateLimit.js'
 
 /**
  * Fetches track information from Spotify API
@@ -19,6 +20,9 @@ export default async function handler(
   if (req.method !== 'GET') {
     return res.status(405).json({error: 'Method not allowed'})
   }
+  if (!rateLimit(req, res, {key: 'track', limit: 60, windowMs: 60_000})) {
+    return res
+  }
 
   const {uri} = req.query
 
@@ -29,9 +33,13 @@ export default async function handler(
   try {
     const accessToken = await fetchSpotifyToken()
 
-    // Handle search queries
+    // Handle search queries. `req.query` is already URL-decoded by Vercel, so
+    // decoding again would turn a literal "%" into a URIError.
     if (uri.startsWith('spotify:search:')) {
-      const searchQuery = decodeURIComponent(uri.replace('spotify:search:', ''))
+      const searchQuery = uri.slice('spotify:search:'.length).trim()
+      if (!searchQuery || searchQuery.length > 200) {
+        return res.status(400).json({error: 'Search query must be between 1 and 200 characters'})
+      }
       const searchData = await fetchSpotifySearch(searchQuery, accessToken) as SpotifySearchResponse
       const trackData = searchData.tracks?.items?.[0]
 

@@ -14,7 +14,7 @@ export default tseslint.config(
       'node_modules',
       'generated.ts',
       'src/generated.ts',
-      'typechain-types',
+      'src/shared/config/generated.ts',
       'contracts',
       '*.config.js',
       '*.config.ts',
@@ -57,6 +57,10 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // These effects synchronise external systems (media recorder, RPC reads,
+      // route-driven fetches); the synchronous state update is the intended
+      // transition, not a render-loop bug.
+      'react-hooks/set-state-in-effect': 'off',
       'react-refresh/only-export-components': [
         'error',
         { allowConstantExport: true },

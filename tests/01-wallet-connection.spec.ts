@@ -8,6 +8,7 @@ test.describe('Wallet Connection Flow', () => {
   });
 
   test('should show Web3Auth modal when Sign In is clicked', async ({ walletPage }) => {
+    test.skip(process.env.VITE_E2E === '1', 'Web3Auth is mocked in deterministic e2e')
     await walletPage.connect();
 
     // Check for Web3Auth modal elements

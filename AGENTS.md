@@ -1,10 +1,12 @@
-# Melodot Development Guide
+# Donalyze Development Guide
 
-_Comprehensive instructions for AI agents helping develop Melodot_
+> **Finish line.** Before calling a task complete, run `bun run validate`, `bun run test:contract:coverage`, `bun run slither`, and `bun run build`. UI changes also run `bun run test:e2e`. Never lower `config/coverage-floors.json` or skip a red gate; add the missing test instead. Architecture follows `docs/adr/0001-feature-sliced-design.md`: `app → pages → widgets → features → entities → shared`.
+
+_Comprehensive instructions for AI agents helping develop Donalyze_
 
 ## Project Overview
 
-**Melodot** is a decentralized music discovery and tipping platform that:
+**Donalyze** is a decentralized music discovery and tipping platform that:
 - Records audio using Web Audio API
 - Identifies songs through audio recognition
 - Enables direct artist tipping via smart contracts on Polkadot
@@ -14,14 +16,14 @@ _Comprehensive instructions for AI agents helping develop Melodot_
 ## Tech Stack
 
 ### Core Technologies
-- **Smart Contracts**: Solidity 0.8.28, Hardhat, Polkadot Paseo Asset Hub
-- **Frontend**: React 18, TypeScript, Vite
+- **Smart Contracts**: Solidity 0.8.28, Foundry (Forge), Polkadot Hub TestNet
+- **Frontend**: React 19, TypeScript, Vite
 - **Web3**: Wagmi, Viem, Web3Auth Modal
 - **Styling**: TailwindCSS 4, Radix UI, Lucide icons
 - **Audio**: Web Audio API
 - **API**: Vercel serverless functions
 - **Package Manager**: Bun
-- **Testing**: Playwright (e2e)
+- **Testing**: Foundry (contracts), Playwright (e2e)
 
 ### Key Dependencies
 ```json
@@ -39,12 +41,23 @@ _Comprehensive instructions for AI agents helping develop Melodot_
 
 ```
 shaz/
-├── contracts/              # Smart contracts
-│   ├── contracts/
+├── contracts/              # Smart contracts (Foundry)
+│   ├── src/
 │   │   └── Donate.sol     # Artist donation contract
-│   ├── hardhat.config.ts  # Hardhat configuration
-│   ├── test/              # Contract tests
-│   └── ignition/          # Deployment configs
+│   ├── test/              # Forge tests (unit, fuzz, invariant)
+│   │   ├── Donate.t.sol
+│   │   ├── Donate.fuzz.t.sol
+│   │   ├── Donate.invariant.t.sol
+│   │   ├── handlers/     # Invariant test handler
+│   │   └── mocks/        # Reentrancy / receive mocks
+│   ├── script/
+│   │   └── Deploy.s.sol   # Deployment script
+│   ├── deployments/
+│   │   └── polkadotHubTestnet.json  # Deployed address (read by wagmi)
+│   ├── foundry.toml       # Foundry configuration
+│   └── remappings.txt     # forge-std / OpenZeppelin remappings
+├── scripts/
+│   └── sync-deployment.ts # Copies broadcast address into deployments JSON
 ├── api/                   # Vercel serverless functions
 │   ├── endpoints/
 │   │   ├── discover.ts   # Music discovery endpoint
@@ -86,35 +99,35 @@ shaz/
 
 ## Network Configuration
 
-### Paseo Asset Hub Testnet
+### Polkadot Hub TestNet (successor of the retired Passet Hub)
 
 **Network Details:**
 - Chain ID: `420420417` (0x190f1b41)
-- RPC: `https://services.polkadothub-rpc.com/testnet`
+- RPC: `https://eth-rpc-testnet.polkadot.io/` (fallback: `https://services.polkadothub-rpc.com/testnet`)
 - Explorer: `https://blockscout-testnet.polkadot.io`
-- Faucet: `https://faucet.polkadot.io/`
+- Faucet: `https://faucet.polkadot.io/?parachain=1111`
 - Currency: PAS
 
-**Hardhat Configuration:**
-```typescript
-import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
-import "@parity/hardhat-polkadot";
+**Foundry Configuration** (`contracts/foundry.toml`):
+```toml
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+test = "test"
+script = "script"
+solc = "0.8.28"
+optimizer = true
+optimizer_runs = 200
 
-const config: HardhatUserConfig = {
-  solidity: "0.8.28",
-  resolc: {
-    compilerSource: "npm",
-    settings: {},
-  },
-  networks: {
-    passetHub: {
-      polkavm: true, // REQUIRED for Polkadot
-      url: "https://services.polkadothub-rpc.com/testnet",
-      accounts: [process.env.PRIVATE_KEY],
-    },
-  },
-};
+[rpc_endpoints]
+polkadotHubTestnet = "https://eth-rpc-testnet.polkadot.io"
+```
+
+Deploy with the named endpoint:
+```bash
+cd contracts
+forge script script/Deploy.s.sol:Deploy --rpc-url polkadotHubTestnet --broadcast
 ```
 
 ## Development Workflow
@@ -125,35 +138,59 @@ const config: HardhatUserConfig = {
 # Development
 bun install                  # Install dependencies
 bun dev                      # Start dev server (port 5173)
-bun run build               # Build for production
-bun run reinstall           # Clean reinstall
+bun run build                # Build for production
+bun run reinstall            # Clean reinstall
 
-# Contracts
-cd contracts
-bun run compile             # Compile contracts
-bun run test                # Run contract tests
-bun run deploy-contract     # Deploy to Paseo + generate types
+# Contracts (from repo root)
+bun run test:contract        # forge test -vvv
+bun run test:contract:ci     # forge test --profile ci
+bun run test:contract:coverage
+bun run contract:deploy      # Deploy, sync address, generate types
+bun run contract:sync        # Record broadcast address in contracts/deployments
+bun run contract:redeploy    # forge clean + deploy
+bun run contract:clean       # forge clean
+
+# Inside contracts/
+bun run build                # forge build --sizes
+bun run test                 # forge test
+bun run test:gas             # forge test --gas-report
+bun run fmt                  # forge fmt
+bun run lint                 # forge lint
+bun run install:libs         # Install forge-std + OpenZeppelin
 
 # Testing
-bun run test:e2e           # Run e2e tests (Playwright)
-bun run test:api           # Test API functions
-bun run test:contract      # Run contract tests
-bun run test:all           # Run all tests
+bun run test:e2e             # Run e2e tests (Playwright)
+bun run test:api             # Test API functions
+bun run test:all             # Run all tests
 
 # Code Generation
-bun run generate           # Generate Wagmi types from contract
+bun run generate             # forge build + wagmi generate
 ```
+
+`bun run generate` reads the ABI from `contracts/out/Donate.sol/Donate.json` and the
+address from `contracts/deployments/polkadotHubTestnet.json`. It fails when the address
+is still the zero placeholder.
 
 ### Private Key Setup
 
-**IMPORTANT**: Never commit private keys
+**IMPORTANT**: Never commit private keys.
+
 ```bash
-# In contracts/.env
-PRIVATE_KEY=your_private_key_without_0x_prefix
+# contracts/.env
+OWNER=0x...          # Contract owner and platform fee recipient
+CLAIM_SIGNER=0x...   # Signs EIP-712 claim authorisations
+PRIVATE_KEY=0x...    # Optional signer for `forge script --broadcast`
+```
+
+Prefer a Foundry keystore over a raw key:
+```bash
+cast wallet import donalyze --interactive
+cd contracts
+forge script script/Deploy.s.sol:Deploy --rpc-url polkadotHubTestnet --broadcast --account donalyze
 ```
 
 ### Get Testnet Tokens
-1. Visit [Polkadot Faucet](https://faucet.polkadot.io/)
+1. Visit [Polkadot Faucet](https://faucet.polkadot.io/?parachain=1111)
 2. Enter your wallet address
 3. Receive PAS tokens for testing
 
@@ -163,40 +200,62 @@ PRIVATE_KEY=your_private_key_without_0x_prefix
 
 **Contract Features:**
 - Artist donation tracking by ID (Spotify artist ID)
-- Platform fee: 1% (100 basis points)
-- Artist claiming system
-- Withdrawal mechanisms for artists and platform
+- Platform fee: 1% default (100 basis points, configurable up to 2,000 (20%))
+- EIP-712 signed artist claims with a deadline
+- Pausable emergency shutdown; withdrawals stay open
+- Pull-payment withdrawals for artists, platform fees, and the owner
 
 **Key Functions:**
 ```solidity
 // Donate to artist
-donateToArtist(string memory artistId) external payable
+donateToArtist(string calldata artistId) external payable
 
-// Artist claims identity
-claimArtist(string memory artistId) external
+// Artist claims identity with a platform-signed EIP-712 authorisation
+claimArtist(string calldata artistId, uint256 deadline, bytes calldata signature) external
 
-// Artist withdraws donations
-withdrawDonates(string memory artistId, address recipient) external
+// Claimant moves the artist balance into pending withdrawals
+settleDonations(string calldata artistId) external
 
-// Owner withdraws platform fees
-withdrawPlatformFees(address recipient) external onlyOwner
+// Owner moves accrued platform fees into pending withdrawals
+settlePlatformFees() external onlyOwner
+
+// Pull payment
+withdraw(address recipient) external nonReentrant
+
+// Owner-only administration
+setPlatformFeeInfo(address recipient, uint256 feeBps) external onlyOwner
+setClaimSigner(address claimSigner) external onlyOwner
+pause() external onlyOwner
+unpause() external onlyOwner
 
 // View functions
-getArtistInfo(string memory artistId) public view
-getPlatformFeeBalance() public view
+getArtistInfo(string calldata artistId) external view
+getArtistClaimant(string calldata artistId) external view
+getArtistsCount() external view
+getPlatformFeeBalance() external view
+getPlatformFeeInfo() external view
+claimSigner() external view
+getClaimDigest(string calldata artistId, address claimant, uint256 deadline) external view
 ```
+
+**Donation Flow:**
+1. `donateToArtist` credits the artist balance and accrues the platform fee.
+2. Off-chain verification issues an EIP-712 signature from `CLAIM_SIGNER`.
+3. `claimArtist` binds the artist ID to the caller.
+4. `settleDonations` moves the artist balance into `pendingWithdrawals`.
+5. `withdraw` pays out the pending balance.
 
 **Security Patterns:**
 - Custom errors for gas efficiency
-- Ownable pattern (based on thirdweb)
-- Platform fee system with basis points
-- Reentrancy protection via checks-effects-interactions
+- OpenZeppelin `Ownable2Step`, `ReentrancyGuard`, `ECDSA`, `EIP712`
+- Checks-effects-interactions
+- Direct ETH transfers rejected; payouts use pull payments
 
 ### Contract Limitations
 
-- **Size Limit**: ~100KB bytecode
-- **No OpenZeppelin**: Use minimal custom implementations (already done)
-- **PolkaVM Required**: Must set `polkavm: true` in network config
+- **EVM size limit**: 24 KB deployed bytecode (`forge build --sizes`)
+- **Non-upgradeable**: redeploy to change logic
+- **Off-chain verification**: Spotify bio checks do not happen on-chain
 
 ## Frontend Architecture
 
@@ -382,7 +441,7 @@ const response = await fetch('/api/verify?artistId=ARTIST_ID');
 }
 ```
 
-**Requires**: `RAPIDAPI_KEY`, `VITE_VERIFICATION_CODE`
+**Requires**: `RAPIDAPI_KEY`, `VERIFICATION_SECRET`
 
 ## Environment Variables
 
@@ -391,16 +450,20 @@ const response = await fetch('/api/verify?artistId=ARTIST_ID');
 ```bash
 # .env (root)
 VITE_WEB3AUTH_CLIENT_ID=       # Web3Auth dashboard
-PRIVATE_KEY=                    # Deployment wallet (no 0x prefix)
+
+# contracts/.env (deployment)
+OWNER=                          # Contract owner + platform fee recipient
+CLAIM_SIGNER=                   # EIP-712 claim signer
+PRIVATE_KEY=                    # Optional; prefer a Foundry keystore
 ```
 
 ### Optional (for music APIs)
 
 ```bash
-VITE_RAPIDAPI_KEY=             # RapidAPI key for Shazam/Spotify scraper
+RAPIDAPI_KEY=             # RapidAPI key for Shazam/Spotify scraper
 SPOTIFY_CLIENT_ID=             # Spotify API client ID
 SPOTIFY_CLIENT_SECRET=         # Spotify API client secret
-VITE_VERIFICATION_CODE=        # Code artists must include in bio to verify
+VERIFICATION_SECRET=        # Server-only HMAC secret for one-time challenges
 ```
 
 ## Deployment
@@ -408,22 +471,31 @@ VITE_VERIFICATION_CODE=        # Code artists must include in bio to verify
 ### Contract Deployment
 
 ```bash
-cd contracts
-bun run deploy-contract        # Deploys and generates types
+bun run contract:deploy
 ```
 
+This runs `forge script script/Deploy.s.sol:Deploy --rpc-url polkadotHubTestnet
+--broadcast`, copies the address into `contracts/deployments/polkadotHubTestnet.json`,
+and regenerates `src/generated.ts`.
+
 **Deployment Checklist:**
-- [ ] Private key set in `.env`
+- [ ] Foundry installed (`forge --version`)
+- [ ] Foundry dependencies installed: `cd contracts && bun run install:libs`
+- [ ] `OWNER` and `CLAIM_SIGNER` set in `contracts/.env`
+- [ ] Funded signer available (`--account` keystore or `PRIVATE_KEY`)
 - [ ] Sufficient PAS tokens in wallet
-- [ ] Contract compiles without errors
-- [ ] Contract size under 100KB
-- [ ] `polkavm: true` in hardhat.config.ts
+- [ ] `forge build --sizes` passes
+- [ ] Deployment address recorded in `contracts/deployments/polkadotHubTestnet.json`
 
 **Reset Deployment State:**
 ```bash
+bun run contract:redeploy   # forge clean + deploy
+```
+
+**Manual deploy:**
+```bash
 cd contracts
-rm -rf ignition/deployments/
-bun run deploy-contract
+forge script script/Deploy.s.sol:Deploy --rpc-url polkadotHubTestnet --broadcast --account donalyze
 ```
 
 ### Frontend Deployment (Vercel)
@@ -450,40 +522,53 @@ vercel deploy --prod
 bun run test:e2e          # Run e2e tests
 ```
 
-### Contract Tests
+### Contract Tests (Foundry)
 ```bash
-cd contracts
-bun run test              # Hardhat tests
+bun run test:contract          # forge test -vvv
+bun run test:contract:ci       # fuzz 1024 / invariant 256 x 128
+bun run test:contract:coverage # forge coverage
 ```
+
+Test layout:
+- `contracts/test/Donate.t.sol` — unit tests
+- `contracts/test/Donate.fuzz.t.sol` — stateless fuzzing
+- `contracts/test/Donate.invariant.t.sol` — invariant campaign
+- `contracts/test/handlers/DonateHandler.sol` — bounded handler
+- `contracts/test/mocks/` — reentrancy and revert-on-receive mocks
 
 ## Common Issues & Solutions
 
-### "CodeRejected" Error
-**Cause**: Missing PolkaVM configuration
-**Solution**: Ensure `polkavm: true` in `hardhat.config.ts` networks config
+### Missing Foundry Dependencies
+**Cause**: `contracts/lib` is ignored by git and not installed.
+**Solution**: `cd contracts && bun run install:libs`
 
-### "initcode is too big"
-**Cause**: Contract exceeds 100KB limit
-**Solution**: Already optimized with minimal implementations instead of OpenZeppelin
+### "Donate address is not configured"
+**Cause**: `contracts/deployments/polkadotHubTestnet.json` still holds the zero address.
+**Solution**: Run `bun run contract:deploy`, or record the deployed address and run `bun run generate`.
+
+### "Broadcast artifact not found"
+**Cause**: `contract:sync` ran without a broadcast.
+**Solution**: Deploy with `--broadcast` first, then `bun run contract:sync`.
 
 ### Contract Deployment Fails
 **Checklist**:
-- Private key format correct (no `0x` prefix)
+- `OWNER` and `CLAIM_SIGNER` set in `contracts/.env`
+- Funded signer passed via `--account` or `--private-key`
 - Sufficient PAS balance
-- Network connectivity to RPC
-- Clean deployment: `rm -rf ignition/deployments/`
+- RPC reachable: `cast chain-id --rpc-url polkadotHubTestnet`
+- Clean state: `bun run contract:clean`
 
 ### Web3Auth Not Working
 **Checklist**:
 - `VITE_WEB3AUTH_CLIENT_ID` set correctly
-- Network matches (Paseo Asset Hub)
+- Network matches (Polkadot Hub TestNet, chain ID `420420417`)
 - Browser has Web3 wallet extension
 
 ### Type Errors After Contract Changes
 **Solution**:
 ```bash
-bun run deploy-contract  # Regenerates types
-# or
+bun run contract:deploy  # Redeploy + sync address + regenerate types
+# or, with a recorded deployment address:
 bun run generate
 ```
 
@@ -506,14 +591,17 @@ bun run generate
 - **Use type-safe patterns** - Create type guards for contract data instead of `as` casts
 
 ### API Security
-- **Add CORS headers** - Restrict API access to your domain
+- **Add CORS headers** - Restrict API access to your domain; the RPC proxy allows only Donalyze origins
+- **Rate limit endpoints** - Per-instance burst guards are in `api/_lib/rateLimit.ts`; use Vercel WAF/Upstash for a hard global quota
 - **Implement rate limiting** - Prevent API abuse and quota exhaustion
 - **Validate all inputs** - Check format, length, and type of all parameters
 - **Don't expose internal errors** - Log server-side, return generic messages to clients
 
 ### Smart Contract Security
+- **Reuse audited primitives** - OpenZeppelin `Ownable2Step`, `ReentrancyGuard`, `ECDSA`, `EIP712`
+- **Bind signatures to context** - EIP-712 claims include artist ID, claimant, and deadline
 - **Follow checks-effects-interactions** - Update state before external calls
-- **Consider reentrancy guards** - Add mutex locks for state-modifying functions
+- **Use pull payments** - Credit `pendingWithdrawals`, let recipients withdraw
 - **Validate string lengths** - Prevent storage bloat with maximum length checks
 
 ## Code Style & Conventions
@@ -536,9 +624,11 @@ bun run generate
 ### Contract Development
 
 - **Solidity Version**: 0.8.28
+- **Formatting**: `forge fmt` (120 char lines, 4-space tabs)
 - **Gas Optimization**: Use custom errors instead of require strings
 - **Security**: Follow checks-effects-interactions pattern
 - **Naming**: Clear, descriptive function and variable names
+- **Docs**: NatSpec on external functions and state variables
 
 ### Frontend Development
 
@@ -560,19 +650,25 @@ bun run generate
 **Before asking for help:**
 
 - [ ] Dependencies installed: `bun install`
+- [ ] Foundry dependencies installed: `cd contracts && bun run install:libs`
 - [ ] Environment variables set in `.env`
-- [ ] Private key set (no `0x` prefix)
+- [ ] `OWNER` and `CLAIM_SIGNER` set in `contracts/.env`
 - [ ] Sufficient PAS testnet tokens
-- [ ] Contract compiles: `cd contracts && bun run compile`
-- [ ] Network RPC accessible
+- [ ] Contract compiles: `cd contracts && forge build --sizes`
+- [ ] Network RPC accessible: `cast chain-id --rpc-url polkadotHubTestnet`
 - [ ] Web3Auth client ID configured
 - [ ] Generated types up to date: `bun run generate`
 
 ## Quick Reference
 
 ### Key Files
-- `contracts/contracts/Donate.sol` - Main donation contract
-- `contracts/hardhat.config.ts` - Network configuration
+- `contracts/src/Donate.sol` - Main donation contract
+- `contracts/test/Donate.t.sol` - Contract unit tests
+- `contracts/script/Deploy.s.sol` - Deployment script
+- `contracts/foundry.toml` - Foundry config and RPC endpoints
+- `contracts/deployments/polkadotHubTestnet.json` - Deployed address
+- `scripts/sync-deployment.ts` - Copies broadcast address into deployments JSON
+- `wagmi.config.ts` - Reads ABI + address and generates `src/generated.ts`
 - `src/main.tsx` - App entry point and providers setup
 - `src/wagmi-config.ts` - Chain definitions (single source of truth)
 - `src/web3authContext.tsx` - Web3Auth client configuration
@@ -584,14 +680,14 @@ bun run generate
 - `src/pages/Donations.tsx` - Donations history
 - `src/pages/Owner.tsx` - Owner dashboard
 - `api/endpoints/discover.ts` - Music discovery API
-- `api/api.ts` - Centralized API utilities
+- `api/_lib/api.ts` - Centralized API utilities
 - `src/generated.ts` - Auto-generated Wagmi contract types
 - `package.json` - Scripts and dependencies
 
 ### Key URLs
 - Local dev: `http://localhost:5173`
 - Block explorer: `https://blockscout-testnet.polkadot.io`
-- Faucet: `https://faucet.polkadot.io/`
+- Faucet: `https://faucet.polkadot.io/?parachain=1111`
 - Web3Auth dashboard: `https://dashboard.web3auth.io`
 
 ### Package Manager: Bun
@@ -602,8 +698,9 @@ This project uses Bun, not npm or yarn. Always use:
 
 ## Resources
 
+- [Foundry Book](https://book.getfoundry.sh/)
+- [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/5.x/)
 - [Polkadot Smart Contracts](https://docs.polkadot.com/develop/smart-contracts/)
-- [Hardhat Polkadot Plugin](https://github.com/paritytech/hardhat-polkadot)
 - [Wagmi Documentation](https://wagmi.sh/)
 - [Web3Auth Documentation](https://web3auth.io/docs)
 - [Viem Documentation](https://viem.sh/)
@@ -611,4 +708,4 @@ This project uses Bun, not npm or yarn. Always use:
 
 ---
 
-**Remember**: This is a Polkadot-based project using EVM compatibility. Always ensure `polkavm: true` in network config and use PAS testnet tokens.
+**Remember**: This is a Polkadot-based project using EVM compatibility. Build with Foundry, deploy with `bun run contract:deploy`, and use PAS testnet tokens.

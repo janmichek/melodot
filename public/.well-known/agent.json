@@ -1,0 +1,33 @@
+{
+  "name": "Donalyze",
+  "description": "Audio-first music discovery and direct artist tipping on Polkadot Hub TestNet.",
+  "url": "https://donalyze.vercel.app",
+  "version": "1.0.0",
+  "protocolVersion": "0.2.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false
+  },
+  "defaultInputModes": ["text/plain", "application/json"],
+  "defaultOutputModes": ["application/json", "text/plain"],
+  "skills": [
+    {
+      "id": "music-discovery",
+      "name": "Music discovery",
+      "description": "Identify a track from a short audio sample and resolve its Spotify artists.",
+      "tags": ["music", "audio", "recognition", "spotify"]
+    },
+    {
+      "id": "artist-tipping",
+      "name": "Artist tipping",
+      "description": "Send PAS tips to one or more Spotify artists through the Donate contract.",
+      "tags": ["payments", "polkadot", "tipping", "web3"]
+    },
+    {
+      "id": "artist-claim",
+      "name": "Artist claim",
+      "description": "Verify a Spotify bio code and issue an EIP-712 claim authorisation.",
+      "tags": ["identity", "verification", "eip712"]
+    }
+  ]
+}

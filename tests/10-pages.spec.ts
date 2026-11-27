@@ -5,7 +5,7 @@ test.describe('Page Navigation and Content', () => {
   test.describe('Donations Page', () => {
     test('should navigate to donations page', async ({ page }) => {
       await page.goto('/donations');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const url = page.url();
       expect(url).toContain('/donations');
@@ -13,7 +13,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should display donations page header', async ({ page }) => {
       await page.goto('/donations');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const header = page.locator('h1:has-text("Donations"), h2:has-text("Donations")');
       await expect(header).toBeVisible({ timeout: 5000 });
@@ -21,7 +21,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should show donations list container', async ({ page }) => {
       await page.goto('/donations');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const donationsList = page.locator('[data-testid="donations-list"]');
       await expect(donationsList).toBeVisible({ timeout: 5000 });
@@ -29,7 +29,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should display donation tabs', async ({ page }) => {
       await page.goto('/donations');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for tabs or table structure in donations page
       const tabs = page.locator('[role="tablist"], .tabs, div:has(button[role="tab"]), [data-testid="donations-list"]');
@@ -39,7 +39,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should switch between donation tabs', async ({ page }) => {
       await page.goto('/donations');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const tabButtons = page.locator('button[role="tab"]');
       const tabCount = await tabButtons.count();
@@ -59,7 +59,7 @@ test.describe('Page Navigation and Content', () => {
   test.describe('Claim Page', () => {
     test('should navigate to claim page', async ({ page }) => {
       await page.goto('/claim');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const url = page.url();
       expect(url).toContain('/claim');
@@ -67,7 +67,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should display claim page header', async ({ page }) => {
       await page.goto('/claim');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const header = page.locator('h1:has-text("Claim"), h2:has-text("Claim")');
       await expect(header).toBeVisible({ timeout: 5000 });
@@ -75,7 +75,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should show sign in prompt when not connected', async ({ page }) => {
       await page.goto('/claim');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Should show either sign in button or claim form
       const signInButton = page.locator('main button:has-text("Sign In")');
@@ -92,7 +92,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should display description text', async ({ page }) => {
       await page.goto('/claim');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const description = page.locator('p:has-text("claim"), p:has-text("artist")');
       const hasDescription = await description.count() > 0;
@@ -103,7 +103,7 @@ test.describe('Page Navigation and Content', () => {
   test.describe('About Page', () => {
     test('should navigate to about page', async ({ page }) => {
       await page.goto('/about');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const url = page.url();
       expect(url).toContain('/about');
@@ -111,7 +111,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should display about page header', async ({ page }) => {
       await page.goto('/about');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const header = page.locator('h1:has-text("About"), h2:has-text("About")');
       await expect(header).toBeVisible({ timeout: 5000 });
@@ -119,15 +119,15 @@ test.describe('Page Navigation and Content', () => {
 
     test('should show how to use section', async ({ page }) => {
       await page.goto('/about');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
-      const howToSection = page.locator('h1:has-text("How to use Melodot"), h2:has-text("How to use Melodot")');
+      const howToSection = page.locator('h1:has-text("How to use Donalyze"), h2:has-text("How to use Donalyze")');
       await expect(howToSection).toBeVisible({ timeout: 5000 });
     });
 
     test('should display about content with key phrases', async ({ page }) => {
       await page.goto('/about');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for specific content from the About page
       const contentText = await page.textContent('main');
@@ -137,7 +137,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should show numbered steps in how to use section', async ({ page }) => {
       await page.goto('/about');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for numbered steps (1-5)
       const steps = page.locator('span:has-text("1"), span:has-text("2"), span:has-text("3"), span:has-text("4"), span:has-text("5")');
@@ -147,7 +147,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should display step descriptions', async ({ page }) => {
       await page.goto('/about');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const contentText = await page.textContent('main');
       expect(contentText).toContain('Log in');
@@ -161,7 +161,7 @@ test.describe('Page Navigation and Content', () => {
   test.describe('Statistics Page', () => {
     test('should navigate to statistics page', async ({ page }) => {
       await page.goto('/statistics');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const url = page.url();
       expect(url).toContain('/statistics');
@@ -169,7 +169,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should display statistics page header', async ({ page }) => {
       await page.goto('/statistics');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const header = page.locator('h1:has-text("Statistics"), h2:has-text("Statistics")');
       await expect(header).toBeVisible({ timeout: 5000 });
@@ -177,7 +177,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should show statistics dashboard component', async ({ page }) => {
       await page.goto('/statistics');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Dashboard should be present on statistics page
       const statsSection = page.locator('[class*="stat"], [data-testid*="stat"]');
@@ -187,7 +187,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should display page description', async ({ page }) => {
       await page.goto('/statistics');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const description = page.locator('p:has-text("Platform activity"), p:has-text("metrics")');
       const hasDescription = await description.count() > 0;
@@ -198,7 +198,7 @@ test.describe('Page Navigation and Content', () => {
   test.describe('Sidebar Navigation', () => {
     test('should have sidebar with navigation links', async ({ page }) => {
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for sidebar
       const sidebar = page.locator('[data-sidebar], aside, nav');
@@ -208,7 +208,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should have links to all main pages', async ({ page }) => {
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for links to main pages
       const discoverLink = page.locator('a[href="/"], a:has-text("Discover")');
@@ -229,7 +229,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should navigate via sidebar links', async ({ page }) => {
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Click on donations link
       const donationsLink = page.locator('a[href="/donations"]').first();
@@ -237,7 +237,7 @@ test.describe('Page Navigation and Content', () => {
 
       if (isVisible) {
         await donationsLink.click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         const url = page.url();
         expect(url).toContain('/donations');
@@ -249,7 +249,7 @@ test.describe('Page Navigation and Content', () => {
 
     test('should highlight active page in sidebar', async ({ page }) => {
       await page.goto('/donations');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Active link should have active state
       const activeLink = page.locator('[data-active="true"], a[aria-current="page"]');
@@ -265,7 +265,7 @@ test.describe('Page Navigation and Content', () => {
 
       for (const route of routes) {
         await page.goto(route);
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Each page should have a header
         const header = page.locator('header, [role="banner"]');
@@ -276,10 +276,10 @@ test.describe('Page Navigation and Content', () => {
 
     test('should have app logo in header', async ({ page }) => {
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for logo or app name
-      const logo = page.locator('svg[class*="logo"], img[alt*="logo"], span:has-text("Melodot")');
+      const logo = page.locator('svg[class*="logo"], img[alt*="logo"], span:has-text("Donalyze")');
       const hasLogo = await logo.count() > 0;
       expect(hasLogo).toBeTruthy();
     });

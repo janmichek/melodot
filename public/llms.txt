@@ -1,0 +1,37 @@
+# Donalyze
+
+> Hear a song, tip the artist directly on-chain. Donalyze records a short audio sample, identifies the track, and lets listeners send PAS tips to Spotify artists on Polkadot Hub TestNet.
+
+## What this app does
+- Records up to 15 seconds of audio in the browser.
+- Identifies the track through Shazam-compatible audio recognition.
+- Resolves Spotify artists and opens a multi-artist donation flow.
+- Sends donations through the Donate Solidity contract on Polkadot Hub TestNet (chain 420420417).
+- Lets artists claim an artist ID with a platform-signed EIP-712 authorisation and withdraw tips.
+
+## Main routes
+- / — discover a track and tip artists
+- /claim — artist claim and payout flow
+- /donations — on-chain donation history
+- /statistics — platform metrics
+- /about — product context
+
+## Public API
+- POST /api/discover — multipart audio file (audio/*, max 10 MB)
+- GET /api/artist?artistUrl= — Spotify artist lookup
+- GET /api/artists?ids= — up to 50 Spotify artist IDs
+- GET /api/track?uri= — Spotify track lookup
+- GET /api/verify?artistId=&claimant= — bio verification + EIP-712 claim authorisation
+- POST /api/rpc — read-only Polkadot Hub JSON-RPC proxy
+
+## Contract
+- Source: contracts/src/Donate.sol
+- Network: Polkadot Hub TestNet (420420417)
+- Currency: PAS
+- Explorer: https://blockscout-testnet.polkadot.io
+- Claims: EIP-712 signed, bound to artist ID, claimant, and deadline.
+
+## Agent notes
+- Prefer /api endpoints over scraping the UI.
+- Do not attempt to claim an artist ID without a valid EIP-712 signature from the platform signer.
+- Donations are irreversible on-chain.

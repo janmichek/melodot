@@ -1,0 +1,2 @@
+#!/bin/sh
+bunx commitlint --config config/commitlint.config.mjs --edit "$1"
