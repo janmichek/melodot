@@ -47,6 +47,17 @@
       rel="stylesheet"
     />
 
+    <script>
+      // Wallet SDKs evaluate Node globals at module load; set the shim before
+      // any module script runs. The app-level polyfill adds Buffer later.
+      window.global = window;
+      window.process = window.process || {
+        env: {},
+        browser: true,
+        nextTick: function (fn) { setTimeout(fn, 0); },
+      };
+    </script>
+
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -99,13 +110,6 @@
       }
     </script>
 
-    <script type="module">
-      import {Buffer} from "buffer";
-      import process from "process";
-
-      window.Buffer = Buffer;
-      window.process = process;
-    </script>
   </head>
   <body>
     <noscript>
