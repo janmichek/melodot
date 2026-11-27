@@ -60,9 +60,12 @@ jobs:
 
   e2e:
     runs-on: ubuntu-latest
+    env:
+      VITE_WEB3AUTH_CLIENT_ID: ${{ vars.VITE_WEB3AUTH_CLIENT_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
       - run: bunx playwright install --with-deps chromium
-      - run: PLAYWRIGHT_CPU_THROTTLE=85 bun run test:e2e
+      # CPU throttling is intentionally local-only; CI runs at full speed.
+      - run: bun run test:e2e
