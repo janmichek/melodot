@@ -121,7 +121,7 @@ test.describe('Page Navigation and Content', () => {
       await page.goto('/about');
       await page.waitForLoadState('networkidle');
 
-      const howToSection = page.locator('h1:has-text("How to use Melodot"), h2:has-text("How to use Melodot")');
+      const howToSection = page.locator('h1:has-text("How to use Donalyze"), h2:has-text("How to use Donalyze")');
       await expect(howToSection).toBeVisible({ timeout: 5000 });
     });
 
@@ -279,7 +279,7 @@ test.describe('Page Navigation and Content', () => {
       await page.waitForLoadState('networkidle');
 
       // Look for logo or app name
-      const logo = page.locator('svg[class*="logo"], img[alt*="logo"], span:has-text("Melodot")');
+      const logo = page.locator('svg[class*="logo"], img[alt*="logo"], span:has-text("Donalyze")');
       const hasLogo = await logo.count() > 0;
       expect(hasLogo).toBeTruthy();
     });

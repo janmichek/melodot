@@ -121,7 +121,7 @@ export function AppSidebar() {
               <Link to="/" className="flex items-center gap-3">
                 <Logo size="xl" className="!h-9 !w-9 text-sidebar-foreground" />
                 <span className="text-xl font-semibold">
-                  Melodot
+                  Donalyze
                 </span>
               </Link>
             </SidebarMenuButton>

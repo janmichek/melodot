@@ -18,7 +18,7 @@ export function Logo({size = "full", className, animated = false}: LogoProps) {
       className={cn(
         "text-[var(--primary-color)]",
         sizeClasses[size],
-        animated && "melodot-logo-animated",
+        animated && "donalyze-logo-animated",
         className
       )}>
       <circle
@@ -27,16 +27,16 @@ export function Logo({size = "full", className, animated = false}: LogoProps) {
         r="22"
         stroke="currentColor"
         strokeWidth="2"
-        className={animated ? "melodot-circle" : ""}/>
+        className={animated ? "donalyze-circle" : ""}/>
 
       {animated ? (
         <>
-          <line x1="12" y1="28" x2="16" y2="20" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="melodot-line melodot-line-1" />
-          <line x1="16" y1="20" x2="20" y2="26" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="melodot-line melodot-line-2" />
-          <line x1="20" y1="26" x2="24" y2="18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="melodot-line melodot-line-3" />
-          <line x1="24" y1="18" x2="28" y2="24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="melodot-line melodot-line-4" />
-          <line x1="28" y1="24" x2="32" y2="16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="melodot-line melodot-line-5" />
-          <line x1="32" y1="16" x2="36" y2="28" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="melodot-line melodot-line-6" />
+          <line x1="12" y1="28" x2="16" y2="20" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="donalyze-line donalyze-line-1" />
+          <line x1="16" y1="20" x2="20" y2="26" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="donalyze-line donalyze-line-2" />
+          <line x1="20" y1="26" x2="24" y2="18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="donalyze-line donalyze-line-3" />
+          <line x1="24" y1="18" x2="28" y2="24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="donalyze-line donalyze-line-4" />
+          <line x1="28" y1="24" x2="32" y2="16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="donalyze-line donalyze-line-5" />
+          <line x1="32" y1="16" x2="36" y2="28" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="donalyze-line donalyze-line-6" />
         </>
       ) : (
         <path
@@ -52,19 +52,19 @@ export function Logo({size = "full", className, animated = false}: LogoProps) {
         cy="28"
         r="2.5"
         fill="currentColor"
-        className={animated ? "melodot-dot melodot-dot-1" : ""}/>
+        className={animated ? "donalyze-dot donalyze-dot-1" : ""}/>
       <circle
         cx="24"
         cy="18"
         r="2.5"
         fill="currentColor"
-        className={animated ? "melodot-dot melodot-dot-2" : ""}/>
+        className={animated ? "donalyze-dot donalyze-dot-2" : ""}/>
       <circle
         cx="36"
         cy="28"
         r="2.5"
         fill="currentColor"
-        className={animated ? "melodot-dot melodot-dot-3" : ""}/>
+        className={animated ? "donalyze-dot donalyze-dot-3" : ""}/>
     </svg>
   )
 }

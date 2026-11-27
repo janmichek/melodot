@@ -421,69 +421,69 @@ code {
 
 
 
-/* Melodot Logo Animations */
-.melodot-logo-animated {
-	animation: melodot-pulse 2s ease-in-out infinite;
+/* Donalyze Logo Animations */
+.donalyze-logo-animated {
+	animation: donalyze-pulse 2s ease-in-out infinite;
 }
 
-.melodot-circle {
-	animation: melodot-circle-pulse 2s ease-in-out infinite;
+.donalyze-circle {
+	animation: donalyze-circle-pulse 2s ease-in-out infinite;
 }
 
 /* Waveform line animations - each line moves independently */
-.melodot-line {
+.donalyze-line {
 	transform-box: fill-box;
-	animation: melodot-wave-move 1.2s ease-in-out infinite;
+	animation: donalyze-wave-move 1.2s ease-in-out infinite;
 }
 
 /* Set transform origin to midpoint of each line for proper rotation */
-.melodot-line-1 {
+.donalyze-line-1 {
 	animation-delay: 0s;
 	transform-origin: 14px 24px;
 }
 
-.melodot-line-2 {
+.donalyze-line-2 {
 	animation-delay: 0.15s;
 	transform-origin: 18px 23px;
 }
 
-.melodot-line-3 {
+.donalyze-line-3 {
 	animation-delay: 0.3s;
 	transform-origin: 22px 22px;
 }
 
-.melodot-line-4 {
+.donalyze-line-4 {
 	animation-delay: 0.45s;
 	transform-origin: 26px 21px;
 }
 
-.melodot-line-5 {
+.donalyze-line-5 {
 	animation-delay: 0.6s;
 	transform-origin: 30px 20px;
 }
 
-.melodot-line-6 {
+.donalyze-line-6 {
 	animation-delay: 0.75s;
 	transform-origin: 34px 22px;
 }
 
-.melodot-dot {
-	animation: melodot-dot-pulse 1.5s ease-in-out infinite;
+.donalyze-dot {
+	animation: donalyze-dot-pulse 1.5s ease-in-out infinite;
 }
 
-.melodot-dot-1 {
+.donalyze-dot-1 {
 	animation-delay: 0s;
 }
 
-.melodot-dot-2 {
+.donalyze-dot-2 {
 	animation-delay: 0.3s;
 }
 
-.melodot-dot-3 {
+.donalyze-dot-3 {
 	animation-delay: 0.6s;
 }
 
-@keyframes melodot-pulse {
+@keyframes donalyze-pulse {
 	0%, 25% {
 		opacity: 1;
 		transform: scale(1);
@@ -498,7 +498,7 @@ code {
 	}
 }
 
-@keyframes melodot-circle-pulse {
+@keyframes donalyze-circle-pulse {
 	0%, 25% {
 		stroke-opacity: 1;
 	}
@@ -511,7 +511,7 @@ code {
 }
 
 /* Wave animation - makes lines move up and down like a sound wave */
-@keyframes melodot-wave-move {
+@keyframes donalyze-wave-move {
 	0%, 25% {
 		transform: translateY(0);
 		opacity: 1;
@@ -542,7 +542,7 @@ code {
 	}
 }
 
-@keyframes melodot-dot-pulse {
+@keyframes donalyze-dot-pulse {
 	0%, 25% {
 		opacity: 1;
 		transform: scale(1);

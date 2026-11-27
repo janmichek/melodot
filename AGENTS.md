@@ -1,10 +1,10 @@
-# Melodot Development Guide
+# Donalyze Development Guide
 
-_Comprehensive instructions for AI agents helping develop Melodot_
+_Comprehensive instructions for AI agents helping develop Donalyze_
 
 ## Project Overview
 
-**Melodot** is a decentralized music discovery and tipping platform that:
+**Donalyze** is a decentralized music discovery and tipping platform that:
 - Records audio using Web Audio API
 - Identifies songs through audio recognition
 - Enables direct artist tipping via smart contracts on Polkadot

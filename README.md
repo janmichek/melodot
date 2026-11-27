@@ -1,6 +1,6 @@
-# Melodot
+# Donalyze
 
-Melodot is a decentralized music discovery and donation platform. 
+Donalyze is a decentralized music discovery and donation platform. 
 Record live audio, identify tracks in real time, and tip artists directly on Polkadot’s Paseo Asset Hub.
 
 ## Table of Contents
@@ -46,8 +46,8 @@ Record live audio, identify tracks in real time, and tip artists directly on Pol
 ### Installation
 
 ```bash
-git clone https://github.com/janmichek/melodot.git
-cd melodot
+git clone https://github.com/janmichek/melodot.git donalyze
+cd donalyze
 bun install
 ```
 
@@ -91,6 +91,6 @@ bun run deploy-contract  # Deploy to Paseo + generate types
 
 ## Deployment
 
-- dapp is deployed on https://melodot.vercel.app/
+- dapp is deployed on https://donalyze.vercel.app/
 - **Frontend + API**: Integrate github repo to Vercel integrattion. Push to main branch will trugger deployment
 

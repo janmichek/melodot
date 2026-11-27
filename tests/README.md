@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains end-to-end tests for Melodot using Playwright. The tests are organized to cover wallet connection, audio recording, donations, and complete user flows.
+This directory contains end-to-end tests for Donalyze using Playwright. The tests are organized to cover wallet connection, audio recording, donations, and complete user flows.
 
 ## Test Structure
 
@@ -53,7 +53,7 @@ bunx playwright test --debug
 
 ### Current Limitation
 
-Melodot uses Web3Auth Modal with React hooks which is tightly integrated with the Web3Auth SDK. Fully mocking this in e2e tests is complex because:
+Donalyze uses Web3Auth Modal with React hooks which is tightly integrated with the Web3Auth SDK. Fully mocking this in e2e tests is complex because:
 
 1. Web3Auth requires initialization and authentication flow
 2. It manages wallet state through its own provider

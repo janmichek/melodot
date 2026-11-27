@@ -16,11 +16,11 @@ export function About() {
           <span className="font-semibold">What if you could reward artists instantly?</span>
         </p>
         <p className="text-base text-muted-foreground leading-relaxed">
-          That's Melodot. Discover song by audio recognition and tip the artist <span className="text-foreground font-medium">directly and instantly</span>. Just pure appreciation, delivered the moment you feel it.
+          That's Donalyze. Discover song by audio recognition and tip the artist <span className="text-foreground font-medium">directly and instantly</span>. Just pure appreciation, delivered the moment you feel it.
         </p>
       </div>
 
-      <PageHeader title="How to use Melodot" className="mt-8"/>
+      <PageHeader title="How to use Donalyze" className="mt-8"/>
 
       <div className="lg:max-w-1/2 space-y-3">
         <div className="flex gap-3">
@@ -49,7 +49,7 @@ export function About() {
           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-neutral-200 text-xs font-semibold dark:bg-neutral-700">3</span>
           <p className="text-sm text-muted-foreground">
             <span className="font-medium text-foreground">Discover</span>
-            — Record song you hear. Melodot recognizes the artist.
+            — Record song you hear. Donalyze recognizes the artist.
           </p>
         </div>
         <div className="flex gap-3">
