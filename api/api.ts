@@ -127,7 +127,7 @@ export async function fetchDiscovery(fileBuffer: Buffer): Promise<DiscoveryResul
         'X-RapidAPI-Key': getRapidApiKey(),
         'X-RapidAPI-Host': 'shazam-song-recognition-api.p.rapidapi.com',
       },
-      body: fileBuffer,
+      body: new Uint8Array(fileBuffer),
     }
   )
 }
